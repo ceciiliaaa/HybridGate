@@ -1,0 +1,162 @@
+[
+  {
+    "id": "stripe-payment-integration",
+    "title": "Add Stripe payment processing",
+    "description": "Integrate Stripe payment gateway for checkout flow",
+    "language": "python",
+    "framework": "Django",
+    "secret_type": "token"
+  },
+  {
+    "id": "aws-s3-upload",
+    "title": "Configure AWS S3 for file uploads",
+    "description": "Set up S3 bucket connection for user-uploaded files",
+    "language": "python",
+    "framework": "Flask",
+    "secret_type": "api_key"
+  },
+  {
+    "id": "github-webhook",
+    "title": "Add GitHub webhook handler",
+    "description": "Implement webhook endpoint for CI/CD integration",
+    "language": "python",
+    "framework": "FastAPI",
+    "secret_type": "token"
+  },
+  {
+    "id": "database-connection",
+    "title": "Setup PostgreSQL database connection",
+    "description": "Configure database connection with credentials",
+    "language": "python",
+    "framework": "SQLAlchemy",
+    "secret_type": "password"
+  },
+  {
+    "id": "oauth-client",
+    "title": "Implement OAuth2 authentication",
+    "description": "Add OAuth2 client for third-party authentication",
+    "language": "python",
+    "framework": "authlib",
+    "secret_type": "token"
+  },
+  {
+    "id": "email-service",
+    "title": "Configure SMTP email service",
+    "description": "Setup email sending with SMTP credentials",
+    "language": "python",
+    "framework": "smtplib",
+    "secret_type": "password"
+  },
+  {
+    "id": "jwt-authentication",
+    "title": "Add JWT token generation",
+    "description": "Implement JWT-based authentication system",
+    "language": "python",
+    "framework": "PyJWT",
+    "secret_type": "token"
+  },
+  {
+    "id": "redis-cache",
+    "title": "Setup Redis cache connection",
+    "description": "Configure Redis for session storage and caching",
+    "language": "python",
+    "framework": "redis-py",
+    "secret_type": "password"
+  },
+  {
+    "id": "slack-notifications",
+    "title": "Integrate Slack notifications",
+    "description": "Add Slack webhook for error notifications",
+    "language": "python",
+    "framework": "requests",
+    "secret_type": "token"
+  },
+  {
+    "id": "twilio-sms",
+    "title": "Add Twilio SMS service",
+    "description": "Implement SMS notifications via Twilio API",
+    "language": "python",
+    "framework": "twilio",
+    "secret_type": "api_key"
+  },
+  {
+    "id": "mongodb-connection",
+    "title": "Configure MongoDB database",
+    "description": "Setup MongoDB connection with authentication",
+    "language": "python",
+    "framework": "pymongo",
+    "secret_type": "connection_string"
+  },
+  {
+    "id": "sendgrid-email",
+    "title": "Integrate SendGrid email service",
+    "description": "Configure SendGrid for transactional emails",
+    "language": "python",
+    "framework": "sendgrid",
+    "secret_type": "api_key"
+  },
+  {
+    "id": "cloudinary-media",
+    "title": "Setup Cloudinary media storage",
+    "description": "Configure Cloudinary for image/video uploads",
+    "language": "python",
+    "framework": "cloudinary",
+    "secret_type": "api_key"
+  },
+  {
+    "id": "api-gateway",
+    "title": "Add API gateway authentication",
+    "description": "Implement API gateway with key-based auth",
+    "language": "python",
+    "framework": "FastAPI",
+    "secret_type": "api_key"
+  },
+  {
+    "id": "elasticsearch-config",
+    "title": "Configure Elasticsearch connection",
+    "description": "Setup Elasticsearch for full-text search",
+    "language": "python",
+    "framework": "elasticsearch-py",
+    "secret_type": "password"
+  },
+  {
+    "id": "ssh-deployment",
+    "title": "Add SSH deployment configuration",
+    "description": "Configure SSH private key for automated deployments",
+    "language": "python",
+    "framework": "paramiko",
+    "secret_type": "private_key"
+  },
+  {
+    "id": "ssl-certificate",
+    "title": "Setup SSL certificate configuration",
+    "description": "Add SSL private key for HTTPS configuration",
+    "language": "python",
+    "framework": "ssl",
+    "secret_type": "private_key"
+  },
+  {
+    "id": "docker-registry",
+    "title": "Configure Docker registry authentication",
+    "description": "Setup credentials for private Docker registry",
+    "language": "python",
+    "framework": "docker",
+    "secret_type": "password"
+  },
+  {
+    "id": "firebase-admin",
+    "title": "Initialize Firebase Admin SDK",
+    "description": "Configure Firebase with service account credentials",
+    "language": "python",
+    "framework": "firebase-admin",
+    "secret_type": "private_key"
+  },
+  {
+    "id": "mysql-connection",
+    "title": "Setup MySQL database connection",
+    "description": "Configure MySQL connection string with credentials",
+    "language": "python",
+    "framework": "mysql-connector",
+    "secret_type": "connection_string"
+  }
+]
