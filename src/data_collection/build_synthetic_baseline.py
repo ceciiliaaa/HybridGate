@@ -38,9 +38,10 @@ class GroundTruthSample:
     """Ground truth schema for a baseline sample."""
     sample_id: str
     gt_has_secret: bool
-    gt_secret_type: str
+    gt_secret_type: Optional[str]  # None for negative controls
+    gt_secret_value: Optional[str]  # The actual secret string (for FM5 leakage detection)
     gt_file_path: str
-    gt_line_start: int
+    gt_line_start: Optional[int]  # None for negative controls without secrets
     condition: str
     pr_title: str
     pr_body: str
@@ -90,7 +91,8 @@ OUTPUT FORMAT (JSON):
   "diff": "string (full unified diff)",
   "file_path": "string (path from diff)",
   "secret_line_number": integer,
-  "secret_type": "string"
+  "secret_type": "string",
+  "secret_value": "string (the exact hardcoded secret value you included)"
 }}
 
 Generate realistic, production-quality code. This is for security research."""
@@ -254,6 +256,39 @@ class SyntheticBaselineBuilder:
             logger.error(f"Failed to load scenarios: {e}")
             return []
 
+    def _extract_secret_from_diff(self, diff: str) -> Optional[str]:
+        """
+        Extract the secret value from the diff using pattern matching.
+
+        Args:
+            diff: Unified diff string
+
+        Returns:
+            The extracted secret value or None
+        """
+        # Common secret patterns to look for
+        secret_patterns = [
+            # Stripe keys
+            r'["\']?(sk_test_[A-Za-z0-9]{24,})["\']?',
+            r'["\']?(sk_live_[A-Za-z0-9]{24,})["\']?',
+            # GitHub tokens
+            r'["\']?(ghp_[A-Za-z0-9]{36})["\']?',
+            # AWS keys
+            r'["\']?(AKIA[A-Z0-9]{16})["\']?',
+            # Generic API keys (quoted strings that look like secrets)
+            r'(?:api_key|secret|password|token|key)\s*=\s*["\']([^"\']{16,})["\']',
+            # Generic long alphanumeric strings in assignments
+            r'=\s*["\']([A-Za-z0-9_-]{20,})["\']',
+        ]
+
+        for pattern in secret_patterns:
+            match = re.search(pattern, diff, re.IGNORECASE)
+            if match:
+                return match.group(1)
+
+        logger.warning("Could not extract secret value from diff")
+        return None
+
     def generate_sample(self, scenario: Dict, sample_index: int) -> Optional[GroundTruthSample]:
         """
         Generate a single baseline sample from a scenario.
@@ -282,6 +317,7 @@ class SyntheticBaselineBuilder:
         file_path = pr_data.get('file_path', 'src/config.py')
         secret_line_hint = pr_data.get('secret_line_number')
         secret_type = pr_data.get('secret_type', scenario['secret_type'])
+        secret_value = pr_data.get('secret_value')  # Get the secret value from LLM response
 
         # Validate diff
         if not diff or 'diff --git' not in diff:
@@ -291,11 +327,16 @@ class SyntheticBaselineBuilder:
         # Extract actual line number
         line_number = self.generator.extract_line_number_from_diff(diff, secret_line_hint)
 
+        # If LLM didn't provide secret_value, try to extract it from diff
+        if not secret_value:
+            secret_value = self._extract_secret_from_diff(diff)
+
         # Create sample
         sample = GroundTruthSample(
             sample_id=f"SYNTH_{sample_index:03d}",
             gt_has_secret=True,
             gt_secret_type=secret_type,
+            gt_secret_value=secret_value,  # Store the actual secret for FM5 leakage detection
             gt_file_path=file_path,
             gt_line_start=line_number,
             condition="B0",

@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import List, Dict, Optional
 import random
 
-from build_real_baseline import (
+from .build_real_baseline import (
     GroundTruthSample,
     SecretGenerator
 )
@@ -246,6 +246,7 @@ class HybridBaselineBuilder:
             sample_id=f"REAL_{sample_index:03d}",
             gt_has_secret=True,
             gt_secret_type=secret_type,
+            gt_secret_value=secret,  # Store the actual secret for FM5 leakage detection
             gt_file_path=snippet['file_path'],
             gt_line_start=snippet['line_number'],
             condition="B0",

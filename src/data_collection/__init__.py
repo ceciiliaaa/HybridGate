@@ -5,6 +5,7 @@ from .github_pr_collector import GitHubPRCollector
 from .inject_secrets_llm import SecretInjector, RealBaselineBuilder
 from .build_synthetic_baseline import LLMSyntheticGenerator, SyntheticBaselineBuilder
 from .hybrid_baseline_builder import HybridBaselineBuilder
+from .negative_control_builder import NegativeControlBuilder
 
 __all__ = [
     'BaselineBuilder',
@@ -16,4 +17,5 @@ __all__ = [
     'LLMSyntheticGenerator',
     'SyntheticBaselineBuilder',
     'HybridBaselineBuilder',
+    'NegativeControlBuilder',
 ]
