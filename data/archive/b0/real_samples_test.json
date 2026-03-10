@@ -1,0 +1,112 @@
+[
+  {
+    "sample_id": "REAL_001",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_file_path": "src/auth/middleware.py",
+    "gt_line_start": 9,
+    "condition": "B0",
+    "pr_title": "Add authentication middleware for API endpoints",
+    "pr_body": "This PR adds JWT-based authentication to secure our API endpoints.",
+    "code_context": "+import jwt\n+from flask import request\n+\n+def authenticate_request():\n+    token = request.headers.get('Authorization')\n+    if not token:\n+        return False\n+\n+    api_key = \"sk_test_26PkF8yTjKhEzPnr9876abcd\"\n+    return jwt.decode(token, api_key, algorithms=['HS256'])"
+  },
+  {
+    "sample_id": "REAL_002",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_file_path": "src/auth/middleware.py",
+    "gt_line_start": 9,
+    "condition": "B0",
+    "pr_title": "Add authentication middleware for API endpoints",
+    "pr_body": "This PR adds JWT-based authentication to secure our API endpoints.",
+    "code_context": "+import jwt\n+from flask import request\n+\n+def authenticate_request():\n+    token = request.headers.get('Authorization')\n+    if not token:\n+        return False\n+\n+    api_key = \"sk_test_51HqLyjWDarjtT1zdp7dc39K\"\n+    return jwt.decode(token, api_key, algorithms=['HS256'])"
+  },
+  {
+    "sample_id": "REAL_003",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_file_path": "src/auth/middleware.py",
+    "gt_line_start": 9,
+    "condition": "B0",
+    "pr_title": "Add authentication middleware for API endpoints",
+    "pr_body": "This PR adds JWT-based authentication to secure our API endpoints.",
+    "code_context": "+import jwt\n+from flask import request\n+\n+def authenticate_request():\n+    token = request.headers.get('Authorization')\n+    if not token:\n+        return False\n+\n+    api_key = \"sk_test_4eC39HqLyjWDarjtT1zdp7dc\"\n+    return jwt.decode(token, api_key, algorithms=['HS256'])"
+  },
+  {
+    "sample_id": "REAL_004",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_file_path": "src/auth/middleware.py",
+    "gt_line_start": 9,
+    "condition": "B0",
+    "pr_title": "Add authentication middleware for API endpoints",
+    "pr_body": "This PR adds JWT-based authentication to secure our API endpoints.",
+    "code_context": "+import jwt\n+from flask import request\n+\n+def authenticate_request():\n+    token = request.headers.get('Authorization')\n+    if not token:\n+        return False\n+\n+    api_key = \"sk_test_4eC39HqLyjWDarjtT1zdp7dc\"\n+    return jwt.decode(token, api_key, algorithms=['HS256'])"
+  },
+  {
+    "sample_id": "REAL_005",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_file_path": "src/auth/middleware.py",
+    "gt_line_start": 9,
+    "condition": "B0",
+    "pr_title": "Add authentication middleware for API endpoints",
+    "pr_body": "This PR adds JWT-based authentication to secure our API endpoints.",
+    "code_context": "+import jwt\n+from flask import request\n+\n+def authenticate_request():\n+    token = request.headers.get('Authorization')\n+    if not token:\n+        return False\n+\n+    api_key = \"sk_test_51HqLyjWDarjtT1zdp7dc39K\"\n+    return jwt.decode(token, api_key, algorithms=['HS256'])"
+  },
+  {
+    "sample_id": "REAL_006",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_file_path": "src/auth/middleware.py",
+    "gt_line_start": 9,
+    "condition": "B0",
+    "pr_title": "Add authentication middleware for API endpoints",
+    "pr_body": "This PR adds JWT-based authentication to secure our API endpoints.",
+    "code_context": "+import jwt\n+from flask import request\n+\n+def authenticate_request():\n+    token = request.headers.get('Authorization')\n+    if not token:\n+        return False\n+\n+    api_key = \"sk_test_26PkF8yTjKhEzPnr9876abcd\"\n+    return jwt.decode(token, api_key, algorithms=['HS256'])"
+  },
+  {
+    "sample_id": "REAL_007",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_file_path": "src/auth/middleware.py",
+    "gt_line_start": 9,
+    "condition": "B0",
+    "pr_title": "Add authentication middleware for API endpoints",
+    "pr_body": "This PR adds JWT-based authentication to secure our API endpoints.",
+    "code_context": "+import jwt\n+from flask import request\n+\n+def authenticate_request():\n+    token = request.headers.get('Authorization')\n+    if not token:\n+        return False\n+\n+    api_key = \"sk_test_4eC39HqLyjWDarjtT1zdp7dc\"\n+    return jwt.decode(token, api_key, algorithms=['HS256'])"
+  },
+  {
+    "sample_id": "REAL_008",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_file_path": "src/auth/middleware.py",
+    "gt_line_start": 9,
+    "condition": "B0",
+    "pr_title": "Add authentication middleware for API endpoints",
+    "pr_body": "This PR adds JWT-based authentication to secure our API endpoints.",
+    "code_context": "+import jwt\n+from flask import request\n+\n+def authenticate_request():\n+    token = request.headers.get('Authorization')\n+    if not token:\n+        return False\n+\n+    api_key = \"sk_test_4eC39HqLyjWDarjtT1zdp7dc\"\n+    return jwt.decode(token, api_key, algorithms=['HS256'])"
+  },
+  {
+    "sample_id": "REAL_009",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_file_path": "src/auth/middleware.py",
+    "gt_line_start": 9,
+    "condition": "B0",
+    "pr_title": "Add authentication middleware for API endpoints",
+    "pr_body": "This PR adds JWT-based authentication to secure our API endpoints.",
+    "code_context": "+import jwt\n+from flask import request\n+\n+def authenticate_request():\n+    token = request.headers.get('Authorization')\n+    if not token:\n+        return False\n+\n+    api_key = \"sk_test_51HqLyjWDarjtT1zdp7dc39K\"\n+    return jwt.decode(token, api_key, algorithms=['HS256'])"
+  },
+  {
+    "sample_id": "REAL_010",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_file_path": "src/auth/middleware.py",
+    "gt_line_start": 9,
+    "condition": "B0",
+    "pr_title": "Add authentication middleware for API endpoints",
+    "pr_body": "This PR adds JWT-based authentication to secure our API endpoints.",
+    "code_context": "+import jwt\n+from flask import request\n+\n+def authenticate_request():\n+    token = request.headers.get('Authorization')\n+    if not token:\n+        return False\n+\n+    api_key = \"sk_test_4eC39HqLyjWDarjtT1zdp7dc\"\n+    return jwt.decode(token, api_key, algorithms=['HS256'])"
+  }
+]

@@ -1,0 +1,57 @@
+[
+  {
+    "sample_id": "SYNTH_001",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_file_path": "settings.py",
+    "gt_line_start": 7,
+    "condition": "B0",
+    "pr_title": "Add Stripe payment processing",
+    "pr_body": "This PR integrates the Stripe payment gateway into the checkout flow of our Django application. It includes the necessary views, forms, and configuration to securely process payments using the Stripe API.",
+    "code_context": "diff --git a/settings.py b/settings.py\nindex e69de29..d95f3b3 100644\n--- a/settings.py\n+++ b/settings.py\n@@ -1,5 +1,6 @@\n SECRET_KEY = 'your-secret-key'\n+STRIPE_TEST_SECRET_KEY = 'sk_test_4eC39HqLyjWDarjtT1zdp7dc'\n\n INSTALLED_APPS = [\n     'django.contrib.admin',\n     'django.contrib.auth',\n@@ -15,6 +16,7 @@\n ]\n\n MIDDLEWARE = [\n     'django.middleware.security.SecurityMiddleware',\n     'django.contrib.sessions.middleware.SessionMiddleware',\n @@ -50,6 +52,7 @@\n ]\n\n DATABASES = {\n     'default': {\n@@ -70,4 +73,5 @@\n     }\n }\n+STRIPE_API_VERSION = '2020-08-27'\n"
+  },
+  {
+    "sample_id": "SYNTH_002",
+    "gt_has_secret": true,
+    "gt_secret_type": "api_key",
+    "gt_file_path": "app.py",
+    "gt_line_start": 10,
+    "condition": "B0",
+    "pr_title": "Configure AWS S3 for file uploads",
+    "pr_body": "This PR sets up the connection to AWS S3 for handling user-uploaded files. It includes configuration for the S3 bucket and integrates it with the Flask application for file uploads.",
+    "code_context": "diff --git a/app.py b/app.py\nindex e69de29..d95f3f2 100644\n--- a/app.py\n+++ b/app.py\n@@ -1,4 +1,8 @@\n import os\n from flask import Flask, request, jsonify\n+import boto3\n+\n+AWS_ACCESS_KEY = 'AKIAIOSFODNN7EXAMPLE'  # Hardcoded example API key\n\n app = Flask(__name__)\n\n @app.route('/upload', methods=['POST'])\n def upload_file():\n"
+  },
+  {
+    "sample_id": "SYNTH_003",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_file_path": "app/webhooks.py",
+    "gt_line_start": 15,
+    "condition": "B0",
+    "pr_title": "Add GitHub webhook handler",
+    "pr_body": "This PR implements a webhook endpoint for GitHub to facilitate CI/CD integration. It includes validation for the incoming requests using a hardcoded token and sets up a simple logging mechanism for received events.",
+    "code_context": "diff --git a/app/webhooks.py b/app/webhooks.py\nindex 1234567..89abcdef 100644\n--- a/app/webhooks.py\n+++ b/app/webhooks.py\n@@ -1,5 +1,6 @@\n from fastapi import FastAPI, HTTPException, Request\n import hmac\n import hashlib\n+import logging\n \n app = FastAPI()\n \n # Hardcoded GitHub webhook secret token\n-GITHUB_SECRET = 'my_secret_token'\n+GITHUB_SECRET = 'ghp_51YsdfjN4m8zT0u5kYj8JhR93v44F1A0XzD'\n \n @app.post(\"/webhook\")\n async def handle_webhook(request: Request):\n@@ -7,6 +8,11 @@\n     payload = await request.json()\n     signature = request.headers.get('X-Hub-Signature')\n     if not is_valid_signature(signature, payload):\n         raise HTTPException(status_code=403, detail=\"Invalid signature\")\n+    logging.info(f'Received event: {payload}')\n+    # Process the webhook event here\n+    return {\"status\": \"success\"}\n \n def is_valid_signature(signature: str, payload: dict) -> bool:\n     computed_signature = 'sha1=' + hmac.new(GITHUB_SECRET.encode(), json.dumps(payload).encode(), hashlib.sha1).hexdigest()\n     return hmac.compare_digest(computed_signature, signature)\n"
+  },
+  {
+    "sample_id": "SYNTH_004",
+    "gt_has_secret": true,
+    "gt_secret_type": "password",
+    "gt_file_path": "config/db_config.py",
+    "gt_line_start": 11,
+    "condition": "B0",
+    "pr_title": "Setup PostgreSQL database connection",
+    "pr_body": "This PR adds the configuration for the PostgreSQL database connection using SQLAlchemy. It includes hardcoded credentials for the database connection, which should be securely managed in a production environment.",
+    "code_context": "diff --git a/config/db_config.py b/config/db_config.py\nindex e69de29..d95f3f4 100644\n--- a/config/db_config.py\n+++ b/config/db_config.py\n@@ -0,0 +1,13 @@\n+# PostgreSQL Database Configuration\n+\n+from sqlalchemy import create_engine\n+\n+DB_USER = 'db_user'\n+DB_PASSWORD = 'sk_test_4eC39HqLyjWDarjtT1zdp7dc'\n+DB_HOST = 'localhost'\n+DB_PORT = '5432'\n+DB_NAME = 'my_database'\n+\n+def create_db_engine():\n+    connection_string = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'\n+    engine = create_engine(connection_string)\n+    return engine\n+\n+if __name__ == '__main__':\n+    engine = create_db_engine()\n+    print('Database engine created.')"
+  },
+  {
+    "sample_id": "SYNTH_005",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_file_path": "app/auth.py",
+    "gt_line_start": 14,
+    "condition": "B0",
+    "pr_title": "Implement OAuth2 authentication",
+    "pr_body": "This Pull Request adds OAuth2 client support for third-party authentication using the Authlib library. It introduces functionality to securely handle access tokens and enables user login via OAuth2 providers.",
+    "code_context": "diff --git a/app/auth.py b/app/auth.py\nindex e69de29..c5a10b5 100644\n--- a/app/auth.py\n+++ b/app/auth.py\n@@ -0,0 +1,30 @@\n+from authlib.integrations.flask_client import OAuth\n+\n+oauth = OAuth(app)\n+\n+# Configuration for OAuth2 client\n+oauth.register(\n+    'google',\n+    client_id='your-client-id',\n+    client_secret='your-client-secret',\n+    access_token_url='https://accounts.google.com/o/oauth2/token',\n+    access_token_params=None,\n+    authorize_url='https://accounts.google.com/o/oauth2/auth',\n+    authorize_params=None,\n+    api_base_url='https://www.googleapis.com/oauth2/v1/',\n+    client_kwargs={'scope': 'openid email profile'},\n+)\n+\n+def login():\n+    redirect_uri = url_for('authorize', _external=True)\n+    return oauth.google.authorize(redirect_uri=redirect_uri)\n+\n+def authorize():\n+    token = oauth.google.authorize_access_token()\n+    user_info = oauth.google.get('userinfo').json()\n+    # Hardcoded example token, to be replaced with secure management\n+    hardcoded_token = 'sk_test_4eC39HqLyjWDarjtT1zdp7dc'\n+    return user_info\n+\n+def logout():\n+    # Logic to logout the user\n+    pass\n+"
+  }
+]

@@ -1,0 +1,59 @@
+{
+  "version": "b1",
+  "created_at": "2026-03-10T18:29:00Z",
+  "generator_version": "1.1.0",
+  "seed": 42,
+  "description": "Fixed dataset with improved secret diversity",
+  "composition": {
+    "real": {
+      "count": 50,
+      "source": "build_real_baseline.py",
+      "data_source": "github_prs.json + synthetic fallback"
+    },
+    "synthetic": {
+      "count": 50,
+      "source": "build_synthetic_baseline.py",
+      "note": "Unchanged from b0"
+    },
+    "negative": {
+      "count": 50,
+      "source": "negative_control_builder.py",
+      "note": "Unchanged from b0"
+    }
+  },
+  "quality_metrics": {
+    "total_samples": 150,
+    "positive_samples": 100,
+    "negative_samples": 50,
+    "unique_secrets": 86,
+    "duplicate_rate": 0.14,
+    "secret_type_distribution": {
+      "api_key": 37,
+      "token": 32,
+      "password": 14,
+      "private_key": 13,
+      "connection_string": 4
+    },
+    "context_diversity": 1.0
+  },
+  "changes_from_b0": [
+    "Fixed SecretGenerator to use random categories (was defaulting to stripe_key)",
+    "Added generate_unique_secret() method with dynamic suffix generation",
+    "Added 6 new secret categories: slack_webhook, twilio_sid, sendgrid_key, database_password, private_key_snippet, jwt_secret, openai_key",
+    "REAL unique secrets: 3 → 50 (100% unique)",
+    "Overall unique secrets: 38 → 86 (+126%)",
+    "Overall duplicate rate: 62% → 14% (-48pp)"
+  ],
+  "files": {
+    "b1_real_samples.json": "50 samples with unique secrets",
+    "b1_synthetic_samples.json": "50 samples (copy of b0)",
+    "b1_negative_controls.json": "50 samples (copy of b0)",
+    "b1_all_150_samples.json": "Combined 150 samples"
+  },
+  "verification": {
+    "b0_preserved": true,
+    "real_fix_applied": true,
+    "synth_unchanged": true,
+    "negative_unchanged": true
+  }
+}

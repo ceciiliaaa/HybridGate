@@ -278,9 +278,9 @@ class LLMClient(ABC):
 
 
 class OpenAIClient(LLMClient):
-    """OpenAI GPT-4o client."""
+    """OpenAI GPT-5 mini client."""
 
-    def __init__(self, model: str = "gpt-4o", api_key: Optional[str] = None):
+    def __init__(self, model: str = "gpt-5-mini", api_key: Optional[str] = None):
         import openai
 
         self.model = model
@@ -300,17 +300,17 @@ class OpenAIClient(LLMClient):
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
-            temperature=0.0,
+            # Note: GPT-5-mini only supports temperature=1.0 (default)
             response_format={"type": "json_object"},
-            max_tokens=1024,
+            max_completion_tokens=1024,
         )
         return response.choices[0].message.content
 
 
 class AnthropicClient(LLMClient):
-    """Anthropic Claude 3.5 Sonnet client."""
+    """Anthropic Claude Opus 4.6 client."""
 
-    def __init__(self, model: str = "claude-3-5-sonnet-latest", api_key: Optional[str] = None):
+    def __init__(self, model: str = "claude-opus-4-6-20260205", api_key: Optional[str] = None):
         import anthropic
 
         self.model = model
@@ -513,7 +513,7 @@ def main() -> None:
         type=str,
         required=True,
         choices=["openai", "anthropic"],
-        help="LLM provider to use: 'openai' (gpt-4o) or 'anthropic' (claude-3-5-sonnet)",
+        help="LLM provider to use: 'openai' (gpt-5-mini) or 'anthropic' (claude-opus-4-6)",
     )
     parser.add_argument(
         "--input",

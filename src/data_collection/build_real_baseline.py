@@ -34,9 +34,10 @@ class GroundTruthSample:
     """Ground truth schema for a single baseline sample."""
     sample_id: str
     gt_has_secret: bool
-    gt_secret_type: str
+    gt_secret_type: Optional[str]  # None for negative controls
+    gt_secret_value: Optional[str]  # The actual secret string (for FM5 leakage detection)
     gt_file_path: str
-    gt_line_start: int
+    gt_line_start: Optional[int]  # None for negative controls without secrets
     condition: str
     pr_title: str
     pr_body: str
@@ -343,6 +344,62 @@ class SecretGenerator:
                 'ak_live_abcdefghijklmnop1234567890',
                 'key_test_9876543210zyxwvu'
             ]
+        },
+        'slack_webhook': {
+            'type': 'token',
+            'examples': [
+                'https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX',
+                'https://hooks.slack.com/services/T12345678/B87654321/abcdefghijklmnopqrstuvwx',
+                'https://hooks.slack.com/services/TABC12345/BDEF67890/1234567890abcdefghijklmn'
+            ]
+        },
+        'twilio_sid': {
+            'type': 'api_key',
+            'examples': [
+                'AC00000000000000000000000000000000',
+                'AC12345678901234567890123456789012',
+                'ACabcdef12345678901234567890abcdef'
+            ]
+        },
+        'sendgrid_key': {
+            'type': 'api_key',
+            'examples': [
+                'SG.XXXXXXXXXXXXXXXXXXXX.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+                'SG.abcdefghijklmnopqrst.uvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUV',
+                'SG.1234567890abcdefghij.klmnopqrstuvwxyz0123456789ABCDEFGHIJK'
+            ]
+        },
+        'database_password': {
+            'type': 'password',
+            'examples': [
+                'P@ssw0rd!Secure123',
+                'MyDbP@ss#2024Prod',
+                'Admin$ecret!456'
+            ]
+        },
+        'private_key_snippet': {
+            'type': 'private_key',
+            'examples': [
+                '-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA2mKqH...',
+                '-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w...',
+                '-----BEGIN EC PRIVATE KEY-----\nMHQCAQEEIBYr...'
+            ]
+        },
+        'jwt_secret': {
+            'type': 'token',
+            'examples': [
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w',
+                'super_secret_jwt_signing_key_2024',
+                'jwt_signing_secret_DO_NOT_SHARE_xyz123'
+            ]
+        },
+        'openai_key': {
+            'type': 'api_key',
+            'examples': [
+                'sk-proj-abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJ',
+                'sk-proj-1234567890abcdefGHIJKLmnopqrstuvWXYZ0123456789',
+                'sk-proj-TestKey123456789abcdefghijklmnopqrstuvwxyzABCD'
+            ]
         }
     }
 
@@ -366,6 +423,68 @@ class SecretGenerator:
 
         return secret, secret_type
 
+    @staticmethod
+    def generate_unique_secret(secret_category: str = None, index: int = 0) -> Tuple[str, str]:
+        """
+        Generate a unique secret with dynamic suffix for dataset diversity.
+
+        Args:
+            secret_category: Category (random if None)
+            index: Sample index for uniqueness
+
+        Returns:
+            Tuple of (secret_string, secret_type)
+        """
+        import hashlib
+        import time
+
+        # Kategorie zufällig wählen wenn nicht angegeben
+        if secret_category is None:
+            secret_category = random.choice(list(SecretGenerator.SECRET_TYPES.keys()))
+
+        secret_info = SecretGenerator.SECRET_TYPES[secret_category]
+        base_secret = random.choice(secret_info['examples'])
+
+        # Unique suffix generieren (Hash aus Index + Timestamp + random)
+        unique_suffix = hashlib.md5(
+            f"{index}_{time.time()}_{random.randint(0, 999999)}".encode()
+        ).hexdigest()[:8]
+
+        # Secret mit Suffix versehen (formatspezifisch)
+        if secret_category == 'stripe_key':
+            # sk_test_XXXXX → sk_test_XXXXX_abc12345
+            secret = f"{base_secret}_{unique_suffix}"
+        elif secret_category == 'github_token':
+            # ghp_XXXXX → replace last 8 chars with unique suffix
+            secret = base_secret[:-8] + unique_suffix
+        elif secret_category == 'aws_key':
+            # AKIAXXXXX → AKIA + unique suffix (20 chars total)
+            secret = f"AKIA{unique_suffix.upper()}{unique_suffix.upper()[:8]}"
+        elif secret_category == 'slack_webhook':
+            # Append unique path segment
+            secret = base_secret.rsplit('/', 1)[0] + f"/{unique_suffix.upper()}"
+        elif secret_category == 'twilio_sid':
+            # AC + 32 hex chars
+            secret = f"AC{unique_suffix}{unique_suffix}{unique_suffix}{unique_suffix}"
+        elif secret_category == 'sendgrid_key':
+            # SG.XXX.YYY format
+            secret = f"SG.{unique_suffix}_{unique_suffix[:4]}.{unique_suffix}{unique_suffix}{unique_suffix}"
+        elif secret_category == 'database_password':
+            # Password with unique chars
+            secret = f"Pwd_{unique_suffix}!Secure"
+        elif secret_category == 'private_key_snippet':
+            # Keep format but add unique identifier in body
+            secret = f"-----BEGIN RSA PRIVATE KEY-----\nMIIEp{unique_suffix.upper()}..."
+        elif secret_category == 'jwt_secret':
+            secret = f"jwt_secret_{unique_suffix}_signing_key"
+        elif secret_category == 'openai_key':
+            secret = f"sk-proj-{unique_suffix}{unique_suffix}{unique_suffix}{unique_suffix}"
+        else:
+            # Generic: append suffix
+            secret = f"{base_secret}_{unique_suffix}"
+
+        return secret, secret_info['type']
+
 
 class BaselineBuilder:
     """
@@ -385,20 +504,26 @@ class BaselineBuilder:
         'password', 'key', 'security'
     ]
 
-    def __init__(self, context_window_size: int = 15, target_samples: int = 50):
+    def __init__(self, context_window_size: int = 15, target_samples: int = 50, seed: int = None):
         """
         Initialize the baseline builder.
 
         Args:
             context_window_size: Number of lines ±N around the secret
             target_samples: Target number of samples to generate
+            seed: Random seed for reproducibility
         """
         self.context_window_size = context_window_size
         self.target_samples = target_samples
         self.samples: List[GroundTruthSample] = []
+        self.seed = seed
+
+        if seed is not None:
+            random.seed(seed)
+            logger.info(f"Random seed set to {seed}")
 
         logger.info(f"Initialized BaselineBuilder with context_window={context_window_size}, "
-                   f"target_samples={target_samples}")
+                   f"target_samples={target_samples}, seed={seed}")
 
     def _has_security_context(self, pr_title: str, pr_body: str) -> bool:
         """
@@ -443,8 +568,11 @@ class BaselineBuilder:
 
             file_path, line_number, var_name, original_value = injection_point
 
-            # Generate secret
-            secret, secret_type = SecretGenerator.generate_secret()
+            # Generate unique secret with random category
+            secret, secret_type = SecretGenerator.generate_unique_secret(
+                secret_category=None,  # Random category for diversity
+                index=sample_index
+            )
 
             # Inject secret into diff
             modified_diff = DiffParser.inject_secret_into_diff(diff, injection_point, secret)
@@ -462,6 +590,7 @@ class BaselineBuilder:
                 sample_id=f"REAL_{sample_index:03d}",
                 gt_has_secret=True,
                 gt_secret_type=secret_type,
+                gt_secret_value=secret,  # Store the actual secret for FM5 leakage detection
                 gt_file_path=file_path,
                 gt_line_start=adjusted_line or line_number,
                 condition="B0",
@@ -823,13 +952,20 @@ def main():
         action='store_true',
         help='Force use of synthetic PR templates (for demo/testing)'
     )
+    parser.add_argument(
+        '--seed',
+        type=int,
+        default=None,
+        help='Random seed for reproducibility'
+    )
 
     args = parser.parse_args()
 
     # Build baseline
     builder = BaselineBuilder(
         context_window_size=args.context_window,
-        target_samples=args.target_samples
+        target_samples=args.target_samples,
+        seed=args.seed
     )
 
     # Determine PR source
