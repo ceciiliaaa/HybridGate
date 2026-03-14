@@ -147,6 +147,21 @@ CONSISTENCY RULES:
             if not output.get("evidence_snippet", "").strip():
                 errors.append("Missing or empty 'evidence_snippet' when pred_has_secret=true")
 
+        # Minimal reasoning plausibility check
+        reasoning = output.get("reasoning", "").strip()
+        if not reasoning:
+            errors.append("Reasoning is empty")
+        elif len(reasoning) < 10:
+            errors.append("Reasoning too short (<10 chars)")
+
+        # pred_location_line type validation (range check happens in G1)
+        location = output.get("pred_location_line")
+        if location is not None:
+            if not isinstance(location, int):
+                errors.append(f"pred_location_line must be integer, got {type(location).__name__}")
+            elif location < 1:
+                errors.append(f"pred_location_line must be positive, got {location}")
+
         return errors
 
     def validate_allowed_values(self, output: dict, include_confidence: bool = True) -> List[str]:

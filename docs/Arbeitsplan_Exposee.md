@@ -331,13 +331,8 @@ werden mögliche Mitigationen entworfen:
 |         |                  |                  | Prüfung)         |
 +---------+------------------+------------------+------------------+
 
-\*FM5: Aufgrund des BA‑Scopes erfolgt FM5 maximal als kontrollierter
-Subsample‑Test (Tendenzaussage/Trade‑off), nicht als vollständiger
-Faktor. (Würde den Rahmen sprengen im Datensatz noch zusätzlich
-verschiedene Größen an Kontext bereitzustellen). Denkbar wäre den Punkt
-nicht explizit in die Evaluation aufzunehmen, sondern in der Theorie
-bereits zu thematisieren und dann im Kapitel Future Work oder
-Limitationen zu diskutieren.
+\*FM5: Aufgrund des BA‑Scopes wird FM5 nur in der Theorie evaluiert und
+dann im Kapitel Future Work oder Limitationen diskutiert.
 
 **Robutsheitscheck bei der Evauierung:**
 
@@ -379,16 +374,17 @@ Ob G1, G2, G3 als Bundle oder einzeln evaluiert werden, steht noch
 offen. Im „Fragen-Abschnitt" am Ende des Dokumentes wir es nochmal
 genauer diskutiert.
 
-  Guardrail                       Wirkt v. a. auf   Umsetzung (kurz)                                                                 Messnachweis
-  ------------------------------- ----------------- -------------------------------------------------------------------------------- ------------------------------------
-  G1 Evidence+Location            FM2, FM1          Pflichtfelder: file_path, line_start, evidence_snippet; PASS nur bei Evidence.   Δ Location‑Hit, Δ Escape‑Rate
-  G2 Untrusted‑Input Policy       FM1               Systemprompt: PR‑Body/Kommentare untrusted; entscheide nur anhand Diff.          Δ Robustheit in E1/E2
-  G3 Redaction / Never‑Echo       FM4               Secrets maskieren; Output darf keine Secret‑Strings enthalten.                   Δ leak_in_output
-  (G4 High‑Risk Routing) \*\*\*   (FM5)             Große Diffs/high‑risk files → strengere Regeln/LLM‑Review.                       Δ Escape vs. Review‑Load Trade‑off
+  Guardrail                   Wirkt v. a. auf   Umsetzung (kurz)                                                                 Messnachweis
+  --------------------------- ----------------- -------------------------------------------------------------------------------- -------------------------------
+  G1 Evidence+Location        FM2, FM1          Pflichtfelder: file_path, line_start, evidence_snippet; PASS nur bei Evidence.   Δ Location‑Hit, Δ Escape‑Rate
+  G2 Untrusted‑Input Policy   FM1               Systemprompt: PR‑Body/Kommentare untrusted; entscheide nur anhand Diff.          Δ Robustheit in E1/E2
+  G3 Redaction / Never‑Echo   FM4               Secrets maskieren; Output darf keine Secret‑Strings enthalten.                   Δ leak_in_output
 
-\*\*\* G4 Falls es reichen sollte, F5 (Context Compaction) nur
-theoretisch zu diskutieren, würde dieser Guardrail „wegfallen", bzw. nur
-theoretisch diskutiert werden.
+**Neue guardrails:**
+
+  G4 Uncertainty / Abstention                 FM1, FM2                                             Prompt: Ausgabe eines Feldes confidence ∈ {HIGH, MEDIUM, LOW}; Code-Regel: bei LOW automatische Weiterleitung zu REVIEW statt harter Entscheidung.                                                    Δ Escape-Rate, Δ Review-Load, Verteilung Fehler nach Confidence
+  ------------------------------------------- ---------------------------------------------------- ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -----------------------------------------------------------------------------------------
+  G5 Schema Validation / Parse-Fail Routing   FM-übergreifend (primär FM1/FM2, indirekt FM3/FM4)   Deterministischer JSON-/Schema-Check auf Parsebarkeit, Pflichtfelder, Typen, erlaubte Werte und einfache strukturelle Feldkonsistenz; bei Validierungsfehlern automatische Weiterleitung zu REVIEW.   parse_fail_rate, schema_violation_rate, optional guardrail_override_rate, Δ Escape-Rate
 
 # 8. Hybrid‑Gate‑Policies
 
@@ -431,13 +427,13 @@ definiert):
 
 3.  **Classic-Gate + LLM Escalationn (Cost-/Process-Optimized)**
 
-  Kriterium                    P1 -- Safety-Net Policy (Recall-First)                                                                                                                                                                      P2 -- Consensus Policy (Precision-First)                                                                                                                            P3 -- Classic-Gate + LLM Escalation (Cost-/Process-Optimized)
-  ---------------------------- ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ------------------------------------------------------------------------------------------------------------------------------------------------------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  Zielprofil / Leitidee        Kein Secret darf durchrutschen. Konservatives Sicherheitsmodell für hochregulierte oder besonders risikosensitive Umgebungen.                                                                               Nur blocken, wenn der Befund hinreichend abgesichert ist. Fokus auf Akzeptanz, geringe unnötige Blockaden und praktikable Entwicklererfahrung.                      LLM nur dort einsetzen, wo es wahrscheinlich echten Zusatznutzen bringt. Fokus auf Kosten-/Nutzen-Verhältnis und realistische Prozessintegration.
-  Formale Entscheidungslogik   Beide Systeme laufen immer. Wenn klassischer Scanner oder LLM ein Secret meldet → BLOCK. Wenn kein Secret-Hit vorliegt, aber der LLM UNCERTAIN/REVIEW meldet → REVIEW. Sonst → PASS.                        Beide Systeme laufen immer. Wenn Scanner UND LLM ein Secret melden → BLOCK. Wenn genau eines der beiden Systeme anschlägt → REVIEW. Wenn keines anschlägt → PASS.   Klassische Scanner laufen immer. Der LLM läuft nur, wenn mindestens ein definierter Trigger aktiv ist: is_high_risk_file == True oder obfuscation_suspected == True oder (scanner_hit == True AND is_critical_secret_type == False). Wenn scanner_hit == True AND is_critical_secret_type == True → BLOCK ohne LLM. Wenn LLM zugeschaltet wird und llm_hit == True → BLOCK. Wenn llm_decision == REVIEW/UNCERTAIN → REVIEW. Sonst → PASS.
-  Benötigte Tags / Inputs      scanner_hit, llm_hit, llm_decision                                                                                                                                                                          scanner_hit, llm_hit                                                                                                                                                scanner_hit, llm_hit, llm_decision, is_high_risk_file, is_critical_secret_type, obfuscation_suspected
-  Praxisrelevanz               Sehr relevant für Kontexte, in denen ein einzelner Secret-Leak schwerwiegende Folgen hätte. Typisch für stark regulierte Umgebungen, sensible Plattformen oder sicherheitskritische Entwicklungsprozesse.   Sehr relevant für Teams mit hoher Delivery-Geschwindigkeit, in denen zu viele Fehlblockaden das Vertrauen in Security-Gates schwächen würden.                       Sehr hoher Praxisbezug, weil Unternehmen LLMs oft nicht flächendeckend, sondern selektiv in teureren/komplexeren Prüfpfaden einsetzen würden.
-  Erwarteter KPI-Trade-off     Vorteil: minimiert Leak-Escape-Rate, maximiert Recall. Nachteil: höhere False-Block-Rate und ggf. höherer Review-Load.                                                                                      Vorteil: niedrigere False-Block-Rate, höhere Entwicklerakzeptanz. Nachteil: potenziell höhere Leak-Escape-Rate als P1.                                              Vorteil: geringere LLM-Nutzung, kontrollierter Review-Aufwand, potenziell guter Mittelweg zwischen Sicherheit und Aufwand. Nachteil: etwas komplexer. Recall kann unter P1 liegen, wenn Trigger zu eng definiert sind.
+  Kriterium                    P1 -- Safety-Net Policy (Recall-First)                                                                                                                                                                                                                                                                           P2 -- Consensus Policy (Precision-First)                                                                                                                                                                                                                                         P3 -- Classic-Gate + LLM Escalation (Cost-/Process-Optimized)
+  ---------------------------- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  Zielprofil / Leitidee        Kein Secret darf durchrutschen. Konservatives Sicherheitsmodell für hochregulierte oder besonders risikosensitive Umgebungen.                                                                                                                                                                                    Nur blocken, wenn der Befund hinreichend abgesichert ist. Fokus auf Akzeptanz, geringe unnötige Blockaden und praktikable Entwicklererfahrung.                                                                                                                                   LLM nur dort einsetzen, wo es wahrscheinlich echten Zusatznutzen bringt. Fokus auf Kosten-/Nutzen-Verhältnis und realistische Prozessintegration.
+  Formale Entscheidungslogik   Beide Systeme laufen immer. Wenn der klassische Scanner ein Secret meldet → BLOCK (unabhängig von der LLM-Entscheidung). Wenn der Scanner nicht anschlägt, aber die guardrail-bereinigte finale LLM-Entscheidung BLOCK ist → BLOCK. Wenn die finale LLM-Entscheidung REVIEW lautet → REVIEW. Andernfalls PASS.   BLOCK wird nur ausgelöst, wenn der klassische Scanner anschlägt **und** die guardrail-bereinigte finale LLM-Entscheidung BLOCK ist. Liegt bei nur einem System ein positiver Befund vor **oder** lautet die finale LLM-Entscheidung REVIEW, wird REVIEW ausgelöst. Sonst PASS.   Scanner laufen immer, der LLM nur bei definierten Triggern. Kritische Scanner-Funde können weiterhin direkt BLOCKauslösen. Wird der LLM zugeschaltet, so führt nur eine **guardrail-bereinigte finale LLM-Entscheidung** BLOCK zu BLOCK; lautet die finale LLM-Entscheidung REVIEW, wird REVIEW zurückgegeben. Ein roher LLM-Hit allein reicht nicht, wenn G4 oder G5 den Fall in den Review-Pfad überführen.
+  Benötigte Tags / Inputs      scanner_hit, llm_hit, llm_decision                                                                                                                                                                                                                                                                               scanner_hit, llm_hit                                                                                                                                                                                                                                                             scanner_hit, llm_hit, llm_decision, is_high_risk_file, is_critical_secret_type, obfuscation_suspected
+  Praxisrelevanz               Sehr relevant für Kontexte, in denen ein einzelner Secret-Leak schwerwiegende Folgen hätte. Typisch für stark regulierte Umgebungen, sensible Plattformen oder sicherheitskritische Entwicklungsprozesse.                                                                                                        Sehr relevant für Teams mit hoher Delivery-Geschwindigkeit, in denen zu viele Fehlblockaden das Vertrauen in Security-Gates schwächen würden.                                                                                                                                    Sehr hoher Praxisbezug, weil Unternehmen LLMs oft nicht flächendeckend, sondern selektiv in teureren/komplexeren Prüfpfaden einsetzen würden.
+  Erwarteter KPI-Trade-off     Vorteil: minimiert Leak-Escape-Rate, maximiert Recall. Nachteil: höhere False-Block-Rate und ggf. höherer Review-Load.                                                                                                                                                                                           Vorteil: niedrigere False-Block-Rate, höhere Entwicklerakzeptanz. Nachteil: potenziell höhere Leak-Escape-Rate als P1.                                                                                                                                                           Vorteil: geringere LLM-Nutzung, kontrollierter Review-Aufwand, potenziell guter Mittelweg zwischen Sicherheit und Aufwand. Nachteil: etwas komplexer. Recall kann unter P1 liegen, wenn Trigger zu eng definiert sind.
 
 (Anmerkung: Tabelle für mit den nötigen Tags/Labels für die Berechnung
 im Anhang)
@@ -454,16 +450,21 @@ Die Auswahl orientiert sich an drei Kriterien:
 
 3.  methodische Kontrollierbarkeit im experimentellen Design
 
-**Klassische Secret-Scanner (Gitleaks & TruffleHog)**
+**Klassische Secret-Scanner (Gitleaks & Detect-Secrets)**
 
-  Kriterium                                      Gitleaks                                                                                      TruffleHog v3
-  ---------------------------------------------- --------------------------------------------------------------------------------------------- --------------------------------------------------------------------------------------------------------------------------
-  Erkennungsansatz                               Regex-Pattern-Matching                                                                        Regex + Entropy-Analyse + aktive Verification
-  Wissenschaftliche Basis für Secret erkennung   Top-Tool nach Recall (88%) und Precision (46%) im SecretBench-Benchmark (Basak et al. 2023)   Zweitbestes Recall (52%) im SecretBench-Benchmark
+  Kriterium                                      Gitleaks                                                                                      Detect-Secrets
+  ---------------------------------------------- --------------------------------------------------------------------------------------------- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
+  Erkennungsansatz                               Regex-Pattern-Matching                                                                        Regex + Entropy-basierte Heuristiken + pluginbasierte Secret-Erkennung
+  Wissenschaftliche Basis für Secret erkennung   Top-Tool nach Recall (88%) und Precision (46%) im SecretBench-Benchmark (Basak et al. 2023)   Etablierter Open-Source-Secret-Scanner zur Erkennung potenziell hartkodierter Secrets über kombinierte Heuristiken
   Output-Format                                  JSON, CSV, SARIF direkt maschinell auswertbar                                                 JSON direkt maschinell auswertbar
-  Begründung der Auswahl                         Meistverbreiteter Open-Source-Secret-Scanner (16k+ GitHub Stars)                              Entropy-basierte Erkennung und aktive Verification. Ermöglicht den Vergleich zweier komplementärer Detektionsparadigmen.
+  Begründung der Auswahl                         Meistverbreiteter Open-Source-Secret-Scanner (16k+ GitHub Stars)                              Ergänzt Gitleaks um einen alternativen, heuristikbasierten Erkennungsansatz und reduziert die Abhängigkeit der Baseline von einem einzelnen Detektionsparadigma.
 
-# Die Kombination beider Scanner stellt sicher, dass die klassische Baseline nicht von einem einzelnen Tool-Profil abhängt. Gitleaks deckt bekannte Muster breit ab, während TruffleHog durch Entropy-Analyse auch atypische Secrets erkennt, die keinem festen Pattern folgen.
+Die Kombination beider Scanner stellt sicher, dass die klassische
+Baseline nicht von einem einzelnen Tool-Profil abhängt. Gitleaks deckt
+bekannte Muster breit über regelbasierte Signaturen ab, während
+Detect-Secrets zusätzlich heuristische Hinweise wie Entropie und
+pluginbasierte Prüfungen nutzt. Dadurch können zwei komplementäre
+klassische Detektionslogiken gegenübergestellt werden.
 
 **LLM basierte Reviewer-Modelle:**
 
@@ -519,6 +520,8 @@ Beispielhafter Protokollumfang:
     Prompt-Template
 
 -   Laufumgebung: OS/Python-Version, Libraries/Container
+
+-   
 
 # 10. Metriken und Auswertung
 
@@ -612,30 +615,6 @@ Hybrid‑Gate praktisch einsetzbar ist.
 
 **\
 **
-
-**Fragen:**\
-\
-**1. Frage: Wie sollte ich am besten im Rahmen der BA die Guardrails
-Testen?**
-
-Es gibt 2 Ansätze:
-
-  **Variante**                    **Idee**                                                                                                                                                        **Vorteile**                                                                                                                                                                                                                                                                                                                    **Nachteile**
-  ------------------------------- --------------------------------------------------------------------------------------------------------------------------------------------------------------- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-  A\) Guardrails als Set testen   Alle geplanten Guardrails werden in einer realistischen Kombination („Bundle") gemeinsam aktiviert und als Gesamtkonfiguration gegen die Baseline verglichen.   Sehr praxisnah: Unternehmen würden Guardrails typischerweise kombiniert einsetzen, nicht einzeln. - Weniger Aufwand: z. B. 2 Konfigurationen (Baseline vs. Bundle) × 2 Modelle × 150 Samples ≈ 600 LLM‑Runs. - Direkter „Nettoeffekt" des geplanten Setups messbar (Recall, Leak‑Escape‑Rate, False‑Block‑Rate, Review‑Load).   Kein isolierter Beitrag einzelner Guardrails sichtbar. Nur Aussage: „Die Gesamtkonfiguration wirkt", aber nicht: „Guardrail G1 bringt genau X %".
-  B\) Guardrails einzeln testen   Jedes Guardrail wird separat (und ggf. in Kombinationen) getestet, um seinen individuellen Effekt zu bestimmen.                                                 Feingranulare Ergebnisse: pro Guardrail messbar („G1 verbessert Location‑Accuracy um X %", „G3 reduziert False‑Blocks um Y %").                                                                                                                                                                                                 Deutlich mehr Aufwand: z. B. 4 Varianten (Baseline, nur G1, nur G3, nur G4) × 2 Modelle × 150 Samples ≈ 1200 LLM‑Runs. - Weniger praxisnah, da reale Systeme Guardrails meist kombiniert nutzen. Gefahr, den Scope (Implementierung, Auswertung, Dokumentation) zu sprengen.
-
-**Frage 2: Sollte ich Context Compaction als zu evaluierenden Failure
-Mode drinnen lassen?**
-
-Wie bereits im Kapitel der Failure Modes erklärt: Aufgrund des BA‑Scopes
-würde FM5 sowieso maximal als kontrollierter Subsample‑Test
-(Tendenzaussage/Trade‑off) laufen, nicht als vollständiger Faktor.
-(Würde sonst den Rahmen sprengen im Datensatz noch zu jedem Sample
-zusätzlich verschiedene Größen an Kontext bereitzustellen). Denkbar wäre
-m.M.n. den Punkt nicht explizit in die Evaluation aufzunehmen, sondern
-in der Theorie bereits zu thematisieren und dann im Kapitel Future Work
-oder Limitationen zu diskutieren.
 
 # Anhang
 

@@ -122,20 +122,23 @@ def apply_guardrails(llm_output: dict, ground_truth: dict = None) -> dict:
 def apply_guardrails_with_routing(
     raw_response: str,
     ground_truth: dict = None,
-    settings: GuardrailSettings = None
+    settings: GuardrailSettings = None,
+    diff_context: str = None
 ) -> dict:
     """
-    Apply guardrails with decision routing (G5 -> G4 -> G3 order).
+    Apply guardrails with decision routing (G5 -> G4 -> G1 -> G3 order).
 
     This is the new comprehensive guardrail application function that:
     1. G5: Validates schema, routes invalid to REVIEW
     2. G4: Checks confidence, routes LOW to REVIEW
-    3. G3: Checks for secret leakage
+    3. G1: Validates evidence, routes invalid to REVIEW
+    4. G3: Checks for secret leakage
 
     Args:
         raw_response: Raw LLM response string (before JSON parsing)
         ground_truth: Optional ground truth for leak detection
         settings: Guardrail settings (defaults to DEFAULT_SETTINGS)
+        diff_context: Optional diff content for context-aware G1 validation
 
     Returns:
         Dictionary with:
@@ -145,8 +148,8 @@ def apply_guardrails_with_routing(
         - confidence: Confidence value from LLM (or None)
         - schema_valid: Whether G5 validation passed
         - validation_errors: List of G5 validation errors
-        - routed_by_guardrail: Which guardrail triggered routing (G4/G5/None)
-        - g1_valid, g2_valid, g3_valid, g3_leak_detected: Legacy validation flags
+        - routed_by_guardrail: Which guardrail triggered routing (G1/G4/G5/None)
+        - g1_valid, g1_issues, g2_valid, g3_valid, g3_leak_detected: Validation flags
     """
     # Import with fallback for testing
     try:
@@ -225,6 +228,17 @@ def apply_guardrails_with_routing(
             result["final_decision"] = "REVIEW"
 
     # =========================================================================
+    # STEP 2b: G2 Untrusted Input Check
+    # =========================================================================
+    g2 = G2UntrustedInput()
+    result["g2_valid"] = g2.validate_output(llm_output)
+
+    # G2: Route to REVIEW if untrusted input influence detected (and not already routed)
+    if not result["g2_valid"] and result["routed_by_guardrail"] is None:
+        result["routed_by_guardrail"] = "G2"
+        result["final_decision"] = "REVIEW"
+
+    # =========================================================================
     # STEP 3: G3 Leakage Check (runs last)
     # =========================================================================
     g3 = G3Redaction()
@@ -236,9 +250,22 @@ def apply_guardrails_with_routing(
         result["g3_valid"] = g3.validate_output(llm_output)
 
     # =========================================================================
-    # G1 Evidence Check (for logging, does not affect routing)
+    # G1 Evidence Check (WITH routing on failure)
     # =========================================================================
     g1 = G1EvidenceLocation()
-    result["g1_valid"] = g1.validate_output(llm_output)
+
+    # Parse diff_lines for context-aware validation
+    diff_lines = None
+    if diff_context:
+        diff_lines = diff_context.split('\n')
+
+    g1_valid, g1_issues = g1.validate_output_with_context(llm_output, diff_lines)
+    result["g1_valid"] = g1_valid
+    result["g1_issues"] = g1_issues
+
+    # G1: Route to REVIEW if evidence validation fails (and not already routed)
+    if not g1_valid and result["routed_by_guardrail"] is None:
+        result["routed_by_guardrail"] = "G1"
+        result["final_decision"] = "REVIEW"
 
     return result

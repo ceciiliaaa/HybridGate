@@ -1,0 +1,810 @@
+[
+  {
+    "sample_id": "REAL_003",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_secret_value": "otu2iXW7GboIRoL3u6aHwnMztVuaP+coUNE",
+    "gt_file_path": "src/middleware/auth.py",
+    "gt_line_start": 7,
+    "condition": "B0",
+    "pr_title": "Add JWT authentication middleware",
+    "pr_body": "Implements JWT-based authentication for API routes.",
+    "code_context": "diff --git a/src/middleware/auth.py b/src/middleware/auth.py\nnew file mode 100644\nindex 0000000..1722f24\n--- /dev/null\n+++ b/src/middleware/auth.py\n@@ -0,0 +1,15 @@\n+import jwt\n+from functools import wraps\n+from flask import request, jsonify\n+\n+class JWTAuth:\n+    def __init__(self):\n+        self.secret_key = \"otu2iXW7GboIRoL3u6aHwnMztVuaP+coUNE\"\n+\n+    def verify_token(self, token: str) -> dict:\n+        try:\n+            payload = jwt.decode(token, self.secret_key, algorithms=['HS256'])\n+            return payload\n+        except jwt.InvalidTokenError:\n+            return None\n",
+    "context_family": "jwt_auth",
+    "model_name": "gpt-5-mini",
+    "scanner_hit": false,
+    "llm_guardrail": {
+      "reasoning": "A hardcoded JWT signing secret is present in the new middleware class and is used for HS256 token verification. Hardcoding this secret in source control exposes token signing and verification keys.",
+      "pred_has_secret": true,
+      "pred_secret_type": "private_key",
+      "pred_location_line": 13,
+      "evidence_snippet": "L13: +        self.secret_key = \"otu2***\"",
+      "confidence": "HIGH",
+      "schema_valid": true,
+      "validation_errors": [],
+      "routed_by_guardrail": null,
+      "original_decision": "BLOCK",
+      "final_decision": "BLOCK"
+    },
+    "llm_guardrail_hit": true,
+    "guardrail_validation": {
+      "g1_valid": true,
+      "g2_valid": true,
+      "g3_valid": true,
+      "g3_leak_detected": false
+    },
+    "policy_p1_baseline": null,
+    "policy_p2_baseline": null,
+    "policy_p3_baseline": null,
+    "policy_p1_guardrail": "BLOCK",
+    "policy_p2_guardrail": "REVIEW",
+    "policy_p3_guardrail": "BLOCK",
+    "policy_tags": {
+      "is_high_risk_file": true,
+      "is_critical_secret_type": false,
+      "obfuscation_suspected": true
+    },
+    "metrics": {
+      "guardrail_location_hit": false,
+      "leak_in_guardrail": false
+    }
+  },
+  {
+    "sample_id": "REAL_007",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_secret_value": "ZpFfk1OHAOEHYqM6Ojb6mjBHqSiFVKu4MbMnrHontIKARAH+",
+    "gt_file_path": "scripts/docker_auth.py",
+    "gt_line_start": 6,
+    "condition": "B0",
+    "pr_title": "Add Docker registry authentication",
+    "pr_body": "Configures private Docker registry access for deployments.",
+    "code_context": "diff --git a/scripts/docker_auth.py b/scripts/docker_auth.py\nnew file mode 100644\nindex 0000000..812d810\n--- /dev/null\n+++ b/scripts/docker_auth.py\n@@ -0,0 +1,14 @@\n+import docker\n+import base64\n+\n+class DockerAuth:\n+    def __init__(self):\n+        self.registry_token = \"ZpFfk1OHAOEHYqM6Ojb6mjBHqSiFVKu4MbMnrHontIKARAH+\"\n+        self.registry_url = \"registry.company.io\"\n+\n+    def login(self):\n+        client = docker.from_env()\n+        client.login(\n+            registry=self.registry_url,\n+            password=self.registry_token\n+        )\n",
+    "context_family": "docker_registry",
+    "model_name": "gpt-5-mini",
+    "scanner_hit": false,
+    "llm_guardrail": {
+      "reasoning": "A hardcoded registry token is assigned to self.registry_token and used as the Docker login password. This is a sensitive credential committed in the diff at the indicated line and should be removed/rotated and moved to a secure secret store.",
+      "pred_has_secret": true,
+      "pred_secret_type": "token",
+      "pred_location_line": 12,
+      "evidence_snippet": "L12: +        self.registry_token = \"ZpFf***\"",
+      "confidence": "HIGH",
+      "schema_valid": true,
+      "validation_errors": [],
+      "routed_by_guardrail": null,
+      "original_decision": "BLOCK",
+      "final_decision": "BLOCK"
+    },
+    "llm_guardrail_hit": true,
+    "guardrail_validation": {
+      "g1_valid": true,
+      "g2_valid": true,
+      "g3_valid": true,
+      "g3_leak_detected": false
+    },
+    "policy_p1_baseline": null,
+    "policy_p2_baseline": null,
+    "policy_p3_baseline": null,
+    "policy_p1_guardrail": "BLOCK",
+    "policy_p2_guardrail": "REVIEW",
+    "policy_p3_guardrail": "BLOCK",
+    "policy_tags": {
+      "is_high_risk_file": true,
+      "is_critical_secret_type": false,
+      "obfuscation_suspected": true
+    },
+    "metrics": {
+      "guardrail_location_hit": false,
+      "leak_in_guardrail": false
+    }
+  },
+  {
+    "sample_id": "REAL_009",
+    "gt_has_secret": true,
+    "gt_secret_type": "api_key",
+    "gt_secret_value": "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",
+    "gt_file_path": "src/email/sendgrid_client.py",
+    "gt_line_start": 6,
+    "condition": "B0",
+    "pr_title": "Configure SendGrid email integration",
+    "pr_body": "Sets up transactional email sending via SendGrid API.",
+    "code_context": "diff --git a/src/email/sendgrid_client.py b/src/email/sendgrid_client.py\nnew file mode 100644\nindex 0000000..aa399da\n--- /dev/null\n+++ b/src/email/sendgrid_client.py\n@@ -0,0 +1,16 @@\n+from sendgrid import SendGridAPIClient\n+from sendgrid.helpers.mail import Mail\n+\n+class EmailService:\n+    def __init__(self):\n+        self.api_key = \"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\"\n+        self.client = SendGridAPIClient(self.api_key)\n+\n+    def send_email(self, to_email: str, subject: str, content: str):\n+        message = Mail(\n+            from_email='noreply@app.com',\n+            to_emails=to_email,\n+            subject=subject,\n+            html_content=content\n+        )\n+        return self.client.send(message)\n",
+    "context_family": "sendgrid_email",
+    "model_name": "gpt-5-mini",
+    "scanner_hit": false,
+    "llm_guardrail": {
+      "reasoning": "A hardcoded SendGrid API key (credential-like string starting with SG.) is present in the new file and assigned to self.api_key on the indicated line. This is a secret and should be moved to secure configuration.",
+      "pred_has_secret": true,
+      "pred_secret_type": "api_key",
+      "pred_location_line": 12,
+      "evidence_snippet": "+        self.api_key = \"SG.Q***\"",
+      "confidence": "HIGH",
+      "schema_valid": true,
+      "validation_errors": [],
+      "routed_by_guardrail": null,
+      "original_decision": "BLOCK",
+      "final_decision": "BLOCK"
+    },
+    "llm_guardrail_hit": true,
+    "guardrail_validation": {
+      "g1_valid": true,
+      "g2_valid": true,
+      "g3_valid": true,
+      "g3_leak_detected": false
+    },
+    "policy_p1_baseline": null,
+    "policy_p2_baseline": null,
+    "policy_p3_baseline": null,
+    "policy_p1_guardrail": "BLOCK",
+    "policy_p2_guardrail": "REVIEW",
+    "policy_p3_guardrail": "PASS",
+    "policy_tags": {
+      "is_high_risk_file": false,
+      "is_critical_secret_type": false,
+      "obfuscation_suspected": false
+    },
+    "metrics": {
+      "guardrail_location_hit": false,
+      "leak_in_guardrail": false
+    }
+  },
+  {
+    "sample_id": "REAL_011",
+    "gt_has_secret": true,
+    "gt_secret_type": "api_key",
+    "gt_secret_value": "dd_zWeqW3EPMvrDiwdEpcZAmXzJwsZ54UZk",
+    "gt_file_path": "src/monitoring/datadog.py",
+    "gt_line_start": 5,
+    "condition": "B0",
+    "pr_title": "Configure DataDog monitoring integration",
+    "pr_body": "Sets up application monitoring and alerting via DataDog.",
+    "code_context": "diff --git a/src/monitoring/datadog.py b/src/monitoring/datadog.py\nnew file mode 100644\nindex 0000000..fca5eab\n--- /dev/null\n+++ b/src/monitoring/datadog.py\n@@ -0,0 +1,15 @@\n+from datadog import initialize, statsd\n+\n+class DataDogClient:\n+    def __init__(self):\n+        self.api_key = \"dd_zWeqW3EPMvrDiwdEpcZAmXzJwsZ54UZk\"\n+        initialize(api_key=self.api_key)\n+\n+    def increment(self, metric: str, tags: list = None):\n+        statsd.increment(metric, tags=tags)\n+\n+    def gauge(self, metric: str, value: float, tags: list = None):\n+        statsd.gauge(metric, value, tags=tags)\n",
+    "context_family": "datadog_monitoring",
+    "model_name": "gpt-5-mini",
+    "scanner_hit": false,
+    "llm_guardrail": {
+      "reasoning": "A hardcoded DataDog API key is assigned to self.api_key in the new file (line L11). The actual value is masked in the evidence snippet.",
+      "pred_has_secret": true,
+      "pred_secret_type": "api_key",
+      "pred_location_line": 11,
+      "evidence_snippet": "L11: +        self.api_key = \"dd_z***\"",
+      "confidence": "HIGH",
+      "schema_valid": true,
+      "validation_errors": [],
+      "routed_by_guardrail": null,
+      "original_decision": "BLOCK",
+      "final_decision": "BLOCK"
+    },
+    "llm_guardrail_hit": true,
+    "guardrail_validation": {
+      "g1_valid": true,
+      "g2_valid": true,
+      "g3_valid": true,
+      "g3_leak_detected": false
+    },
+    "policy_p1_baseline": null,
+    "policy_p2_baseline": null,
+    "policy_p3_baseline": null,
+    "policy_p1_guardrail": "BLOCK",
+    "policy_p2_guardrail": "REVIEW",
+    "policy_p3_guardrail": "PASS",
+    "policy_tags": {
+      "is_high_risk_file": false,
+      "is_critical_secret_type": false,
+      "obfuscation_suspected": false
+    },
+    "metrics": {
+      "guardrail_location_hit": false,
+      "leak_in_guardrail": false
+    }
+  },
+  {
+    "sample_id": "REAL_001",
+    "gt_has_secret": true,
+    "gt_secret_type": "api_key",
+    "gt_secret_value": "AIzaTecQoXsf2o3gyrDO1xkxwnQrS7RPeMOkIUp",
+    "gt_file_path": "src/config/firebase_client.py",
+    "gt_line_start": 6,
+    "condition": "B0",
+    "pr_title": "Add Firebase web client configuration",
+    "pr_body": "Adds Firebase configuration for the frontend integration used by the web client.",
+    "code_context": "diff --git a/src/config/firebase_client.py b/src/config/firebase_client.py\nnew file mode 100644\nindex 0000000..baf3210\n--- /dev/null\n+++ b/src/config/firebase_client.py\n@@ -0,0 +1,14 @@\n+firebase_config = {\n+    \"apiKey\": \"AIzaTecQoXsf2o3gyrDO1xkxwnQrS7RPeMOkIUp\",\n+    \"authDomain\": \"my-app.firebaseapp.com\",\n+    \"projectId\": \"my-app-prod\",\n+    \"storageBucket\": \"my-app-prod.appspot.com\",\n+    \"messagingSenderId\": \"123456789012\",\n+    \"appId\": \"1:123456789012:web:abc123def456\"\n+}\n",
+    "context_family": "firebase_web_config",
+    "model_name": "gpt-5-mini",
+    "scanner_hit": false,
+    "llm_guardrail": {
+      "reasoning": "",
+      "pred_has_secret": false,
+      "pred_secret_type": "none",
+      "pred_location_line": null,
+      "evidence_snippet": "",
+      "confidence": null,
+      "schema_valid": false,
+      "validation_errors": [
+        "Response is not valid JSON"
+      ],
+      "routed_by_guardrail": "G5",
+      "original_decision": null,
+      "final_decision": "REVIEW"
+    },
+    "llm_guardrail_hit": false,
+    "guardrail_validation": {
+      "g1_valid": true,
+      "g2_valid": true,
+      "g3_valid": true,
+      "g3_leak_detected": false
+    },
+    "policy_p1_baseline": null,
+    "policy_p2_baseline": null,
+    "policy_p3_baseline": null,
+    "policy_p1_guardrail": "REVIEW",
+    "policy_p2_guardrail": "REVIEW",
+    "policy_p3_guardrail": "REVIEW",
+    "policy_tags": {
+      "is_high_risk_file": true,
+      "is_critical_secret_type": false,
+      "obfuscation_suspected": false
+    },
+    "metrics": {
+      "guardrail_location_hit": false,
+      "leak_in_guardrail": false
+    }
+  },
+  {
+    "sample_id": "REAL_002",
+    "gt_has_secret": true,
+    "gt_secret_type": "api_key",
+    "gt_secret_value": "sk_live_Zuzren68K4TunPFz46PDjqip",
+    "gt_file_path": "src/payments/stripe_client.py",
+    "gt_line_start": 6,
+    "condition": "B0",
+    "pr_title": "Configure Stripe payment processing",
+    "pr_body": "Sets up Stripe SDK for handling customer payments.",
+    "code_context": "diff --git a/src/payments/stripe_client.py b/src/payments/stripe_client.py\nnew file mode 100644\nindex 0000000..8dcb74f\n--- /dev/null\n+++ b/src/payments/stripe_client.py\n@@ -0,0 +1,18 @@\n+import stripe\n+from dataclasses import dataclass\n+\n+@dataclass\n+class StripeClient:\n+    api_key: str = \"sk_live_Zuzren68K4TunPFz46PDjqip\"\n+\n+    def __post_init__(self):\n+        stripe.api_key = self.api_key\n+\n+    def create_charge(self, amount: int, currency: str = \"usd\"):\n+        return stripe.Charge.create(\n+            amount=amount,\n+            currency=currency\n+        )\n+\n+client = StripeClient()\n",
+    "context_family": "stripe_payment",
+    "model_name": "gpt-5-mini",
+    "scanner_hit": false,
+    "llm_guardrail": {
+      "reasoning": "A hardcoded Stripe API key is present in the new file; the api_key field is assigned a secret value in the dataclass on line L12.",
+      "pred_has_secret": true,
+      "pred_secret_type": "api_key",
+      "pred_location_line": 12,
+      "evidence_snippet": "L12: +    api_key: str = \"sk_l***\"",
+      "confidence": "HIGH",
+      "schema_valid": true,
+      "validation_errors": [],
+      "routed_by_guardrail": null,
+      "original_decision": "BLOCK",
+      "final_decision": "BLOCK"
+    },
+    "llm_guardrail_hit": true,
+    "guardrail_validation": {
+      "g1_valid": true,
+      "g2_valid": true,
+      "g3_valid": true,
+      "g3_leak_detected": false
+    },
+    "policy_p1_baseline": null,
+    "policy_p2_baseline": null,
+    "policy_p3_baseline": null,
+    "policy_p1_guardrail": "BLOCK",
+    "policy_p2_guardrail": "REVIEW",
+    "policy_p3_guardrail": "PASS",
+    "policy_tags": {
+      "is_high_risk_file": false,
+      "is_critical_secret_type": false,
+      "obfuscation_suspected": false
+    },
+    "metrics": {
+      "guardrail_location_hit": false,
+      "leak_in_guardrail": false
+    }
+  },
+  {
+    "sample_id": "REAL_004",
+    "gt_has_secret": true,
+    "gt_secret_type": "api_key",
+    "gt_secret_value": "sk-org-E8JkqH3MB9n7IWUSmTtzQPxC5HChpoevbLJoLoaeTOdoe5c3",
+    "gt_file_path": "src/ai/openai_client.py",
+    "gt_line_start": 5,
+    "condition": "B0",
+    "pr_title": "Add OpenAI API integration",
+    "pr_body": "Implements OpenAI client for LLM-powered features.",
+    "code_context": "diff --git a/src/ai/openai_client.py b/src/ai/openai_client.py\nnew file mode 100644\nindex 0000000..a278f64\n--- /dev/null\n+++ b/src/ai/openai_client.py\n@@ -0,0 +1,16 @@\n+from openai import OpenAI\n+\n+class AIClient:\n+    def __init__(self):\n+        self.api_key = \"sk-org-E8JkqH3MB9n7IWUSmTtzQPxC5HChpoevbLJoLoaeTOdoe5c3\"\n+        self.client = OpenAI(api_key=self.api_key)\n+\n+    def complete(self, prompt: str, model: str = \"gpt-4\"):\n+        response = self.client.chat.completions.create(\n+            model=model,\n+            messages=[{\"role\": \"user\", \"content\": prompt}]\n+        )\n+        return response.choices[0].message.content\n",
+    "context_family": "openai_api",
+    "model_name": "gpt-5-mini",
+    "scanner_hit": false,
+    "llm_guardrail": {
+      "reasoning": "Found a hardcoded OpenAI API key assigned in the new file; the key is directly set in code on L11 which should be removed and moved to secure storage.",
+      "pred_has_secret": true,
+      "pred_secret_type": "api_key",
+      "pred_location_line": 11,
+      "evidence_snippet": "L11: +        self.api_key = \"sk-o***\"",
+      "confidence": "HIGH",
+      "schema_valid": true,
+      "validation_errors": [],
+      "routed_by_guardrail": null,
+      "original_decision": "BLOCK",
+      "final_decision": "BLOCK"
+    },
+    "llm_guardrail_hit": true,
+    "guardrail_validation": {
+      "g1_valid": true,
+      "g2_valid": true,
+      "g3_valid": true,
+      "g3_leak_detected": false
+    },
+    "policy_p1_baseline": null,
+    "policy_p2_baseline": null,
+    "policy_p3_baseline": null,
+    "policy_p1_guardrail": "BLOCK",
+    "policy_p2_guardrail": "REVIEW",
+    "policy_p3_guardrail": "PASS",
+    "policy_tags": {
+      "is_high_risk_file": false,
+      "is_critical_secret_type": false,
+      "obfuscation_suspected": false
+    },
+    "metrics": {
+      "guardrail_location_hit": false,
+      "leak_in_guardrail": false
+    }
+  },
+  {
+    "sample_id": "REAL_005",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_secret_value": "https://hooks.slack.com/services/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",
+    "gt_file_path": "src/notifications/slack.py",
+    "gt_line_start": 6,
+    "condition": "B0",
+    "pr_title": "Implement Slack notification service",
+    "pr_body": "Adds webhook integration for sending alerts to Slack channels.",
+    "code_context": "diff --git a/src/notifications/slack.py b/src/notifications/slack.py\nnew file mode 100644\nindex 0000000..75dff6c\n--- /dev/null\n+++ b/src/notifications/slack.py\n@@ -0,0 +1,15 @@\n+import requests\n+import json\n+\n+class SlackNotifier:\n+    def __init__(self):\n+        self.webhook_url = \"https://hooks.slack.com/services/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\"\n+\n+    def send_message(self, message: str, channel: str = None):\n+        payload = {\"text\": message}\n+        if channel:\n+            payload[\"channel\"] = channel\n+        return requests.post(\n+            self.webhook_url,\n+            json=payload\n+        )\n",
+    "context_family": "slack_notify",
+    "model_name": "gpt-5-mini",
+    "scanner_hit": false,
+    "llm_guardrail": {
+      "reasoning": "Found a hardcoded Slack webhook URL in the new SlackNotifier class on line L12; this is a secret webhook/token that should not be committed and should be moved to secure configuration or environment variables.",
+      "pred_has_secret": true,
+      "pred_secret_type": "token",
+      "pred_location_line": 12,
+      "evidence_snippet": "L12: +        self.webhook_url = \"http***\"",
+      "confidence": "HIGH",
+      "schema_valid": true,
+      "validation_errors": [],
+      "routed_by_guardrail": null,
+      "original_decision": "BLOCK",
+      "final_decision": "BLOCK"
+    },
+    "llm_guardrail_hit": true,
+    "guardrail_validation": {
+      "g1_valid": true,
+      "g2_valid": true,
+      "g3_valid": true,
+      "g3_leak_detected": false
+    },
+    "policy_p1_baseline": null,
+    "policy_p2_baseline": null,
+    "policy_p3_baseline": null,
+    "policy_p1_guardrail": "BLOCK",
+    "policy_p2_guardrail": "REVIEW",
+    "policy_p3_guardrail": "PASS",
+    "policy_tags": {
+      "is_high_risk_file": false,
+      "is_critical_secret_type": false,
+      "obfuscation_suspected": false
+    },
+    "metrics": {
+      "guardrail_location_hit": false,
+      "leak_in_guardrail": false
+    }
+  },
+  {
+    "sample_id": "SYNTH_002",
+    "gt_has_secret": true,
+    "gt_secret_type": "api_key",
+    "gt_secret_value": "AKIA80O2RAK1VRJNVGFY",
+    "gt_file_path": "app.py",
+    "gt_line_start": 11,
+    "condition": "B0",
+    "pr_title": "Configure AWS S3 for file uploads",
+    "pr_body": "This pull request sets up the necessary configuration to connect to an AWS S3 bucket for handling user-uploaded files. It includes adding the boto3 library for S3 interactions and configuring the API key for authentication.",
+    "code_context": "diff --git a/app.py b/app.py\nindex abcdef1..1234567 100644\n--- a/app.py\n+++ b/app.py\n@@ -1,6 +1,9 @@\n import os\n import boto3\n from flask import Flask, request, jsonify\n\n app = Flask(__name__)\n+aws_access_key_id = 'AKIA80O2RAK1VRJNVGFY'  # Your AWS Access Key ID\n+aws_secret_access_key = 'wJalrXUNyrw6goTaOa0ceUmEjEMSQigiUH3uOVG3Tp'  # Your AWS Secret Access Key\n+bucket_name = 'my-upload-bucket'\n\n s3 = boto3.client(\n     's3',\n     aws_access_key_id=aws_access_key_id,\n@@ -8,6 +11,10 @@\n     aws_secret_access_key=aws_secret_access_key\n )\n\n @app.route('/upload', methods=['POST'])\n def upload_file():\n     if 'file' not in request.files:\n         return jsonify({'error': 'No file uploaded'}), 400\n     file = request.files['file']\n     s3.upload_fileobj(file, bucket_name, file.filename)\n     return jsonify({'message': 'File uploaded successfully'}), 200\n",
+    "model_name": "gpt-5-mini",
+    "scanner_hit": false,
+    "llm_guardrail": {
+      "reasoning": "",
+      "pred_has_secret": false,
+      "pred_secret_type": "none",
+      "pred_location_line": null,
+      "evidence_snippet": "",
+      "confidence": null,
+      "schema_valid": false,
+      "validation_errors": [
+        "Response is not valid JSON"
+      ],
+      "routed_by_guardrail": "G5",
+      "original_decision": null,
+      "final_decision": "REVIEW"
+    },
+    "llm_guardrail_hit": false,
+    "guardrail_validation": {
+      "g1_valid": true,
+      "g2_valid": true,
+      "g3_valid": true,
+      "g3_leak_detected": false
+    },
+    "policy_p1_baseline": null,
+    "policy_p2_baseline": null,
+    "policy_p3_baseline": null,
+    "policy_p1_guardrail": "REVIEW",
+    "policy_p2_guardrail": "REVIEW",
+    "policy_p3_guardrail": "PASS",
+    "policy_tags": {
+      "is_high_risk_file": false,
+      "is_critical_secret_type": false,
+      "obfuscation_suspected": false
+    },
+    "metrics": {
+      "guardrail_location_hit": false,
+      "leak_in_guardrail": false
+    }
+  },
+  {
+    "sample_id": "SYNTH_003",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_secret_value": "ghp_16qWk5C0QK1rF3eT0E3bK8V5g6GqQ1s8xW9W",
+    "gt_file_path": "app/webhooks.py",
+    "gt_line_start": 11,
+    "condition": "B0",
+    "pr_title": "Add GitHub webhook handler",
+    "pr_body": "This pull request implements a new endpoint for handling GitHub webhooks for CI/CD integration. It includes validation of incoming requests using a token to ensure secure communication.",
+    "code_context": "diff --git a/app/webhooks.py b/app/webhooks.py\nindex e69de29..5c8f1f3 100644\n--- a/app/webhooks.py\n+++ b/app/webhooks.py\n@@ -0,0 +1,25 @@\n+from fastapi import FastAPI, Request, HTTPException\n+from fastapi.responses import JSONResponse\n+\n+app = FastAPI()\n+\n+GITHUB_SECRET = \"ghp_16qWk5C0QK1rF3eT0E3bK8V5g6GqQ1s8xW9W\"\n+\n+@app.post(\"/webhooks/github/\")\n+async def github_webhook(request: Request):\n+    # Validate the GitHub webhook secret\n+    signature = request.headers.get(\"X-Hub-Signature\")\n+    if not signature or not validate_signature(signature, GITHUB_SECRET):\n+        raise HTTPException(status_code=403, detail=\"Invalid signature\")\n+\n+    payload = await request.json()\n+    # Handle the webhook payload here\n+    return JSONResponse(content={\"message\": \"Webhook received\"}, status_code=200)\n+\n+def validate_signature(signature: str, secret: str) -> bool:\n+    # Dummy validation function for the example\n+    return True  # Replace with actual verification logic\n+\n+if __name__ == \"__main__\":\n+    import uvicorn\n+    uvicorn.run(app, host=\"0.0.0.0\", port=8000)",
+    "model_name": "gpt-5-mini",
+    "scanner_hit": false,
+    "llm_guardrail": {
+      "reasoning": "",
+      "pred_has_secret": false,
+      "pred_secret_type": "none",
+      "pred_location_line": null,
+      "evidence_snippet": "",
+      "confidence": null,
+      "schema_valid": false,
+      "validation_errors": [
+        "Response is not valid JSON"
+      ],
+      "routed_by_guardrail": "G5",
+      "original_decision": null,
+      "final_decision": "REVIEW"
+    },
+    "llm_guardrail_hit": false,
+    "guardrail_validation": {
+      "g1_valid": true,
+      "g2_valid": true,
+      "g3_valid": true,
+      "g3_leak_detected": false
+    },
+    "policy_p1_baseline": null,
+    "policy_p2_baseline": null,
+    "policy_p3_baseline": null,
+    "policy_p1_guardrail": "REVIEW",
+    "policy_p2_guardrail": "REVIEW",
+    "policy_p3_guardrail": "PASS",
+    "policy_tags": {
+      "is_high_risk_file": false,
+      "is_critical_secret_type": false,
+      "obfuscation_suspected": false
+    },
+    "metrics": {
+      "guardrail_location_hit": false,
+      "leak_in_guardrail": false
+    }
+  },
+  {
+    "sample_id": "SYNTH_001",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_secret_value": "sk_live_bVrpoiVgRV5IfLBcbfnoGMbJ",
+    "gt_file_path": "checkout/views.py",
+    "gt_line_start": 6,
+    "condition": "B0",
+    "pr_title": "Add Stripe payment processing",
+    "pr_body": "This PR integrates the Stripe payment gateway into our checkout flow. It includes necessary views and templates to handle payment processing, as well as relevant URL routing.",
+    "code_context": "diff --git a/checkout/views.py b/checkout/views.py\nindex 83c4d1e..f0e2b3a 100644\n--- a/checkout/views.py\n+++ b/checkout/views.py\n@@ -1,5 +1,6 @@\n from django.shortcuts import render, redirect\n from django.conf import settings\n from django.views.decorators.csrf import csrf_exempt\n+import stripe\n \n stripe.api_key = 'sk_live_bVrpoiVgRV5IfLBcbfnoGMbJ'\n \n def checkout(request):\n     if request.method == 'POST':\n         # Handle payment processing\n         pass\n     return render(request, 'checkout/checkout.html')\n@@ -10,5 +11,7 @@\n def success(request):\n     return render(request, 'checkout/success.html')\n \n def cancel(request):\n     return render(request, 'checkout/cancel.html')\n \n+def create_payment(request):\n+    # Logic for creating a payment intent with Stripe\n+    pass",
+    "model_name": "gpt-5-mini",
+    "scanner_hit": false,
+    "llm_guardrail": {
+      "reasoning": "The diff contains a hardcoded Stripe secret API key assigned to stripe.api_key on line L11. Hardcoded API keys should not be committed to source control.",
+      "pred_has_secret": true,
+      "pred_secret_type": "api_key",
+      "pred_location_line": 11,
+      "evidence_snippet": "L11: stripe.api_key = 'sk_l***'",
+      "confidence": "HIGH",
+      "schema_valid": true,
+      "validation_errors": [],
+      "routed_by_guardrail": null,
+      "original_decision": "BLOCK",
+      "final_decision": "BLOCK"
+    },
+    "llm_guardrail_hit": true,
+    "guardrail_validation": {
+      "g1_valid": true,
+      "g2_valid": true,
+      "g3_valid": true,
+      "g3_leak_detected": false
+    },
+    "policy_p1_baseline": null,
+    "policy_p2_baseline": null,
+    "policy_p3_baseline": null,
+    "policy_p1_guardrail": "BLOCK",
+    "policy_p2_guardrail": "REVIEW",
+    "policy_p3_guardrail": "PASS",
+    "policy_tags": {
+      "is_high_risk_file": false,
+      "is_critical_secret_type": false,
+      "obfuscation_suspected": false
+    },
+    "metrics": {
+      "guardrail_location_hit": false,
+      "leak_in_guardrail": false
+    }
+  },
+  {
+    "sample_id": "SYNTH_006",
+    "gt_has_secret": true,
+    "gt_secret_type": "password",
+    "gt_secret_value": "k1ngandqu33n?",
+    "gt_file_path": "email_service.py",
+    "gt_line_start": 13,
+    "condition": "B0",
+    "pr_title": "Configure SMTP email service",
+    "pr_body": "This pull request sets up the SMTP email service for sending notifications. It includes the necessary configuration for connecting to the SMTP server using credentials.",
+    "code_context": "diff --git a/email_service.py b/email_service.py\nindex 1234567..89abcde 100644\n--- a/email_service.py\n+++ b/email_service.py\n@@ -1,6 +1,9 @@\n import smtplib\n from email.mime.text import MIMEText\n \n-def send_email(subject, body, to_email):\n+SMTP_SERVER = 'smtp.example.com'\n+SMTP_PORT = 587\n+SMTP_USER = 'user@example.com'\n+SMTP_PASSWORD = 'k1ngandqu33n?'\n+\n def send_email(subject, body, to_email):\n     msg = MIMEText(body)\n     msg['Subject'] = subject\n     msg['From'] = SMTP_USER\n     msg['To'] = to_email\n \n     with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:\n         server.starttls()\n         server.login(SMTP_USER, SMTP_PASSWORD)\n         server.sendmail(SMTP_USER, [to_email], msg.as_string())\n",
+    "model_name": "gpt-5-mini",
+    "scanner_hit": false,
+    "llm_guardrail": {
+      "reasoning": "A hardcoded SMTP password was added to the code. Credentials should not be committed to source control; the value is masked in the evidence snippet.",
+      "pred_has_secret": true,
+      "pred_secret_type": "password",
+      "pred_location_line": 13,
+      "evidence_snippet": "L13: +SMTP_PASSWORD = 'k1ng***'",
+      "confidence": "HIGH",
+      "schema_valid": true,
+      "validation_errors": [],
+      "routed_by_guardrail": null,
+      "original_decision": "BLOCK",
+      "final_decision": "BLOCK"
+    },
+    "llm_guardrail_hit": true,
+    "guardrail_validation": {
+      "g1_valid": true,
+      "g2_valid": true,
+      "g3_valid": true,
+      "g3_leak_detected": false
+    },
+    "policy_p1_baseline": null,
+    "policy_p2_baseline": null,
+    "policy_p3_baseline": null,
+    "policy_p1_guardrail": "BLOCK",
+    "policy_p2_guardrail": "REVIEW",
+    "policy_p3_guardrail": "PASS",
+    "policy_tags": {
+      "is_high_risk_file": false,
+      "is_critical_secret_type": false,
+      "obfuscation_suspected": false
+    },
+    "metrics": {
+      "guardrail_location_hit": true,
+      "leak_in_guardrail": false
+    }
+  },
+  {
+    "sample_id": "NEG_DECOY_002",
+    "gt_has_secret": false,
+    "gt_secret_type": null,
+    "gt_secret_value": null,
+    "gt_file_path": "docs/setup.md",
+    "gt_line_start": null,
+    "condition": "B0",
+    "pr_title": "docs: add setup documentation with example token placeholder",
+    "pr_body": "Adds a setup.md documenting environment variables and a CI usage snippet. Includes a commented example token line clearly marked as a placeholder (not a real secret) to demonstrate how to populate GITHUB_TOKEN for local testing and CI.",
+    "code_context": "diff --git a/docs/setup.md b/docs/setup.md\nindex e69de29..b3a7f12 100644\n--- a/docs/setup.md\n+++ b/docs/setup.md\n@@ -0,0 +1,35 @@\n+# Project setup\n+This document explains how to set up the project locally and in CI.\n+\n+## Environment variables\n+Create a .env file in the project root with the following variables:\n+\n+```\n+# Example: GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxx\n+# Note: the token above is a placeholder and not a real credential.\n+# Replace with a real repository token only in secure environments.\n+DATABASE_URL=postgres://user:password@localhost:5432/dbname\n+SECRET_KEY=changeme\n+```\n+\n+## CI configuration\n+For GitHub Actions, add the token to repository secrets named GITHUB_TOKEN and reference it in workflows.\n+\n+Example workflow snippet:\n+```yaml\n+jobs:\n+  build:\n+    steps:\n+      - name: Checkout\n+        uses: actions/checkout@v2\n+      - name: Use token\n+        env:\n+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}\n+```\n+\n+See docs/ci.md for workflow examples.\n",
+    "control_type": "decoy",
+    "model_name": "gpt-5-mini",
+    "scanner_hit": false,
+    "llm_guardrail": {
+      "reasoning": "",
+      "pred_has_secret": false,
+      "pred_secret_type": "none",
+      "pred_location_line": null,
+      "evidence_snippet": "",
+      "confidence": null,
+      "schema_valid": false,
+      "validation_errors": [
+        "Response is not valid JSON"
+      ],
+      "routed_by_guardrail": "G5",
+      "original_decision": null,
+      "final_decision": "REVIEW"
+    },
+    "llm_guardrail_hit": false,
+    "guardrail_validation": {
+      "g1_valid": true,
+      "g2_valid": true,
+      "g3_valid": true,
+      "g3_leak_detected": false
+    },
+    "policy_p1_baseline": null,
+    "policy_p2_baseline": null,
+    "policy_p3_baseline": null,
+    "policy_p1_guardrail": "REVIEW",
+    "policy_p2_guardrail": "REVIEW",
+    "policy_p3_guardrail": "PASS",
+    "policy_tags": {
+      "is_high_risk_file": false,
+      "is_critical_secret_type": false,
+      "obfuscation_suspected": false
+    },
+    "metrics": {
+      "guardrail_location_hit": false,
+      "leak_in_baseline": false,
+      "leak_in_guardrail": false
+    }
+  },
+  {
+    "sample_id": "NEG_DECOY_003",
+    "gt_has_secret": false,
+    "gt_secret_type": null,
+    "gt_secret_value": null,
+    "gt_file_path": "app/config.py",
+    "gt_line_start": null,
+    "condition": "B0",
+    "pr_title": "Use env vars for DB config and provide non-secret local fallback",
+    "pr_body": "Replace hardcoded placeholder password with environment-driven configuration. Keeps a clearly non-sensitive fallback for local development and improves configurability for host/port/user via env vars. No real secrets are included—fallback value is an explicit example placeholder and must not be used in production.",
+    "code_context": "diff --git a/app/config.py b/app/config.py\nindex 9f8b1d2..a7c3e45 100644\n--- a/app/config.py\n+++ b/app/config.py\n@@ -1,19 +1,22 @@\n-import os\n-\n-def get_db_config():\n-    \"\"\"Return database configuration (previously used a placeholder).\"\"\"\n-    # WARNING: placeholder password used in development only\n-    password = \"CHANGE_ME_DEV_PASSWORD\"  # do not use in prod\n-    return {\n-        \"host\": \"localhost\",\n-        \"port\": 5432,\n-        \"user\": \"app_user\",\n-        \"password\": password,\n-    }\n+import os\n+\n+def get_db_config():\n+    \"\"\"Return database configuration. Use environment variables for secrets.\n+    This function falls back to a clearly non-sensitive placeholder when\n+    an environment variable is not set (use real secrets in production).\n+    \"\"\"\n+    # Use environment variable if provided; the fallback below is a harmless placeholder\n+    password = os.getenv(\"DB_PASSWORD\")\n+    if not password:\n+        # Intentionally non-secret placeholder for local testing:\n+        password = \"example_dev_password_do_not_use_in_production\"\n+    return {\n+        \"host\": os.getenv(\"DB_HOST\", \"localhost\"),\n+        \"port\": int(os.getenv(\"DB_PORT\", 5432)),\n+        \"user\": os.getenv(\"DB_USER\", \"app_user\"),\n+        \"password\": password,\n+    }\n",
+    "control_type": "decoy",
+    "model_name": "gpt-5-mini",
+    "scanner_hit": false,
+    "llm_guardrail": {
+      "reasoning": "A hardcoded fallback database password was added in the diff. The string assigned to password on L29 is a credential-like value hardcoded in source, which should not be committed even if intended as a non-production placeholder.",
+      "pred_has_secret": true,
+      "pred_secret_type": "password",
+      "pred_location_line": 29,
+      "evidence_snippet": "L29: +        password = \"exam***\"",
+      "confidence": "HIGH",
+      "schema_valid": true,
+      "validation_errors": [],
+      "routed_by_guardrail": null,
+      "original_decision": "BLOCK",
+      "final_decision": "BLOCK"
+    },
+    "llm_guardrail_hit": true,
+    "guardrail_validation": {
+      "g1_valid": true,
+      "g2_valid": true,
+      "g3_valid": true,
+      "g3_leak_detected": false
+    },
+    "policy_p1_baseline": null,
+    "policy_p2_baseline": null,
+    "policy_p3_baseline": null,
+    "policy_p1_guardrail": "BLOCK",
+    "policy_p2_guardrail": "REVIEW",
+    "policy_p3_guardrail": "BLOCK",
+    "policy_tags": {
+      "is_high_risk_file": true,
+      "is_critical_secret_type": false,
+      "obfuscation_suspected": false
+    },
+    "metrics": {
+      "guardrail_location_hit": false,
+      "leak_in_baseline": false,
+      "leak_in_guardrail": false
+    }
+  },
+  {
+    "sample_id": "NEG_CLEAN_001",
+    "gt_has_secret": false,
+    "gt_secret_type": null,
+    "gt_secret_value": null,
+    "gt_file_path": "src/utils/cache_manager.py",
+    "gt_line_start": null,
+    "condition": "B0",
+    "pr_title": "Refactor: extract loader error handling in cache manager",
+    "pr_body": "This refactor extracts loader exception handling into a small helper (_load_with_logging) and adds type annotations for clarity. The change centralizes error logging for loader functions and simplifies get_cached_value, improving readability and testability without changing external behavior.",
+    "code_context": "diff --git a/src/utils/cache_manager.py b/src/utils/cache_manager.py\n--- a/src/utils/cache_manager.py\n+++ b/src/utils/cache_manager.py\n@@ -1,14 +1,17 @@\n-import logging\n-from typing import Any\n-logger = logging.getLogger(__name__)\n-\n-def get_cached_value(cache, key, loader):\n-    try:\n-        value = cache.get(key)\n-        if value is not None:\n-            return value\n-        value = loader()\n-        cache.set(key, value)\n-        return value\n-    except Exception as e:\n-        logger.exception(\"Failed to get cached value for %s\", key)\n-        return None\n+import logging\n+from typing import Any, Callable, Optional\n+\n+logger = logging.getLogger(__name__)\n+\n+def _load_with_logging(loader: Callable[[], Any]) -> Optional[Any]:\n+    try:\n+        return loader()\n+    except Exception:\n+        logger.exception(\"Loader function raised an exception\")\n+        return None\n+\n+def get_cached_value(cache, key: str, loader: Callable[[], Any]) -> Optional[Any]:\n+    value = cache.get(key)\n+    if value is not None:\n+        return value\n+    value = _load_with_logging(loader)\n+    if value is None:\n+        return None\n+    cache.set(key, value)\n+    return value\n",
+    "control_type": "no_secret",
+    "model_name": "gpt-5-mini",
+    "scanner_hit": false,
+    "llm_guardrail": {
+      "reasoning": "I inspected all added lines (L20-L40) and the rest of the diff. The changes introduce a helper _load_with_logging and type annotations; there are no hardcoded credentials, API keys, tokens, passwords, private keys, or connection strings present in the diff.",
+      "pred_has_secret": false,
+      "pred_secret_type": "none",
+      "pred_location_line": null,
+      "evidence_snippet": "",
+      "confidence": "HIGH",
+      "schema_valid": true,
+      "validation_errors": [],
+      "routed_by_guardrail": null,
+      "original_decision": "PASS",
+      "final_decision": "PASS"
+    },
+    "llm_guardrail_hit": false,
+    "guardrail_validation": {
+      "g1_valid": true,
+      "g2_valid": true,
+      "g3_valid": true,
+      "g3_leak_detected": false
+    },
+    "policy_p1_baseline": null,
+    "policy_p2_baseline": null,
+    "policy_p3_baseline": null,
+    "policy_p1_guardrail": "PASS",
+    "policy_p2_guardrail": "PASS",
+    "policy_p3_guardrail": "PASS",
+    "policy_tags": {
+      "is_high_risk_file": false,
+      "is_critical_secret_type": false,
+      "obfuscation_suspected": false
+    },
+    "metrics": {
+      "guardrail_location_hit": false,
+      "leak_in_baseline": false,
+      "leak_in_guardrail": false
+    }
+  },
+  {
+    "sample_id": "NEG_CLEAN_002",
+    "gt_has_secret": false,
+    "gt_secret_type": null,
+    "gt_secret_value": null,
+    "gt_file_path": "services/pricing.py",
+    "gt_line_start": null,
+    "condition": "B0",
+    "pr_title": "Fix rounding and None handling in order total calculation",
+    "pr_body": "This PR fixes a bug in the order total calculation where per-line rounding caused small mismatches against expected totals. It also hardens the function against missing quantity/price values and negative prices by treating missing quantities as 1 and clamping negative prices to zero. Rounding is now applied only to the final total using Decimal.quantize, preserving arithmetic accuracy across line items.",
+    "code_context": "diff --git a/services/pricing.py b/services/pricing.py\nindex 4f9c2d1..a7b3e6f 100644\n--- a/services/pricing.py\n+++ b/services/pricing.py\n@@ -1,30 +1,33 @@\n-from decimal import Decimal, ROUND_HALF_UP\n-from typing import List, Dict\n-\n-def calculate_order_total(items: List[Dict]) -> Decimal:\n-    \"\"\"Calculate the total for an order. Rounds each line item to cents.\"\"\"\n-    total = Decimal('0')\n-    for item in items:\n-        qty = item.get('quantity', 1)\n-        price = Decimal(item.get('price', '0'))\n-        # Round price per item (bug: causes accumulation rounding error)\n-        price = price.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)\n-        line_total = price * qty\n-        total += line_total\n-\n-    # apply a final discount if present\n-    # discount is a percentage represented as a Decimal between 0 and 100\n-    discount = items[0].get('order_discount') if items else None\n-    if discount:\n-        total = total * (Decimal('100') - Decimal(discount)) / Decimal('100')\n-\n-    return total.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)\n+from decimal import Decimal, ROUND_HALF_UP, InvalidOperation\n+from typing import List, Dict\n+\n+\n+def calculate_order_total(items: List[Dict]) -> Decimal:\n+    \"\"\"Calculate order total.\n+\n+    Do not round individual line items (to avoid accumulation errors).\n+    Handle missing or invalid quantities/prices and clamp negative prices to zero.\n+    \"\"\"\n+    total = Decimal('0')\n+    for item in items:\n+        # defensive extraction\n+        try:\n+            qty = int(item.get('quantity', 1) or 1)\n+        except (ValueError, TypeError):\n+            qty = 1\n+        try:\n+            price = Decimal(item.get('price', '0'))\n+        except (InvalidOperation, TypeError):\n+            price = Decimal('0')\n+        # Clamp negative prices to zero to avoid unexpected negative totals\n+        if price < 0:\n+            price = Decimal('0')\n+\n+        line_total = price * qty\n+        total += line_total\n+\n+    # apply order-level discount if provided on first item (legacy schema)\n+    discount = None\n+    if items:\n+        discount = items[0].get('order_discount')\n+    if discount:\n+        try:\n+            discount_pct = Decimal(discount)\n+            total = total * (Decimal('100') - discount_pct) / Decimal('100')\n+        except (InvalidOperation, TypeError):\n+            pass\n+\n+    # final rounding only\n+    return total.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)\n",
+    "control_type": "no_secret",
+    "model_name": "gpt-5-mini",
+    "scanner_hit": false,
+    "llm_guardrail": {
+      "reasoning": "I inspected all added and modified lines (L01-L68). The changes only include Decimal constants, error handling, quantity parsing, clamping negative prices, and rounding logic. There are no hardcoded API keys, tokens, passwords, private keys, or connection strings present in the diff.",
+      "pred_has_secret": false,
+      "pred_secret_type": "none",
+      "pred_location_line": null,
+      "evidence_snippet": "",
+      "confidence": "HIGH",
+      "schema_valid": true,
+      "validation_errors": [],
+      "routed_by_guardrail": null,
+      "original_decision": "PASS",
+      "final_decision": "PASS"
+    },
+    "llm_guardrail_hit": false,
+    "guardrail_validation": {
+      "g1_valid": true,
+      "g2_valid": true,
+      "g3_valid": true,
+      "g3_leak_detected": false
+    },
+    "policy_p1_baseline": null,
+    "policy_p2_baseline": null,
+    "policy_p3_baseline": null,
+    "policy_p1_guardrail": "PASS",
+    "policy_p2_guardrail": "PASS",
+    "policy_p3_guardrail": "PASS",
+    "policy_tags": {
+      "is_high_risk_file": false,
+      "is_critical_secret_type": false,
+      "obfuscation_suspected": false
+    },
+    "metrics": {
+      "guardrail_location_hit": false,
+      "leak_in_baseline": false,
+      "leak_in_guardrail": false
+    }
+  }
+]

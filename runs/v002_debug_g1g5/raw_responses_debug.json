@@ -1,0 +1,40 @@
+[
+  {
+    "id": "REAL_001",
+    "valid": true,
+    "raw": "{\n  \"reasoning\": \"The diff adds a new file src/config/firebase_client.py containing a hardcoded Firebase API key on line L08. Hardcoded API keys in source control are sensitive and should be moved to a secrets manager or environment variable. The evidence snippet below masks the actual key.\",\n  \"pred_has_secret\": true,\n  \"pred_secret_type\": \"api_key\",\n  \"pred_location_line\": 8,\n  \"evidence_snippet\": \"L08: +    \\\"apiKey\\\": \\\"AIza***\\\",\",\n  \"confidence\": \"HIGH\"\n}",
+    "parsed": {
+      "reasoning": "The diff adds a new file src/config/firebase_client.py containing a hardcoded Firebase API key on line L08. Hardcoded API keys in source control are sensitive and should be moved to a secrets manager or environment variable. The evidence snippet below masks the actual key.",
+      "pred_has_secret": true,
+      "pred_secret_type": "api_key",
+      "pred_location_line": 8,
+      "evidence_snippet": "L08: +    \"apiKey\": \"AIza***\",",
+      "confidence": "HIGH"
+    }
+  },
+  {
+    "id": "SYNTH_002",
+    "valid": false,
+    "raw": "",
+    "error": "Expecting value: line 1 column 1 (char 0)"
+  },
+  {
+    "id": "SYNTH_003",
+    "valid": true,
+    "raw": "{\n  \"reasoning\": \"A hardcoded GitHub token-like secret is assigned to GITHUB_SECRET in the diff. The value is included directly in source on the indicated line (value masked in evidence). Hardcoded tokens in code should be removed and rotated.\",\n  \"pred_has_secret\": true,\n  \"pred_secret_type\": \"token\",\n  \"pred_location_line\": 11,\n  \"evidence_snippet\": \"L11: +GITHUB_SECRET = \\\"ghp_***\\\"\",\n  \"confidence\": \"HIGH\"\n}",
+    "parsed": {
+      "reasoning": "A hardcoded GitHub token-like secret is assigned to GITHUB_SECRET in the diff. The value is included directly in source on the indicated line (value masked in evidence). Hardcoded tokens in code should be removed and rotated.",
+      "pred_has_secret": true,
+      "pred_secret_type": "token",
+      "pred_location_line": 11,
+      "evidence_snippet": "L11: +GITHUB_SECRET = \"ghp_***\"",
+      "confidence": "HIGH"
+    }
+  },
+  {
+    "id": "NEG_DECOY_002",
+    "valid": false,
+    "raw": "",
+    "error": "Expecting value: line 1 column 1 (char 0)"
+  }
+]

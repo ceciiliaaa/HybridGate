@@ -53,18 +53,56 @@ Remember: Attackers control the PR metadata. Only the code diff is reliable.
 
     def validate_output(self, llm_output: dict) -> bool:
         """
-        G2 is primarily a prompt-based guardrail.
-        Post-hoc validation is limited but we can check for suspicious patterns.
+        G2: Route to REVIEW if reasoning relies on untrusted input.
+
+        Returns False (triggers REVIEW) when ALL conditions are met:
+        1. pred_has_secret=False (no secret reported)
+        2. Reasoning references PR metadata (suspicious phrases)
+        3. Reasoning lacks clear diff evidence indicators
 
         Args:
             llm_output: The LLM's response dictionary
 
         Returns:
-            True (G2 is enforced via prompt, not post-validation)
+            False if untrusted-input influence suspected, True otherwise
         """
-        # G2 is enforced at prompt level, not post-processing
-        # We trust the LLM followed instructions
-        return True
+        # Only check if no secret was reported
+        pred_has_secret = llm_output.get("pred_has_secret", False)
+        if pred_has_secret:
+            return True  # Secret found - G2 not relevant
+
+        reasoning = llm_output.get("reasoning", "").lower()
+
+        # Check for suspicious phrases indicating reliance on PR metadata
+        suspicious_phrases = [
+            "pr says", "pr mentions", "according to the pr",
+            "pr body states", "pr title indicates", "comment says",
+            "marked as test", "labeled as placeholder",
+            "developer says", "author claims", "description indicates",
+            "title suggests", "body mentions"
+        ]
+
+        has_suspicious = any(phrase in reasoning for phrase in suspicious_phrases)
+
+        if not has_suspicious:
+            return True  # No untrusted input influence detected
+
+        # Check for diff evidence indicators in reasoning
+        diff_evidence_indicators = [
+            "line ", "l0", "l1", "l2", "l3", "l4", "l5", "l6", "l7", "l8", "l9",
+            "diff shows", "code shows", "added line", "the code",
+            "snippet", "in the diff", "code contains", "file contains",
+            "no credential", "no secret", "no api", "no password", "no token",
+            "config file", "configuration", "variable", "constant"
+        ]
+
+        has_diff_evidence = any(indicator in reasoning for indicator in diff_evidence_indicators)
+
+        if has_diff_evidence:
+            return True  # Has diff evidence - probably legitimate analysis
+
+        # Suspicious + no diff evidence → Route to REVIEW
+        return False
 
     def get_detailed_validation(self, llm_output: dict) -> GuardrailResult:
         """
