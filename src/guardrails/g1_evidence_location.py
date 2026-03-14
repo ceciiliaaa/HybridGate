@@ -5,7 +5,8 @@ Forces the LLM to provide concrete evidence (file path, line number, code snippe
 for any secret detection claim. Prevents hallucinated findings.
 """
 
-from typing import Optional
+import re
+from typing import List, Optional, Tuple
 from .base import Guardrail, GuardrailResult
 
 
@@ -74,6 +75,79 @@ OUTPUT SCHEMA REQUIREMENTS:
         has_evidence = bool(llm_output.get("evidence_snippet", "").strip())
 
         return has_location and has_evidence
+
+    def validate_output_with_context(
+        self,
+        llm_output: dict,
+        diff_lines: Optional[List[str]] = None
+    ) -> Tuple[bool, List[str]]:
+        """
+        Validate evidence exists AND is plausible given the diff context.
+
+        Args:
+            llm_output: The LLM's response dictionary
+            diff_lines: List of diff lines for context-aware validation
+
+        Returns:
+            Tuple of (is_valid, list_of_issues)
+        """
+        issues = []
+
+        # If no secret claimed, G1 is satisfied
+        if not llm_output.get("pred_has_secret", False):
+            return True, []
+
+        location = llm_output.get("pred_location_line")
+        evidence = llm_output.get("evidence_snippet", "").strip()
+
+        # Basic checks (same as validate_output)
+        if location is None:
+            issues.append("Missing pred_location_line")
+        if not evidence:
+            issues.append("Missing or empty evidence_snippet")
+
+        # Context-aware plausibility checks (only if diff_lines provided)
+        if diff_lines and location is not None:
+            # Check 1: Location within valid range
+            if location < 1 or location > len(diff_lines):
+                issues.append(
+                    f"pred_location_line={location} outside diff range 1-{len(diff_lines)}"
+                )
+
+            # Check 2: Evidence roughly consistent with referenced line
+            elif evidence:
+                referenced_line = diff_lines[location - 1]  # 1-indexed
+
+                # Extract meaningful tokens from evidence
+                # Ignore: line prefixes like "L29:", masking "***", short tokens
+                evidence_tokens = []
+                for token in evidence.split():
+                    # Skip line prefixes (L01:, L29:, etc.)
+                    if re.match(r'^L?\d+:?$', token):
+                        continue
+                    # Skip masked content
+                    if '***' in token:
+                        continue
+                    # Skip short/trivial tokens
+                    if len(token) <= 3:
+                        continue
+                    # Skip pure punctuation
+                    if all(c in '+-=<>(){}[]"\',.:;' for c in token):
+                        continue
+                    evidence_tokens.append(token)
+
+                # If we have meaningful tokens, check overlap with referenced line
+                if evidence_tokens:
+                    has_overlap = any(
+                        token in referenced_line for token in evidence_tokens[:3]
+                    )
+                    if not has_overlap:
+                        issues.append(
+                            "evidence_snippet inconsistent with referenced line"
+                        )
+                # If no meaningful tokens (all masked), rely on basic checks only
+
+        return len(issues) == 0, issues
 
     def get_detailed_validation(self, llm_output: dict) -> GuardrailResult:
         """

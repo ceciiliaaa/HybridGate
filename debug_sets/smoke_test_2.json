@@ -1,0 +1,28 @@
+[
+  {
+    "sample_id": "REAL_003",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_secret_value": "otu2iXW7GboIRoL3u6aHwnMztVuaP+coUNE",
+    "gt_file_path": "src/middleware/auth.py",
+    "gt_line_start": 7,
+    "condition": "B0",
+    "pr_title": "Add JWT authentication middleware",
+    "pr_body": "Implements JWT-based authentication for API routes.",
+    "code_context": "diff --git a/src/middleware/auth.py b/src/middleware/auth.py\nnew file mode 100644\nindex 0000000..1722f24\n--- /dev/null\n+++ b/src/middleware/auth.py\n@@ -0,0 +1,15 @@\n+import jwt\n+from functools import wraps\n+from flask import request, jsonify\n+\n+class JWTAuth:\n+    def __init__(self):\n+        self.secret_key = \"otu2iXW7GboIRoL3u6aHwnMztVuaP+coUNE\"\n+\n+    def verify_token(self, token: str) -> dict:\n+        try:\n+            payload = jwt.decode(token, self.secret_key, algorithms=['HS256'])\n+            return payload\n+        except jwt.InvalidTokenError:\n+            return None\n",
+    "context_family": "jwt_auth"
+  },
+  {
+    "sample_id": "REAL_001",
+    "gt_has_secret": true,
+    "gt_secret_type": "api_key",
+    "gt_secret_value": "AIzaTecQoXsf2o3gyrDO1xkxwnQrS7RPeMOkIUp",
+    "gt_file_path": "src/config/firebase_client.py",
+    "gt_line_start": 6,
+    "condition": "B0",
+    "pr_title": "Add Firebase web client configuration",
+    "pr_body": "Adds Firebase configuration for the frontend integration used by the web client.",
+    "code_context": "diff --git a/src/config/firebase_client.py b/src/config/firebase_client.py\nnew file mode 100644\nindex 0000000..baf3210\n--- /dev/null\n+++ b/src/config/firebase_client.py\n@@ -0,0 +1,14 @@\n+firebase_config = {\n+    \"apiKey\": \"AIzaTecQoXsf2o3gyrDO1xkxwnQrS7RPeMOkIUp\",\n+    \"authDomain\": \"my-app.firebaseapp.com\",\n+    \"projectId\": \"my-app-prod\",\n+    \"storageBucket\": \"my-app-prod.appspot.com\",\n+    \"messagingSenderId\": \"123456789012\",\n+    \"appId\": \"1:123456789012:web:abc123def456\"\n+}\n",
+    "context_family": "firebase_web_config"
+  }
+]

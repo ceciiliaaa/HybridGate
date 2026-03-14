@@ -274,7 +274,8 @@ class HybridEvaluationClient:
             guardrail_result = apply_guardrails_with_routing(
                 raw_response,
                 ground_truth=ground_truth,
-                settings=self.guardrail_settings
+                settings=self.guardrail_settings,
+                diff_context=numbered_diff
             )
 
             # If schema validation failed completely, return minimal result
@@ -308,7 +309,13 @@ class HybridEvaluationClient:
                 "validation_errors": guardrail_result["validation_errors"],
                 "routed_by_guardrail": guardrail_result["routed_by_guardrail"],
                 "original_decision": guardrail_result["original_decision"],
-                "final_decision": guardrail_result["final_decision"]
+                "final_decision": guardrail_result["final_decision"],
+                # G1/G2 validation fields
+                "g1_valid": guardrail_result.get("g1_valid"),
+                "g1_issues": guardrail_result.get("g1_issues", []),
+                "g2_valid": guardrail_result.get("g2_valid"),
+                "g4_valid": guardrail_result.get("g4_valid"),
+                "g5_valid": guardrail_result.get("g5_valid")
             }
 
         # =====================================================================
