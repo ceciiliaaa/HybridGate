@@ -9,7 +9,7 @@ Dokumentation aller wichtigen Änderungen am Projekt.
 ### Evaluation
 - **Run v121** (`runs/v121_final_extreme_openai_g5fix/`): Finaler Evaluation-Run auf extreme Perturbation-Dataset (200 Samples)
 - Drei Modi verglichen: Scanner (Gitleaks + detect-secrets), LLM Baseline, LLM + Guardrails (G1–G5)
-- Ergebnisse: Scanner Recall=84.0%, LLM Baseline Recall=100%, Guardrails Recall=100%
+- Ergebnisse (Alert-Level): Scanner Recall=84.0%, LLM Baseline Recall=99.3% (1 API-Fehler), Guardrails Recall=100%
 - Data Leakage Audit durchgeführt — keine ergebnisrelevante Leakage
 
 ### G5-Fix (v120 → v121)
