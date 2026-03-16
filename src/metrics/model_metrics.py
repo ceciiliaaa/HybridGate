@@ -115,11 +115,17 @@ def compute_precision_recall_f1(cm: ConfusionMatrix) -> Dict[str, float]:
 
 def compute_location_accuracy(
     results: List[Dict[str, Any]],
-    pred_line_key: str = "pred_location_line",
-    gt_line_key: str = "gt_line_start"
+    pred_start_key: str = "pred_location_start",
+    pred_end_key: str = "pred_location_end",
+    gt_line_key: str = "gt_line_start",
+    # Legacy compatibility: if caller passes old pred_line_key, map it
+    pred_line_key: str = None,
 ) -> Dict[str, Any]:
     """
-    Compute location prediction accuracy.
+    Compute location prediction accuracy using span logic.
+
+    A location is a "hit" when gt_line_start falls within
+    [pred_location_start, pred_location_end].
 
     Only considers samples where:
     - Ground truth has a secret
@@ -127,8 +133,10 @@ def compute_location_accuracy(
 
     Args:
         results: List of result dictionaries
-        pred_line_key: Key for predicted line number
+        pred_start_key: Key for predicted start line
+        pred_end_key: Key for predicted end line
         gt_line_key: Key for ground truth line number
+        pred_line_key: Deprecated — ignored (kept for call-site compat)
 
     Returns:
         Dictionary with location accuracy metrics
@@ -147,11 +155,12 @@ def compute_location_accuracy(
 
     location_hits = 0
     for r in true_positives:
-        pred_line = r.get(pred_line_key)
         gt_line = r.get(gt_line_key)
+        pred_start = r.get(pred_start_key)
+        pred_end = r.get(pred_end_key)
 
-        if pred_line is not None and gt_line is not None:
-            if int(pred_line) == int(gt_line):
+        if gt_line is not None and pred_start is not None and pred_end is not None:
+            if int(pred_start) <= int(gt_line) <= int(pred_end):
                 location_hits += 1
 
     accuracy = location_hits / len(true_positives)
@@ -167,7 +176,10 @@ def compute_model_metrics(
     results: List[Dict[str, Any]],
     detector_name: str = "llm",
     pred_key: str = "pred_has_secret",
-    pred_line_key: str = "pred_location_line"
+    pred_start_key: str = "pred_location_start",
+    pred_end_key: str = "pred_location_end",
+    # Legacy compatibility — ignored
+    pred_line_key: str = None,
 ) -> Dict[str, Any]:
     """
     Compute all model metrics for a detector.
@@ -176,14 +188,19 @@ def compute_model_metrics(
         results: List of result dictionaries
         detector_name: Name of the detector for labeling
         pred_key: Key for prediction field
-        pred_line_key: Key for predicted line number
+        pred_start_key: Key for predicted start line
+        pred_end_key: Key for predicted end line
 
     Returns:
         Comprehensive metrics dictionary
     """
     cm = compute_confusion_matrix(results, pred_key=pred_key)
     prf = compute_precision_recall_f1(cm)
-    loc = compute_location_accuracy(results, pred_line_key=pred_line_key)
+    loc = compute_location_accuracy(
+        results,
+        pred_start_key=pred_start_key,
+        pred_end_key=pred_end_key,
+    )
 
     return {
         "detector": detector_name,

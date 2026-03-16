@@ -97,7 +97,8 @@ def compute_all_metrics(results: List[Dict[str, Any]]) -> Dict[str, Any]:
     baseline_results = [{
         **r,
         "pred_has_secret": r.get("llm_baseline_hit", False),
-        "pred_location_line": r.get("llm_baseline", {}).get("pred_location_line") if r.get("llm_baseline") else None
+        "pred_location_start": r.get("llm_baseline", {}).get("pred_location_start") if r.get("llm_baseline") else None,
+        "pred_location_end": r.get("llm_baseline", {}).get("pred_location_end") if r.get("llm_baseline") else None,
     } for r in results]
     metrics["model_metrics"]["llm_baseline"] = compute_model_metrics(
         baseline_results, detector_name="llm_baseline"
@@ -107,7 +108,8 @@ def compute_all_metrics(results: List[Dict[str, Any]]) -> Dict[str, Any]:
     guardrail_results = [{
         **r,
         "pred_has_secret": r.get("llm_guardrail_hit", False),
-        "pred_location_line": r.get("llm_guardrail", {}).get("pred_location_line") if r.get("llm_guardrail") else None
+        "pred_location_start": r.get("llm_guardrail", {}).get("pred_location_start") if r.get("llm_guardrail") else None,
+        "pred_location_end": r.get("llm_guardrail", {}).get("pred_location_end") if r.get("llm_guardrail") else None,
     } for r in results]
     metrics["model_metrics"]["llm_guardrail"] = compute_model_metrics(
         guardrail_results, detector_name="llm_guardrail"

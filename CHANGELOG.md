@@ -4,6 +4,52 @@ Dokumentation aller wichtigen Änderungen am Projekt.
 
 ---
 
+## [2026-03-16] Final Evaluation Run v121 (Extreme Dataset, G5-Fix)
+
+### Evaluation
+- **Run v121** (`runs/v121_final_extreme_openai_g5fix/`): Finaler Evaluation-Run auf extreme Perturbation-Dataset (200 Samples)
+- Drei Modi verglichen: Scanner (Gitleaks + detect-secrets), LLM Baseline, LLM + Guardrails (G1–G5)
+- Ergebnisse: Scanner Recall=84.0%, LLM Baseline Recall=100%, Guardrails Recall=100%
+- Data Leakage Audit durchgeführt — keine ergebnisrelevante Leakage
+
+### G5-Fix (v120 → v121)
+- **Bug:** G5 lehnte `confidence`-Feld ab (G4 fordert es, G5 kannte es nicht) → 166/200 falsche REVIEW-Routings
+- **Fix:** `("confidence", str, False)` in `OPTIONAL_FIELDS` von `g5_schema_validation.py` hinzugefügt
+- Testfix: `test_g5_confidence_field_rejected` → `test_g5_confidence_field_accepted`
+
+### Run v120 (broken, archiviert)
+- Identisch zu v121, aber mit G5-Bug — Guardrail-Recall nur 2%
+- Archiviert als Referenz unter `runs/v120_final_extreme_openai/`
+
+---
+
+## [2026-03-15] G1–G5 Guardrail Hardening & 200-Sample Evaluation
+
+### Guardrail-Refactoring
+- **G3 Rewrite:** Fail-closed 3-Schicht-Architektur (Detect → Redact once → REVIEW)
+  - 16 Regex-Patterns, Entropy-Spans, Candidate Echo, Reconstructed Leak Detection
+  - Scannt vollständige JSON-Serialisierung
+- **G4 Neu:** Regelbasierte Uncertainty Escalation mit Confidence + Context-Flags
+  - Rules: R1 (ambiguous context), R2 (reconstructed + ambiguity), R3 (scanner disagreement), R4 (exculpatory escalation)
+  - Inferred Flags aus File-Path, PR-Metadata, Code-Kontext, Scanner-Ergebnissen
+- **G5 Neu:** Schema Validation mit Repair-Mechanismus
+  - Required/Optional Fields, Type-Checking, Enum-Validation
+  - Auto-Repair für häufige Fehler (String→Bool, fehlende Felder)
+- **G1 Erweitert:** Evidence Validation mit Diff-Kontext (`validate_output_with_context`)
+- **G2 Erweitert:** `validate_with_details()` für G4-Integration
+- **Pipeline-Order:** G5 → G2 → G4 → G1 → G3 (`apply_guardrails_with_routing()`)
+
+### Dataset
+- **Extreme Perturbation Dataset** (`all_200_samples_extreme.json`): 150 positive + 50 negative Samples
+- Perturbation Engine v2: E1-B, E2-A, E3-A, E3-B Strategien mit intensivierten Manipulationen
+- 50 hardened positive Samples (`hardened_positive_samples.json`) manuell überarbeitet
+
+### Run v110 (200 Samples, Standard-Perturbation)
+- `runs/v110_full_openai_200samples/`: 200 Samples mit Standard-Dataset, G1–G5
+- G2 Consistency-Fix angewandt
+
+---
+
 ## [2026-03-10] Dataset Versioning & Archive System
 
 ### Hinzugefügt
@@ -148,7 +194,7 @@ Siehe `data/05_results/hybrid_evaluation_*.json`
 ### Commit Messages
 - Englisch
 - Kurze Summary + Details
-- Co-Authored-By: Claude Opus 4.5
+- Co-Authored-By: Claude Opus 4.6
 
 ### Safety Policy
 - **NIEMALS Daten löschen**
