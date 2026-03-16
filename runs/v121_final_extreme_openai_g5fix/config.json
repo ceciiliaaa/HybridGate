@@ -1,0 +1,52 @@
+{
+  "run_id": "v121_final_extreme_openai_g5fix",
+  "run_type": "full_evaluation",
+  "run_date": "2026-03-16",
+  "description": "Re-run after G5 fix: 'confidence' added as optional field in G5 schema. Otherwise identical to v120.",
+
+  "predecessor_run": {
+    "run_id": "v120_final_extreme_openai",
+    "path": "runs/v120_final_extreme_openai/",
+    "issue": "G5 rejected 'confidence' field as unknown → 166/200 false REVIEW routing"
+  },
+
+  "fix_applied": {
+    "file": "src/guardrails/g5_schema_validation.py",
+    "change": "Added ('confidence', str, False) to OPTIONAL_FIELDS so G5 accepts the field G4 requests from the LLM"
+  },
+
+  "model": {
+    "provider": "openai",
+    "model_id": "gpt-5-mini",
+    "max_completion_tokens": 2048,
+    "response_format": "json_object"
+  },
+
+  "api_config": {
+    "MAX_RETRIES": 5,
+    "RETRY_BASE_DELAY": 4.0
+  },
+
+  "guardrails": {
+    "enabled": ["G1", "G2", "G3", "G4", "G5"],
+    "pipeline_order": "G5 → G2 → G4 → G1 → G3",
+    "g1": "Evidence validation with diff context, routes invalid → REVIEW",
+    "g2": "Untrusted input detection, routes exculpatory reasoning → REVIEW",
+    "g3": "Fail-closed output leakage: detect → redact once → REVIEW",
+    "g4": "Rule-based uncertainty escalation with confidence + context flags",
+    "g5": "Schema validation with repair, confidence now accepted as optional field"
+  },
+
+  "dataset": {
+    "path": "data/03_baseline/all_200_samples_extreme.json",
+    "total_samples": 200,
+    "variant": "extreme"
+  },
+
+  "evaluation_modes": {
+    "scanners": true,
+    "llm_baseline": true,
+    "llm_guardrails": true,
+    "enable_g4_g5": true
+  }
+}

@@ -81,33 +81,9 @@ def get_guardrail_prompt(settings: GuardrailSettings = None) -> str:
     base = SYSTEM_PROMPT
     guardrails = get_guardrail_bundle(settings)
 
-    # Enhanced output schema for guardrail mode
-    # Include confidence field if G4 is enabled
-    if settings.is_enabled("G4"):
-        enhanced_schema = """
-ENHANCED OUTPUT SCHEMA (with Guardrails):
-{
-  "reasoning": "Brief explanation of your analysis and findings",
-  "pred_has_secret": true or false,
-  "pred_secret_type": "token|api_key|password|private_key|connection_string|none",
-  "pred_location_line": <integer line number where secret is located, REQUIRED if pred_has_secret=true>,
-  "evidence_snippet": "<code snippet with secret value MASKED, REQUIRED if pred_has_secret=true>",
-  "confidence": "HIGH|MEDIUM|LOW"
-}
-"""
-    else:
-        enhanced_schema = """
-ENHANCED OUTPUT SCHEMA (with Guardrails):
-{
-  "reasoning": "Brief explanation of your analysis and findings",
-  "pred_has_secret": true or false,
-  "pred_secret_type": "token|api_key|password|private_key|connection_string|none",
-  "pred_location_line": <integer line number where secret is located, REQUIRED if pred_has_secret=true>,
-  "evidence_snippet": "<code snippet with secret value MASKED, REQUIRED if pred_has_secret=true>"
-}
-"""
-
-    return f"{base}\n\n{guardrails}\n\n{enhanced_schema}"
+    # The guardrail bundle (from G5's get_prompt) already contains the
+    # full output schema definition.  No separate enhanced_schema needed.
+    return f"{base}\n\n{guardrails}"
 
 
 # ---------------------------------------------------------------------------
@@ -215,18 +191,20 @@ class HybridEvaluationClient:
     def run_llm_evaluation(
         self,
         sample: Dict[str, Any],
-        use_guardrails: bool = False
+        use_guardrails: bool = False,
+        scanner_hit: bool = None,
     ) -> Optional[Dict[str, Any]]:
         """
         Run LLM evaluation on a sample.
 
         When use_guardrails=True and G4/G5 are enabled in settings:
         - G5 validates schema and routes invalid outputs to REVIEW
-        - G4 checks confidence and routes LOW confidence to REVIEW
+        - G4 rule-based uncertainty escalation (flags + context rules)
 
         Args:
             sample: Sample dictionary
             use_guardrails: Whether to use guardrail-enhanced prompt
+            scanner_hit: Optional scanner result for G4 context
 
         Returns:
             Prediction dictionary with guardrail metadata, or None on total failure
@@ -275,21 +253,28 @@ class HybridEvaluationClient:
                 raw_response,
                 ground_truth=ground_truth,
                 settings=self.guardrail_settings,
-                diff_context=numbered_diff
+                diff_context=numbered_diff,
+                pr_title=sample.get("pr_title", ""),
+                pr_body=sample.get("pr_body", ""),
+                scanner_hit=scanner_hit,
+                file_path=sample.get("gt_file_path", ""),
             )
 
             # If schema validation failed completely, return minimal result
             if guardrail_result["parsed_output"] is None:
                 return {
-                    "reasoning": "",
                     "pred_has_secret": False,
                     "pred_secret_type": "none",
-                    "pred_location_line": None,
+                    "evidence_mode": "none",
+                    "pred_location_start": None,
+                    "pred_location_end": None,
                     "evidence_snippet": "",
+                    "used_untrusted_input": False,
                     # G4/G5 metadata fields
                     "confidence": None,
                     "schema_valid": False,
                     "validation_errors": guardrail_result["validation_errors"],
+                    "error_categories": guardrail_result.get("error_categories", []),
                     "routed_by_guardrail": guardrail_result["routed_by_guardrail"],
                     "original_decision": None,
                     "final_decision": "REVIEW"
@@ -298,15 +283,18 @@ class HybridEvaluationClient:
             # Schema valid - extract fields from parsed output
             parsed = guardrail_result["parsed_output"]
             return {
-                "reasoning": parsed.get("reasoning", ""),
                 "pred_has_secret": bool(parsed.get("pred_has_secret", False)),
                 "pred_secret_type": parsed.get("pred_secret_type", "none"),
-                "pred_location_line": parsed.get("pred_location_line"),
+                "evidence_mode": parsed.get("evidence_mode", "none"),
+                "pred_location_start": parsed.get("pred_location_start"),
+                "pred_location_end": parsed.get("pred_location_end"),
                 "evidence_snippet": parsed.get("evidence_snippet", ""),
+                "used_untrusted_input": bool(parsed.get("used_untrusted_input", False)),
                 # G4/G5 metadata fields
                 "confidence": guardrail_result["confidence"],
                 "schema_valid": guardrail_result["schema_valid"],
                 "validation_errors": guardrail_result["validation_errors"],
+                "error_categories": guardrail_result.get("error_categories", []),
                 "routed_by_guardrail": guardrail_result["routed_by_guardrail"],
                 "original_decision": guardrail_result["original_decision"],
                 "final_decision": guardrail_result["final_decision"],
@@ -314,8 +302,15 @@ class HybridEvaluationClient:
                 "g1_valid": guardrail_result.get("g1_valid"),
                 "g1_issues": guardrail_result.get("g1_issues", []),
                 "g2_valid": guardrail_result.get("g2_valid"),
+                "g2_issues": guardrail_result.get("g2_issues", []),
                 "g4_valid": guardrail_result.get("g4_valid"),
-                "g5_valid": guardrail_result.get("g5_valid")
+                "g4_details": guardrail_result.get("g4_details"),
+                "g5_valid": guardrail_result.get("g5_valid"),
+                # Optional schema fields (pass through if present)
+                "uncertainty_flags": parsed.get("uncertainty_flags"),
+                "decision_basis": parsed.get("decision_basis"),
+                "untrusted_input_role": parsed.get("untrusted_input_role"),
+                "untrusted_effect": parsed.get("untrusted_effect"),
             }
 
         # =====================================================================
@@ -327,18 +322,20 @@ class HybridEvaluationClient:
             return None
 
         return {
-            "reasoning": prediction.get("reasoning", ""),
             "pred_has_secret": bool(prediction.get("pred_has_secret", False)),
             "pred_secret_type": prediction.get("pred_secret_type", "none"),
-            "pred_location_line": prediction.get("pred_location_line"),
+            "evidence_mode": prediction.get("evidence_mode", "none"),
+            "pred_location_start": prediction.get("pred_location_start"),
+            "pred_location_end": prediction.get("pred_location_end"),
             "evidence_snippet": prediction.get("evidence_snippet", ""),
+            "used_untrusted_input": bool(prediction.get("used_untrusted_input", False)),
             # No G4/G5 metadata in baseline mode
             "confidence": prediction.get("confidence"),  # May be present if model outputs it
             "schema_valid": True,  # Assumed valid if parsed successfully
             "validation_errors": [],
             "routed_by_guardrail": None,
             "original_decision": None,
-            "final_decision": None
+            "final_decision": prediction.get("final_decision"),
         }
 
     def evaluate_sample(self, sample: Dict[str, Any]) -> Dict[str, Any]:
@@ -373,7 +370,10 @@ class HybridEvaluationClient:
 
         # Stage 3: LLM with Guardrails
         if self.run_llm_guardrails:
-            llm_guardrail = self.run_llm_evaluation(sample, use_guardrails=True)
+            llm_guardrail = self.run_llm_evaluation(
+                sample, use_guardrails=True,
+                scanner_hit=result.get("scanner_hit"),
+            )
             if llm_guardrail:
                 result["llm_guardrail"] = llm_guardrail
                 result["llm_guardrail_hit"] = llm_guardrail.get("pred_has_secret", False)
@@ -476,27 +476,23 @@ class HybridEvaluationClient:
         gt_has_secret = sample.get("gt_has_secret", False)
         gt_line = sample.get("gt_line_start")
 
+        def _span_hit(llm_result: dict) -> bool:
+            """Check if gt_line falls within predicted location span."""
+            if not llm_result.get("pred_has_secret", False) or gt_line is None:
+                return False
+            start = llm_result.get("pred_location_start")
+            end = llm_result.get("pred_location_end")
+            if start is None or end is None:
+                return False
+            return int(start) <= int(gt_line) <= int(end)
+
         # Location hit for baseline
         if result.get("llm_baseline"):
-            baseline = result["llm_baseline"]
-            pred_line = baseline.get("pred_location_line")
-            metrics["baseline_location_hit"] = (
-                baseline.get("pred_has_secret", False) and
-                pred_line is not None and
-                gt_line is not None and
-                int(pred_line) == int(gt_line)
-            )
+            metrics["baseline_location_hit"] = _span_hit(result["llm_baseline"])
 
         # Location hit for guardrail
         if result.get("llm_guardrail"):
-            guardrail = result["llm_guardrail"]
-            pred_line = guardrail.get("pred_location_line")
-            metrics["guardrail_location_hit"] = (
-                guardrail.get("pred_has_secret", False) and
-                pred_line is not None and
-                gt_line is not None and
-                int(pred_line) == int(gt_line)
-            )
+            metrics["guardrail_location_hit"] = _span_hit(result["llm_guardrail"])
 
         # Leak detection
         secret = sample.get("gt_secret_value") or extract_secret_from_context(sample)
@@ -529,11 +525,18 @@ class HybridEvaluationRunner:
         self,
         client: HybridEvaluationClient,
         input_path: str,
-        output_path: str
+        output_path: str,
+        resume_mode: Optional[str] = None  # "auto", "fresh", or None (interactive)
     ):
         self.client = client
         self.input_path = input_path
         self.output_path = output_path
+        self.resume_mode = resume_mode
+
+        # Checkpoint file paths derived from output path
+        out = Path(output_path)
+        self.partial_path = out.with_suffix(".partial.jsonl")
+        self.checkpoint_path = out.with_suffix(".checkpoint.json")
 
     def load_samples(self) -> List[Dict[str, Any]]:
         """Load experiment samples from JSON."""
@@ -543,36 +546,162 @@ class HybridEvaluationRunner:
         logger.info(f"Loaded {len(samples)} samples")
         return samples
 
+    def _load_checkpoint(self) -> Optional[Dict[str, Any]]:
+        """Load checkpoint if it exists and is valid."""
+        if not self.checkpoint_path.exists() or not self.partial_path.exists():
+            return None
+
+        try:
+            with open(self.checkpoint_path, "r", encoding="utf-8") as f:
+                checkpoint = json.load(f)
+
+            # Validate checkpoint has required fields
+            if "completed_ids" not in checkpoint or "total" not in checkpoint:
+                logger.warning("Checkpoint file is malformed, ignoring")
+                return None
+
+            return checkpoint
+        except (json.JSONDecodeError, OSError) as e:
+            logger.warning(f"Could not read checkpoint: {e}")
+            return None
+
+    def _load_partial_results(self) -> List[Dict[str, Any]]:
+        """Load partial results from JSONL file."""
+        results = []
+        try:
+            with open(self.partial_path, "r", encoding="utf-8") as f:
+                for line_num, line in enumerate(f, 1):
+                    line = line.strip()
+                    if line:
+                        try:
+                            results.append(json.loads(line))
+                        except json.JSONDecodeError:
+                            logger.warning(f"Skipping malformed line {line_num} in partial results")
+        except OSError as e:
+            logger.warning(f"Could not read partial results: {e}")
+        return results
+
+    def _write_checkpoint(self, completed_ids: List[str], total: int) -> None:
+        """Write checkpoint state to disk."""
+        checkpoint = {
+            "completed_ids": completed_ids,
+            "completed_count": len(completed_ids),
+            "total": total,
+            "input_path": self.input_path,
+            "output_path": self.output_path,
+            "last_updated": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        }
+        with open(self.checkpoint_path, "w", encoding="utf-8") as f:
+            json.dump(checkpoint, f, indent=2)
+
+    def _append_partial_result(self, result: Dict[str, Any]) -> None:
+        """Append a single result to the partial JSONL file."""
+        with open(self.partial_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(result, ensure_ascii=False) + "\n")
+
+    def _cleanup_checkpoint(self) -> None:
+        """Remove checkpoint files after successful completion."""
+        for path in [self.checkpoint_path, self.partial_path]:
+            if path.exists():
+                path.unlink()
+                logger.info(f"Cleaned up {path.name}")
+
+    def _resolve_resume(self, checkpoint: Dict[str, Any]) -> bool:
+        """
+        Decide whether to resume from checkpoint.
+
+        Returns:
+            True to resume, False to start fresh.
+        """
+        completed = checkpoint["completed_count"]
+        total = checkpoint["total"]
+        last_updated = checkpoint.get("last_updated", "unknown")
+
+        if self.resume_mode == "auto":
+            logger.info(f"Checkpoint found: {completed}/{total} completed (last: {last_updated}). Auto-resuming.")
+            return True
+
+        if self.resume_mode == "fresh":
+            logger.info(f"Checkpoint found but --fresh specified. Starting from scratch.")
+            return False
+
+        # Interactive mode (default)
+        print(f"\n{'='*60}")
+        print(f"  CHECKPOINT FOUND")
+        print(f"  Completed: {completed}/{total} samples")
+        print(f"  Last updated: {last_updated}")
+        print(f"  Input: {checkpoint.get('input_path', 'unknown')}")
+        print(f"{'='*60}")
+        while True:
+            answer = input("  Resume from checkpoint? [y/n]: ").strip().lower()
+            if answer in ("y", "yes"):
+                return True
+            if answer in ("n", "no"):
+                return False
+            print("  Please answer y or n.")
+
     def run(self) -> None:
-        """Execute the full hybrid evaluation pipeline."""
+        """Execute the full hybrid evaluation pipeline with checkpoint support."""
         samples = self.load_samples()
-        results: List[Dict[str, Any]] = []
         total = len(samples)
 
-        logger.info(f"Starting hybrid evaluation on {total} samples")
+        # --- Checkpoint handling ---
+        results: List[Dict[str, Any]] = []
+        completed_ids: set = set()
+        start_fresh = True
 
+        checkpoint = self._load_checkpoint()
+        if checkpoint is not None:
+            if self._resolve_resume(checkpoint):
+                # Resume: load partial results and skip completed samples
+                results = self._load_partial_results()
+                completed_ids = set(checkpoint["completed_ids"])
+                start_fresh = False
+                logger.info(
+                    f"Resuming from checkpoint: {len(completed_ids)}/{total} "
+                    f"already completed, {total - len(completed_ids)} remaining"
+                )
+            else:
+                # Fresh start: remove old checkpoint files
+                self._cleanup_checkpoint()
+
+        if start_fresh:
+            # Ensure partial file starts empty
+            if self.partial_path.exists():
+                self.partial_path.unlink()
+            logger.info(f"Starting hybrid evaluation on {total} samples (fresh)")
+
+        # --- Main evaluation loop ---
         for i, sample in enumerate(samples, 1):
             sid = sample.get("sample_id", f"sample_{i}")
+
+            # Skip already-completed samples
+            if sid in completed_ids:
+                continue
+
             condition = sample.get("condition", "B0")
-            logger.info(f"Evaluating sample {i}/{total} [{sid}] (condition={condition}) ...")
+            done = len(completed_ids)
+            logger.info(f"[{done+1}/{total}] Evaluating [{sid}] (condition={condition}) ...")
 
             try:
                 result = self.client.evaluate_sample(sample)
                 results.append(result)
             except Exception as e:
                 logger.error(f"Error evaluating {sid}: {e}")
-                results.append({
-                    **sample,
-                    "error": str(e)
-                })
+                result = {**sample, "error": str(e)}
+                results.append(result)
+
+            # Incremental save: append result + update checkpoint
+            self._append_partial_result(result)
+            completed_ids.add(sid)
+            self._write_checkpoint(list(completed_ids), total)
 
             # Rate limiting
             time.sleep(0.5)
 
-        # Save results
+        # --- Finalize ---
         self._save_results(results)
-
-        # Log summary
+        self._cleanup_checkpoint()
         self._log_summary(results)
 
     def _save_results(self, results: List[Dict[str, Any]]) -> None:
@@ -751,6 +880,17 @@ def main() -> None:
         action="store_true",
         help="Enable G4 (uncertainty routing) and G5 (schema validation) guardrails",
     )
+    resume_group = parser.add_mutually_exclusive_group()
+    resume_group.add_argument(
+        "--resume",
+        action="store_true",
+        help="Automatically resume from checkpoint if available (no prompt)",
+    )
+    resume_group.add_argument(
+        "--fresh",
+        action="store_true",
+        help="Ignore any existing checkpoint and start from scratch",
+    )
 
     args = parser.parse_args()
 
@@ -797,11 +937,20 @@ def main() -> None:
         model_slug = llm_client.get_model_name().replace(".", "-")
         output_path = f"data/05_results/hybrid_eval_{model_slug}.json"
 
+    # Checkpoint/resume mode
+    if args.resume:
+        resume_mode = "auto"
+    elif args.fresh:
+        resume_mode = "fresh"
+    else:
+        resume_mode = None  # Interactive prompt
+
     # Run evaluation
     runner = HybridEvaluationRunner(
         client=hybrid_client,
         input_path=args.input,
-        output_path=output_path
+        output_path=output_path,
+        resume_mode=resume_mode
     )
     runner.run()
     logger.info("Hybrid evaluation complete!")

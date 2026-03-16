@@ -1,0 +1,68 @@
+{
+  "run_id": "v120_final_extreme_openai",
+  "run_type": "full_evaluation",
+  "run_date": "2026-03-16",
+  "description": "Final evaluation run on extreme perturbation dataset with fully refactored G1-G5 guardrails (G3 fail-closed, pipeline order G5→G2→G4→G1→G3)",
+
+  "predecessor_run": {
+    "run_id": "v110_full_openai_200samples",
+    "path": "runs/v110_full_openai_200samples/",
+    "dataset": "all_200_samples.json",
+    "note": "Previous run on standard dataset with old G3 (prompt-only, no fail-closed)"
+  },
+
+  "model": {
+    "provider": "openai",
+    "model_id": "gpt-5-mini",
+    "max_completion_tokens": 2048,
+    "response_format": "json_object"
+  },
+
+  "api_config": {
+    "MAX_RETRIES": 5,
+    "RETRY_BASE_DELAY": 4.0
+  },
+
+  "guardrails": {
+    "enabled": ["G1", "G2", "G3", "G4", "G5"],
+    "pipeline_order": "G5 → G2 → G4 → G1 → G3",
+    "g1": "Evidence validation with diff context (validate_output_with_context), routes invalid → REVIEW",
+    "g2": "Untrusted input detection, routes exculpatory reasoning → REVIEW",
+    "g3": "Fail-closed output leakage guardrail: 3-layer (detect → redact once → REVIEW). Detection: patterns (16 regex), entropy spans, candidate echo, reconstructed leak. Scans full JSON serialisation.",
+    "g4": "Rule-based uncertainty escalation: confidence + context flags (scanner disagreement, obfuscation, schema repair, G2 issues)",
+    "g5": "Schema validation with repair, routes invalid → REVIEW"
+  },
+
+  "prompt_config": {
+    "base_prompt_sections": [
+      "INPUT CLASSIFICATION (TRUSTED/UNTRUSTED)",
+      "NEVER DO constraints"
+    ],
+    "guardrail_prompt_sections": ["G1", "G2", "G3", "G4", "G5"]
+  },
+
+  "dataset": {
+    "path": "data/03_baseline/all_200_samples_extreme.json",
+    "total_samples": 200,
+    "variant": "extreme",
+    "note": "Extreme perturbation variant with intensified manipulations"
+  },
+
+  "evaluation_modes": {
+    "scanners": true,
+    "llm_baseline": true,
+    "llm_guardrails": true,
+    "enable_g4_g5": true
+  },
+
+  "git_state": {
+    "latest_commit": "b1ebafd",
+    "uncommitted_changes": [
+      "src/guardrails/g2_untrusted_input.py",
+      "src/guardrails/__init__.py (pipeline reorder G5→G2→G4→G1→G3)",
+      "src/guardrails/g3_redaction.py (full rewrite: fail-closed 3-layer)",
+      "src/llm_evaluation/hybrid_evaluation.py",
+      "src/manipulation/perturbation_engine.py"
+    ]
+  }
+}

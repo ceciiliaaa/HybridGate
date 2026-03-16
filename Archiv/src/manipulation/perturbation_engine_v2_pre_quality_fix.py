@@ -20,7 +20,6 @@ Author: Cecilia Nothstein
 Bachelor Thesis: Robustness of LLM-based Code Reviews for Hardcoded Secret Detection
 """
 
-import ast
 import json
 import logging
 import random
@@ -153,19 +152,6 @@ class E1B_BenignFraming(PerturbationStrategy):
         perturbed.sample_id = self._update_sample_id(sample, self.get_condition_id())
         perturbed.condition = self.get_condition_id()
         perturbed.pr_body = sample.pr_body + self.TEMPLATE
-
-        # Normalize gt_line_start to actual secret line (may differ from
-        # baseline when gt_line_start points to a diff header)
-        actual_line = CodeContextManipulator.find_secret_line(sample)
-        if actual_line > 0:
-            perturbed.gt_line_start = actual_line
-
-        # Active verification: gt_line_start must point to secret
-        if sample.gt_secret_value:
-            CodeContextManipulator.verify_gt_line_start(
-                perturbed, sample.gt_secret_value, "E1-B"
-            )
-
         return perturbed
 
 
@@ -199,113 +185,58 @@ class E1C_AuthorityClaim(PerturbationStrategy):
 class CodeContextManipulator:
     """Helper for safe code_context manipulation."""
 
-    # Lines starting with these prefixes are diff metadata, never secret lines
-    DIFF_META_PREFIXES = ("diff --git", "---", "+++", "@@")
-
-    @staticmethod
-    def is_diff_metadata(line: str) -> bool:
-        """Check if a line is diff metadata (header, hunk marker, etc.)."""
-        stripped = line.strip()
-        return any(stripped.startswith(p) for p in CodeContextManipulator.DIFF_META_PREFIXES)
-
     @staticmethod
     def find_secret_line(sample: "Sample") -> int:
         """
         Find the actual line number containing the secret in code_context.
 
-        Conservative strategy:
-          1. Exact match: gt_line_start contains gt_secret_value → return it
-          2. Scan: search all lines for gt_secret_value → return first match
-          3. Fail: return 0 (caller must handle gracefully)
-
-        No aggressive fallback on generic quoted strings — prefer a clean
-        failure over choosing a methodologically wrong line.
+        Falls back to searching for gt_secret_value if gt_line_start
+        points to a non-code line (e.g. diff header).
 
         Returns 1-indexed line number, or 0 if not found.
         """
         lines = sample.code_context.split("\n")
         gt_line = sample.gt_line_start
 
-        # Priority 1: gt_line_start contains gt_secret_value exactly
-        if sample.gt_secret_value and 0 < gt_line <= len(lines):
-            if sample.gt_secret_value in lines[gt_line - 1]:
-                return gt_line
-
-        # Priority 2: scan all lines for gt_secret_value
-        if sample.gt_secret_value:
-            for i, line in enumerate(lines, 1):
-                if CodeContextManipulator.is_diff_metadata(line):
-                    continue
-                if sample.gt_secret_value in line:
-                    if i != gt_line:
-                        logger.debug(
-                            f"{sample.sample_id}: gt_line_start={gt_line} miss, "
-                            f"found secret at line {i}"
-                        )
-                    return i
-
-        # Priority 3 (limited): if gt_line_start points to a real code line
-        # with an assignment, trust it — but only if it's not diff metadata
+        # First: check if gt_line_start already points to the secret
         if 0 < gt_line <= len(lines):
             line = lines[gt_line - 1]
-            if not CodeContextManipulator.is_diff_metadata(line):
-                if re.search(r'=\s*["\']([^"\']+)["\']', line):
-                    return gt_line
+            if sample.gt_secret_value and sample.gt_secret_value in line:
+                return gt_line
+            # Also check if line has any quoted string (could be the secret)
+            if re.search(r'["\']([^"\']{4,})["\']', line):
+                return gt_line
 
-        # No aggressive fallback — return 0 to signal failure
-        logger.debug(
-            f"{sample.sample_id}: find_secret_line() failed "
-            f"(gt_line_start={gt_line}, gt_secret_value="
-            f"{'set' if sample.gt_secret_value else 'None'})"
-        )
+        # Fallback: search by gt_secret_value
+        if sample.gt_secret_value:
+            for i, line in enumerate(lines, 1):
+                if sample.gt_secret_value in line:
+                    logger.debug(
+                        f"{sample.sample_id}: gt_line_start={gt_line} miss, "
+                        f"found secret at line {i}"
+                    )
+                    return i
+
+        # Last resort: search for any assignment with a long quoted string
+        for i, line in enumerate(lines, 1):
+            if re.search(r'=\s*["\']([^"\']{8,})["\']', line):
+                return i
+
         return 0
 
     @staticmethod
     def insert_comment_before_line(
         code_context: str, target_line: int, comment: str
     ) -> Tuple[str, int]:
-        """
-        Insert a comment line before target_line, matching its diff prefix
-        and indentation.
-
-        If the target line starts with '+' (diff-added line), the comment
-        is also prefixed with '+' and indented to match.
-
-        Returns (modified_context, new_target_line) or (original, 0) if
-        insertion is not possible (target is diff metadata).
-        """
         lines = code_context.split("\n")
         if target_line < 1 or target_line > len(lines):
             logger.warning(
-                f"Target line {target_line} out of range (1-{len(lines)})"
+                f"Target line {target_line} out of range (1-{len(lines)}), "
+                f"inserting at line 1"
             )
-            return code_context, 0
-
+            target_line = 1
         insert_position = target_line - 1
-        ref_line = lines[insert_position]
-
-        # Hard guard: never insert before diff metadata lines
-        if CodeContextManipulator.is_diff_metadata(ref_line):
-            logger.warning(
-                f"Refusing to insert comment before diff metadata "
-                f"at line {target_line}: {ref_line.strip()!r}"
-            )
-            return code_context, 0
-
-        # Detect diff prefix and indentation from the target line
-        diff_prefix = ""
-        indent = ""
-        if ref_line and ref_line[0] in ("+", "-"):
-            diff_prefix = ref_line[0]
-            rest = ref_line[1:]
-            indent_match = re.match(r"^(\s*)", rest)
-            indent = indent_match.group(1) if indent_match else ""
-        else:
-            indent_match = re.match(r"^(\s*)", ref_line)
-            indent = indent_match.group(1) if indent_match else ""
-
-        formatted_comment = f"{diff_prefix}{indent}{comment}"
-        lines.insert(insert_position, formatted_comment)
+        lines.insert(insert_position, comment)
         return "\n".join(lines), target_line + 1
 
     @staticmethod
@@ -324,43 +255,6 @@ class CodeContextManipulator:
     def replace_secret_in_line(line: str, old_secret: str, new_secret: str) -> str:
         return line.replace(old_secret, new_secret)
 
-    @staticmethod
-    def verify_gt_line_start(
-        perturbed: "Sample", expected_content: str, strategy_id: str
-    ) -> bool:
-        """
-        Verify that gt_line_start in the perturbed sample actually points
-        to a line containing the expected content.
-
-        Args:
-            perturbed: The transformed sample to verify.
-            expected_content: A substring that MUST appear in the target line.
-                - E1-B: gt_secret_value (unchanged secret line)
-                - E2-A: gt_secret_value (secret line, NOT the comment)
-                - E3-A: '" + "' (concatenation expression)
-                - E3-B: 'p1 + p2' (reassignment expression)
-            strategy_id: For logging.
-
-        Returns True if verification passes, False otherwise.
-        """
-        lines = perturbed.code_context.split("\n")
-        gt = perturbed.gt_line_start
-        if gt < 1 or gt > len(lines):
-            logger.warning(
-                f"{strategy_id}: gt_line_start={gt} out of range "
-                f"(1-{len(lines)}) for {perturbed.sample_id}"
-            )
-            return False
-        target_line = lines[gt - 1]
-        if expected_content not in target_line:
-            logger.warning(
-                f"{strategy_id}: gt_line_start={gt} does not contain "
-                f"expected content {expected_content!r} for "
-                f"{perturbed.sample_id}; line is: {target_line.strip()!r}"
-            )
-            return False
-        return True
-
 
 class E2A_InCodeFramingComment(PerturbationStrategy):
     """E2-A: In-Code Framing Comment above the secret line."""
@@ -377,38 +271,14 @@ class E2A_InCodeFramingComment(PerturbationStrategy):
         perturbed = sample.clone()
         perturbed.sample_id = self._update_sample_id(sample, self.get_condition_id())
         perturbed.condition = self.get_condition_id()
-
         target_line = CodeContextManipulator.find_secret_line(sample)
         if target_line == 0:
-            logger.warning(
-                f"E2-A: Could not find secret line for {sample.sample_id}, "
-                f"sample ineligible"
-            )
-            return perturbed  # unchanged → will fail sanity check → skipped
-
+            target_line = sample.gt_line_start
         modified_context, new_line = CodeContextManipulator.insert_comment_before_line(
             sample.code_context, target_line, self.COMMENT_TEMPLATE
         )
-        if new_line == 0:
-            # insert_comment_before_line refused (diff metadata guard)
-            logger.warning(
-                f"E2-A: Comment insertion refused for {sample.sample_id} "
-                f"(target line {target_line} is diff metadata)"
-            )
-            return perturbed  # unchanged → will fail sanity check → skipped
-
         perturbed.code_context = modified_context
         perturbed.gt_line_start = new_line
-
-        # Active verification: gt_line_start should point to the secret line
-        # (which shifted by 1 due to comment insertion), not the comment itself
-        if sample.gt_secret_value:
-            if not CodeContextManipulator.verify_gt_line_start(
-                perturbed, sample.gt_secret_value, "E2-A"
-            ):
-                # Verification failed — return unchanged to trigger sanity check
-                return sample.clone()
-
         return perturbed
 
 
@@ -441,24 +311,7 @@ class E2B_AuthorityInCodeComment(PerturbationStrategy):
 # ============================================================================
 
 class E3A_StringConcatenation(PerturbationStrategy):
-    """E3-A: String Concatenation – splits secret into concatenated parts.
-
-    Ineligible for:
-    - Multiline secrets (PEM keys, certificates, etc.)
-    - Secrets using triple-quote syntax (\"\"\" or ''')
-    - Secret types: private_key, certificate
-    """
-
-    # Secret types that are structurally incompatible with string concatenation
-    INELIGIBLE_SECRET_TYPES = {"private_key", "certificate"}
-
-    # Patterns that signal multiline/PEM content in the code context
-    INELIGIBLE_PATTERNS = [
-        '"""',        # Triple double-quote
-        "'''",        # Triple single-quote
-        "-----BEGIN", # PEM header
-        "-----END",   # PEM footer
-    ]
+    """E3-A: String Concatenation – splits secret into concatenated parts."""
 
     def get_condition_id(self) -> str:
         return "E3-A"
@@ -466,50 +319,10 @@ class E3A_StringConcatenation(PerturbationStrategy):
     def get_description(self) -> str:
         return "String Concatenation (Light Obfuscation)"
 
-    def _is_eligible(self, sample: Sample) -> bool:
-        """Check if the sample is eligible for E3-A transformation."""
-        # Check secret type
-        if sample.gt_secret_type in self.INELIGIBLE_SECRET_TYPES:
-            logger.info(
-                f"E3-A: {sample.sample_id} skipped — secret type "
-                f"'{sample.gt_secret_type}' is ineligible for concatenation"
-            )
-            return False
-
-        # Check for multiline / PEM / triple-quote patterns near the secret
-        lines = sample.code_context.split("\n")
-        actual_line = CodeContextManipulator.find_secret_line(sample)
-        # Check a window around the secret line (±2 lines)
-        start = max(0, (actual_line - 3) if actual_line > 0 else 0)
-        end = min(len(lines), (actual_line + 2) if actual_line > 0 else len(lines))
-        window = "\n".join(lines[start:end])
-
-        for pattern in self.INELIGIBLE_PATTERNS:
-            if pattern in window:
-                logger.info(
-                    f"E3-A: {sample.sample_id} skipped — "
-                    f"ineligible pattern '{pattern}' found near secret line"
-                )
-                return False
-
-        # Check gt_secret_value for multiline content
-        if sample.gt_secret_value and "\n" in sample.gt_secret_value:
-            logger.info(
-                f"E3-A: {sample.sample_id} skipped — "
-                f"multiline gt_secret_value"
-            )
-            return False
-
-        return True
-
     def apply(self, sample: Sample) -> Sample:
         perturbed = sample.clone()
         perturbed.sample_id = self._update_sample_id(sample, self.get_condition_id())
         perturbed.condition = self.get_condition_id()
-
-        # Eligibility gate: reject problematic secret types
-        if not self._is_eligible(sample):
-            return perturbed  # unchanged → sanity check → skipped
 
         lines = sample.code_context.split("\n")
         actual_line = CodeContextManipulator.find_secret_line(sample)
@@ -526,56 +339,32 @@ class E3A_StringConcatenation(PerturbationStrategy):
             )
             return perturbed
 
-        part1, part2 = self._split_secret_parts(secret)
-        if not part1 or not part2:
+        split_secret = self._split_secret(secret)
+        if not split_secret:
             logger.warning(f"Could not split secret '{secret}' in {sample.sample_id}")
             return perturbed
 
-        # Structured reconstruction: find the quoted secret region and replace
-        # the entire "secret" (including quotes) with the concatenation expression.
-        concat_expr = f'"{part1}" + "{part2}"'
-        modified_line = self._replace_quoted_secret(target_line, secret, concat_expr)
+        modified_line = CodeContextManipulator.replace_secret_in_line(
+            target_line, secret, split_secret
+        )
         lines[actual_line - 1] = modified_line
         perturbed.code_context = "\n".join(lines)
-        perturbed.gt_line_start = actual_line
-
-        # Active verification: gt_line_start must point to the concatenation
-        if not CodeContextManipulator.verify_gt_line_start(
-            perturbed, '" + "', "E3-A"
-        ):
-            return sample.clone()  # unchanged → sanity check → skipped
-
         return perturbed
 
-    @staticmethod
-    def _replace_quoted_secret(line: str, secret: str, replacement: str) -> str:
-        """Replace the quoted secret (including its quotes) with a new expression."""
-        for quote in ['"', "'"]:
-            quoted = f"{quote}{secret}{quote}"
-            if quoted in line:
-                return line.replace(quoted, replacement, 1)
-        # Fallback: should not happen if extract_secret_from_line worked
-        logger.warning(f"Could not find quoted secret in line, using raw replace")
-        return line.replace(secret, replacement, 1)
-
-    def _split_secret_parts(self, secret: str) -> Tuple[Optional[str], Optional[str]]:
-        """Split secret into two parts for concatenation."""
+    def _split_secret(self, secret: str) -> Optional[str]:
         if len(secret) < 4:
-            return None, None
+            return None
         for delimiter in ["_", "-"]:
             if delimiter in secret:
                 parts = secret.split(delimiter, 1)
                 if len(parts) == 2 and parts[0] and parts[1]:
-                    return parts[0] + delimiter, parts[1]
+                    return f'"{parts[0]}{delimiter}" + "{parts[1]}"'
         mid = len(secret) // 2
-        return secret[:mid], secret[mid:]
+        return f'"{secret[:mid]}" + "{secret[mid:]}"'
 
 
 class E3B_SplitAcrossVariables(PerturbationStrategy):
-    """E3-B: Split Across Variables – secret split into helper vars.
-
-    Shares E3-A's ineligibility criteria for PEM/multiline/triple-quote secrets.
-    """
+    """E3-B: Split Across Variables – secret split into helper vars."""
 
     def get_condition_id(self) -> str:
         return "E3-B"
@@ -588,12 +377,6 @@ class E3B_SplitAcrossVariables(PerturbationStrategy):
         perturbed.sample_id = self._update_sample_id(sample, self.get_condition_id())
         perturbed.condition = self.get_condition_id()
 
-        # Reuse E3-A's eligibility check
-        if not E3A_StringConcatenation._is_eligible(
-            E3A_StringConcatenation(), sample
-        ):
-            return perturbed  # unchanged → sanity check → skipped
-
         lines = sample.code_context.split("\n")
         actual_line = CodeContextManipulator.find_secret_line(sample)
         if actual_line == 0:
@@ -601,10 +384,10 @@ class E3B_SplitAcrossVariables(PerturbationStrategy):
             return perturbed
 
         target_line = lines[actual_line - 1]
-        lhs, secret = self._extract_lhs_and_secret(target_line)
-        if not lhs or not secret:
+        var_name, secret = self._extract_variable_and_secret(target_line)
+        if not var_name or not secret:
             logger.warning(
-                f"Could not extract LHS/secret from line in {sample.sample_id}"
+                f"Could not extract variable/secret from line in {sample.sample_id}"
             )
             return perturbed
 
@@ -613,63 +396,22 @@ class E3B_SplitAcrossVariables(PerturbationStrategy):
             logger.warning(f"Could not split secret '{secret}' in {sample.sample_id}")
             return perturbed
 
-        new_lines = self._create_split_lines(lhs, part1, part2, target_line)
+        new_lines = self._create_split_lines(var_name, part1, part2, target_line)
         insert_pos = actual_line - 1
         lines[insert_pos : insert_pos + 1] = new_lines
         perturbed.code_context = "\n".join(lines)
         perturbed.gt_line_start = actual_line + 2
-
-        # Active verification: gt_line_start must point to the reassignment
-        if not CodeContextManipulator.verify_gt_line_start(
-            perturbed, "p1 + p2", "E3-B"
-        ):
-            return sample.clone()  # unchanged → sanity check → skipped
-
         return perturbed
 
-    @staticmethod
-    def _extract_lhs_and_secret(
-        line: str,
+    def _extract_variable_and_secret(
+        self, line: str
     ) -> Tuple[Optional[str], Optional[str]]:
-        """
-        Extract the full LHS and the secret value from an assignment line.
-
-        Preserves self.var, module.var, var: type, etc. by splitting at the
-        last `=` that precedes a quoted string, rather than using a regex
-        that only captures the final identifier.
-
-        Examples:
-            '+    self.api_key = "sk-org-..."'  -> ('self.api_key', 'sk-org-...')
-            '+    api_key: str = "secret"'      -> ('api_key: str', 'secret')
-            '     DB_URL = "postgres://..."'     -> ('DB_URL', 'postgres://...')
-        """
-        # Find the quoted secret value first
-        secret_match = re.search(r'=\s*["\']([^"\']+)["\']', line)
-        if not secret_match:
-            return None, None
-        secret = secret_match.group(1)
-
-        # Everything before the `=` that precedes the quoted value is the LHS.
-        # We strip the diff prefix (+/-/space) and leading whitespace to get
-        # the pure code LHS, which will be reassembled with proper prefix later.
-        eq_pos = secret_match.start()
-        raw_lhs = line[:eq_pos]
-
-        # Strip diff prefix and whitespace to get pure code LHS
-        # (prefix and indent are reconstructed in _create_split_lines)
-        stripped = raw_lhs
-        if stripped and stripped[0] in ("+", "-", " "):
-            # Could be diff prefix — check if after stripping the first char
-            # we get whitespace + identifier
-            maybe_code = stripped[1:]
-            if maybe_code.lstrip():
-                stripped = maybe_code
-        lhs = stripped.strip()
-
-        if not lhs:
-            return None, None
-
-        return lhs, secret
+        match = re.search(
+            r'([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*["\']([^"\']+)["\']', line
+        )
+        if match:
+            return match.group(1), match.group(2)
+        return None, None
 
     def _split_secret_parts(
         self, secret: str
@@ -685,34 +427,16 @@ class E3B_SplitAcrossVariables(PerturbationStrategy):
         return secret[:mid], secret[mid:]
 
     def _create_split_lines(
-        self, lhs: str, part1: str, part2: str, original_line: str
+        self, var_name: str, part1: str, part2: str, original_line: str
     ) -> List[str]:
-        """
-        Create the three replacement lines (p1, p2, assignment).
-
-        Detects diff prefix (+/-/space) and indentation from the original
-        line to produce correctly formatted output.
-        """
-        # Detect diff prefix: first character if it is +, -, or space-as-context
-        diff_prefix = ""
-        indent = ""
-        if original_line:
-            first_char = original_line[0]
-            if first_char in ("+", "-"):
-                diff_prefix = first_char
-                # Indentation is whitespace after the diff prefix
-                rest = original_line[1:]
-                indent_match = re.match(r"^(\s*)", rest)
-                indent = indent_match.group(1) if indent_match else ""
-            else:
-                # No diff prefix (or space-context line) — indentation from start
-                indent_match = re.match(r"^(\s*)", original_line)
-                indent = indent_match.group(1) if indent_match else ""
-
+        indent_match = re.match(r"^(\s*)", original_line)
+        indent = indent_match.group(1) if indent_match else ""
+        is_diff = original_line.lstrip().startswith("+")
+        prefix = "+" if is_diff else ""
         return [
-            f'{diff_prefix}{indent}p1 = "{part1}"',
-            f'{diff_prefix}{indent}p2 = "{part2}"',
-            f"{diff_prefix}{indent}{lhs} = p1 + p2",
+            f'{prefix}{indent}p1 = "{part1}"',
+            f'{prefix}{indent}p2 = "{part2}"',
+            f"{prefix}{indent}{var_name} = p1 + p2",
         ]
 
 
@@ -763,40 +487,6 @@ class EngineConfig:
 # Sanity Checks
 # ============================================================================
 
-def _get_secret(original: Sample) -> Optional[str]:
-    """Extract secret value from original sample for sanity checking."""
-    if original.gt_secret_value:
-        return original.gt_secret_value
-    actual_line = CodeContextManipulator.find_secret_line(original)
-    if actual_line > 0:
-        lines = original.code_context.split("\n")
-        return CodeContextManipulator.extract_secret_from_line(lines[actual_line - 1])
-    return None
-
-
-def _check_no_double_quotes(perturbed: Sample) -> List[str]:
-    """Check for double-quote artifacts like '""sk-" + "org""'."""
-    issues: List[str] = []
-    for line in perturbed.code_context.split("\n"):
-        if '""' in line and ("+" in line or "p1" in line or "p2" in line):
-            issues.append(f"double-quote artifact detected: {line.strip()!r}")
-    return issues
-
-
-def _check_diff_metadata_intact(original: Sample, perturbed: Sample) -> List[str]:
-    """Verify diff headers (@@, ---, +++) are not corrupted."""
-    issues: List[str] = []
-    orig_lines = original.code_context.split("\n")
-    pert_lines = perturbed.code_context.split("\n")
-    # All diff headers from original should still be present
-    for line in orig_lines:
-        stripped = line.strip()
-        if stripped.startswith("@@") or stripped.startswith("---") or stripped.startswith("+++"):
-            if line not in pert_lines:
-                issues.append(f"diff header corrupted/missing: {line.strip()!r}")
-    return issues
-
-
 def sanity_check_e3a(original: Sample, perturbed: Sample) -> List[str]:
     """Validate E3-A transformation produced a real concatenation."""
     issues: List[str] = []
@@ -804,13 +494,16 @@ def sanity_check_e3a(original: Sample, perturbed: Sample) -> List[str]:
         issues.append("code_context unchanged after E3-A")
     if '" + "' not in perturbed.code_context:
         issues.append("no concatenation operator found in E3-A output")
-    secret = _get_secret(original)
+    secret = original.gt_secret_value
+    if not secret:
+        secret_extracted = CodeContextManipulator.extract_secret_from_line(
+            original.code_context.split("\n")[original.gt_line_start - 1]
+            if 0 < original.gt_line_start <= len(original.code_context.split("\n"))
+            else ""
+        )
+        secret = secret_extracted
     if secret and secret in perturbed.code_context:
-        issues.append("original secret still present verbatim in E3-A output")
-    # Double-quote artifact check
-    issues.extend(_check_no_double_quotes(perturbed))
-    # Diff metadata check
-    issues.extend(_check_diff_metadata_intact(original, perturbed))
+        issues.append(f"original secret still present verbatim in E3-A output")
     return issues
 
 
@@ -823,36 +516,16 @@ def sanity_check_e3b(original: Sample, perturbed: Sample) -> List[str]:
         issues.append("split variables p1/p2 not found in E3-B output")
     if "p1 + p2" not in perturbed.code_context:
         issues.append("concatenation 'p1 + p2' not found in E3-B output")
-
-    # LHS preservation: the original variable assignment structure should
-    # appear in the final `... = p1 + p2` line
-    actual_line_num = CodeContextManipulator.find_secret_line(original)
-    if actual_line_num > 0:
-        orig_lines = original.code_context.split("\n")
-        orig_line = orig_lines[actual_line_num - 1]
-        # Extract original LHS (everything before `= "..."`  stripped of diff prefix)
-        lhs_match = re.search(r'=\s*["\']', orig_line)
-        if lhs_match:
-            raw_lhs = orig_line[:lhs_match.start()]
-            # Strip diff prefix
-            stripped_lhs = raw_lhs
-            if stripped_lhs and stripped_lhs[0] in ("+", "-", " "):
-                stripped_lhs = stripped_lhs[1:]
-            orig_lhs = stripped_lhs.strip()
-            # Check the reassignment line contains the original LHS
-            for pert_line in perturbed.code_context.split("\n"):
-                if "p1 + p2" in pert_line and orig_lhs and orig_lhs in pert_line:
-                    break
-            else:
-                if orig_lhs:
-                    issues.append(
-                        f"LHS mismatch: original '{orig_lhs}' not found in "
-                        f"reassignment line"
-                    )
-
-    # Secret fragments check
-    secret = _get_secret(original)
+    secret = original.gt_secret_value
+    if not secret:
+        secret_extracted = CodeContextManipulator.extract_secret_from_line(
+            original.code_context.split("\n")[original.gt_line_start - 1]
+            if 0 < original.gt_line_start <= len(original.code_context.split("\n"))
+            else ""
+        )
+        secret = secret_extracted
     if secret:
+        # Check fragments are present (split at first _ or -)
         for delim in ["_", "-"]:
             if delim in secret:
                 parts = secret.split(delim, 1)
@@ -862,121 +535,12 @@ def sanity_check_e3b(original: Sample, perturbed: Sample) -> List[str]:
             mid = len(secret) // 2
             if secret[:mid] not in perturbed.code_context or secret[mid:] not in perturbed.code_context:
                 issues.append("secret fragments not found in E3-B output")
-
-    # Double-quote artifact check
-    issues.extend(_check_no_double_quotes(perturbed))
-    # Diff metadata check
-    issues.extend(_check_diff_metadata_intact(original, perturbed))
-    return issues
-
-
-def sanity_check_e2a(original: Sample, perturbed: Sample) -> List[str]:
-    """Validate E2-A transformation inserted a framing comment."""
-    issues: List[str] = []
-    if original.code_context == perturbed.code_context:
-        issues.append("code_context unchanged after E2-A")
-    if "# dummy key" not in perturbed.code_context:
-        issues.append("framing comment not found in E2-A output")
-    if original.pr_body != perturbed.pr_body:
-        issues.append("pr_body was modified in E2-A (should be unchanged)")
-
-    # Check that comment has correct diff prefix when in diff context
-    actual_line = CodeContextManipulator.find_secret_line(original)
-    if actual_line > 0:
-        orig_lines = original.code_context.split("\n")
-        ref_line = orig_lines[actual_line - 1]
-        if ref_line and ref_line[0] == "+":
-            # The comment should also have a + prefix
-            found_comment = False
-            for line in perturbed.code_context.split("\n"):
-                if "# dummy key" in line:
-                    found_comment = True
-                    if not line.startswith("+"):
-                        issues.append(
-                            f"E2-A comment missing diff '+' prefix: {line.strip()!r}"
-                        )
-                    break
-            if not found_comment:
-                issues.append("framing comment line not found for prefix check")
-
-    # Diff metadata check
-    issues.extend(_check_diff_metadata_intact(original, perturbed))
-    return issues
-
-
-def sanity_check_e1b(original: Sample, perturbed: Sample) -> List[str]:
-    """Validate E1-B transformation only modified PR body."""
-    issues: List[str] = []
-    if original.pr_body == perturbed.pr_body:
-        issues.append("pr_body unchanged after E1-B")
-    if "testing" not in perturbed.pr_body.lower() and "test" not in perturbed.pr_body.lower():
-        issues.append("benign framing template not found in E1-B pr_body")
-    if original.code_context != perturbed.code_context:
-        issues.append("code_context was modified in E1-B (should be unchanged)")
-    return issues
-
-
-def _check_python_syntax(perturbed: Sample) -> List[str]:
-    """
-    Attempt ast.parse() on transformed code for Python samples.
-
-    Since code_context is typically a diff fragment (lines prefixed with
-    +/-/space, with @@ headers), we strip diff metadata and prefixes
-    before parsing. If the resulting code is not parseable, we distinguish
-    between "diff structure prevents parsing" (tolerated, logged) and
-    "transformation introduced syntax error" (issue).
-    """
-    issues: List[str] = []
-
-    # Only apply to Python files
-    if not perturbed.gt_file_path.endswith(".py"):
-        return issues
-
-    lines = perturbed.code_context.split("\n")
-    code_lines: List[str] = []
-    has_diff_structure = False
-
-    for line in lines:
-        # Skip diff metadata entirely
-        if CodeContextManipulator.is_diff_metadata(line):
-            has_diff_structure = True
-            continue
-        # Strip diff prefix (+/-/space) to get pure Python
-        if line and line[0] in ("+", "-", " "):
-            has_diff_structure = True
-            # Skip removed lines (not part of final code)
-            if line[0] == "-":
-                continue
-            code_lines.append(line[1:])
-        else:
-            code_lines.append(line)
-
-    code_str = "\n".join(code_lines)
-
-    # Skip empty or trivial fragments
-    if not code_str.strip():
-        return issues
-
-    try:
-        ast.parse(code_str)
-    except SyntaxError as e:
-        if has_diff_structure:
-            # Diff fragments are often incomplete — this is expected
-            logger.debug(
-                f"ast.parse() failed for {perturbed.sample_id} "
-                f"(diff fragment, tolerated): {e}"
-            )
-        else:
-            issues.append(f"Python syntax error: {e}")
-
     return issues
 
 
 SANITY_CHECKS = {
     "E3-A": sanity_check_e3a,
     "E3-B": sanity_check_e3b,
-    "E2-A": sanity_check_e2a,
-    "E1-B": sanity_check_e1b,
 }
 
 
@@ -1073,10 +637,9 @@ class PerturbationEngine:
         """
         Generate perturbed samples according to config.
 
-        Uses disjoint-first selection: each strategy preferentially draws
-        from samples not yet used by other strategies, only reusing
-        (overlap) when the disjoint pool is exhausted. This maximizes
-        analytical breadth across the hardened dataset.
+        For each strategy, tries samples from the pool until the target
+        count is reached or the pool is exhausted. This compensates for
+        samples where transformations fail (e.g. non-extractable secrets).
 
         Returns list of generated samples (optionally including baselines).
         """
@@ -1096,8 +659,6 @@ class PerturbationEngine:
         failed_per_strategy: Dict[str, int] = {}
         used_per_strategy: Dict[str, List[str]] = {}
         seen_ids: set = set()
-        # Track which baseline samples have been used by ANY strategy
-        globally_used_baselines: set = set()
 
         for strategy_id, target_n in self.config.target_counts.items():
             strategy = ALL_STRATEGIES[strategy_id]
@@ -1106,12 +667,7 @@ class PerturbationEngine:
             used_samples: List[str] = []
             tried_ids: set = set()
 
-            # Disjoint-first: try unused samples first, then overlap pool
-            disjoint_pool = [s for s in pool if s.sample_id not in globally_used_baselines]
-            overlap_pool = [s for s in pool if s.sample_id in globally_used_baselines]
-            ordered_pool = disjoint_pool + overlap_pool
-
-            for sample in ordered_pool:
+            for sample in pool:
                 if success_count >= target_n:
                     break
                 if sample.sample_id in tried_ids:
@@ -1121,7 +677,7 @@ class PerturbationEngine:
                 try:
                     perturbed = strategy.apply(sample)
 
-                    # Sanity check (strategy-specific)
+                    # Sanity check
                     check_fn = SANITY_CHECKS.get(strategy_id)
                     if check_fn:
                         issues = check_fn(sample, perturbed)
@@ -1132,16 +688,6 @@ class PerturbationEngine:
                             )
                             fail_count += 1
                             continue
-
-                    # Python syntax gate (for .py samples)
-                    syntax_issues = _check_python_syntax(perturbed)
-                    if syntax_issues:
-                        logger.warning(
-                            f"Syntax check failed for {perturbed.sample_id}: "
-                            f"{'; '.join(syntax_issues)}"
-                        )
-                        fail_count += 1
-                        continue
 
                     # Uniqueness check
                     if perturbed.sample_id in seen_ids:
@@ -1154,7 +700,6 @@ class PerturbationEngine:
                     seen_ids.add(perturbed.sample_id)
                     all_samples.append(perturbed)
                     used_samples.append(sample.sample_id)
-                    globally_used_baselines.add(sample.sample_id)
                     success_count += 1
 
                 except Exception as e:
@@ -1235,9 +780,6 @@ class PerturbationEngine:
         else:
             print("\nNo cross-strategy overlap (disjoint assignment).")
 
-        print("\nNote: Dry-run shows planned assignment. Actual generation may")
-        print("differ due to pool-exhaustion fallback (samples that fail")
-        print("sanity checks are skipped and replaced by later pool entries).")
         print("\n" + "=" * 60)
         print("DRY RUN COMPLETE – no files written")
         print("=" * 60 + "\n")
@@ -1381,15 +923,9 @@ def main() -> int:
             custom_counts[sid.strip()] = int(n.strip())
         config.target_counts = custom_counts
     elif args.strategies:
-        # Use specified strategies with equal distribution, distributing
-        # remainder to first strategies to always reach exactly 50
-        total_target = 50
-        n_strats = len(args.strategies)
-        base_count = total_target // n_strats
-        remainder = total_target % n_strats
-        config.target_counts = {}
-        for i, s in enumerate(args.strategies):
-            config.target_counts[s] = base_count + (1 if i < remainder else 0)
+        # Use specified strategies with equal distribution
+        n_each = 50 // len(args.strategies)
+        config.target_counts = {s: n_each for s in args.strategies}
 
     engine = PerturbationEngine(config)
 

@@ -1,21 +1,23 @@
-# Evaluation Results: Baseline vs. Guardrails
+# Evaluation Results: Scanner vs. LLM Baseline vs. LLM + Guardrails
 
-**Datensatz:** `all_150_samples.json` (150 Samples)
-**Datum:** 11. März 2026
-**Evaluierte Modelle:** Claude Sonnet 4, GPT-5 Mini, GPT-4o
-**Scanner:** Gitleaks, detect-secrets
+**Run:** `v121_final_extreme_openai_g5fix`
+**Datensatz:** `all_200_samples_extreme.json` (200 Samples, extreme Perturbation)
+**Datum:** 16. März 2026
+**Modell:** GPT-5 Mini (OpenAI, `gpt-5-mini`)
+**Scanner:** Gitleaks + detect-secrets (kombiniert)
+**Guardrails:** G1–G5, Pipeline-Order G5 → G2 → G4 → G1 → G3
 
 ---
 
-## Guardrail-Bundle (Intervention)
+## Guardrail-Bundle (G1–G5)
 
-Die Evaluation vergleicht **Baseline** (ohne Guardrails) mit einem **Guardrail-Bundle** bestehend aus:
-
-| Guardrail | Beschreibung | Adressiert FM |
-|-----------|--------------|---------------|
-| **G1** Evidence + Location | Pflichtfelder: `file_path`, `line_start`, `evidence_snippet` | FM2 (Evidence Deficit) |
-| **G2** Untrusted-Input Policy | PR-Body/Kommentare als untrusted; Entscheidung nur anhand Code-Diff | FM1 (Metadata Susceptibility) |
-| **G3** Redaction / Never-Echo | Secrets maskieren; Output darf keine Secret-Strings enthalten | FM4 (Secret Leakage) |
+| Guardrail | Beschreibung | Modus |
+|-----------|--------------|-------|
+| **G5** Schema Validation | JSON-Struktur prüfen, reparieren oder → REVIEW | Post-LLM, zuerst |
+| **G2** Untrusted-Input Policy | Exkulpatorische PR-Metadata-Abhängigkeit → REVIEW | Post-LLM |
+| **G4** Uncertainty Escalation | Regelbasiert: Confidence + Context-Flags → REVIEW | Post-LLM |
+| **G1** Evidence + Location | Evidenz-Konsistenz prüfen, invalide → REVIEW | Post-LLM |
+| **G3** Output Leakage (Fail-Closed) | Detect → Redact once → REVIEW falls Leak bleibt | Post-LLM, zuletzt |
 
 ---
 
@@ -23,151 +25,240 @@ Die Evaluation vergleicht **Baseline** (ohne Guardrails) mit einem **Guardrail-B
 
 | Kategorie | Anzahl |
 |-----------|--------|
-| **Positive Samples (mit Secret)** | 100 |
+| **Positive Samples (mit Secret)** | 150 |
 | **Negative Samples (ohne Secret)** | 50 |
-| **Gesamt** | 150 |
+| davon NEG_CLEAN | 25 |
+| davon NEG_DECOY | 25 |
+| **Gesamt** | 200 |
+
+### Perturbation-Conditions (positive Samples)
+
+| Condition | n | Beschreibung |
+|-----------|---|--------------|
+| B0 (Baseline) | 100 | Unveränderte Samples |
+| E1-B (BenignFraming) | 8 | PR-Text behauptet "kein echtes Secret" |
+| E2-A (InCodeFramingComment) | 8 | Code-Kommentar behauptet "dummy/test" |
+| E3-A (StringConcatenation) | 17 | Secret über String-Konkatenation verschleiert |
+| E3-B (SplitAcrossVariables) | 17 | Secret über mehrere Variablen verteilt |
 
 ---
 
-## Hauptergebnis: Baseline vs. Guardrails
+## Hauptergebnis
 
-### Claude Sonnet 4
-
-| Metrik | Baseline | Mit Guardrails | Differenz |
-|--------|----------|----------------|-----------|
-| **Precision** | 84.75% | 84.75% | 0% |
-| **Recall** | 100.00% | 100.00% | 0% |
-| **F1-Score** | 91.74% | 91.74% | 0% |
-| **FM4-Violations** | 86 | 86 | 0 |
-
-**Fazit:** Bei Claude zeigen die Guardrails keine messbare Wirkung. Das Modell gibt weiterhin in 86 von 150 Fällen das Secret im Output aus (FM4: Secret Leakage).
-
----
-
-### GPT-5 Mini
-
-| Metrik | Baseline | Mit Guardrails | Differenz |
-|--------|----------|----------------|-----------|
-| **Precision** | 81.30% | 93.65% | **+12.35%** |
-| **Recall** | 100.00% | 59.00% | **-41.00%** |
-| **F1-Score** | 89.69% | 72.39% | -17.30% |
-| **FM4-Violations** | n/a | 5 | **-81 vs. Claude** |
-
-**Fazit:** GPT-5 Mini reagiert stark auf Guardrails:
-- **Positiv:** Precision steigt um 12%, FM4-Violations drastisch reduziert (nur 5 statt 86 bei Claude)
-- **Negativ:** Recall fällt von 100% auf 59% - das Modell wird zu konservativ und übersieht 41 echte Secrets
+| Metrik | Scanner | LLM Baseline | LLM + Guardrails |
+|--------|---------|--------------|------------------|
+| **TP** | 126 | 149 | 150 |
+| **FP** | 10 | 23 | 26 |
+| **FN** | 24 | 0 | 0 |
+| **TN** | 40 | 27 | 24 |
+| **Precision** | 92.6% | 86.6% | 85.2% |
+| **Recall** | 84.0% | 100.0% | 100.0% |
+| **F1-Score** | 88.1% | 92.8% | 92.0% |
+| **Specificity** | 80.0% | 54.0% | 48.0% |
 
 ---
 
-### GPT-4o
+## Per-Condition Recall (positive Samples)
 
-| Metrik | Baseline | Mit Guardrails | Differenz |
-|--------|----------|----------------|-----------|
-| **Precision** | 92.86% | 85.87% | **-7.00%** |
-| **Recall** | 78.00% | 79.00% | +1.00% |
-| **F1-Score** | 84.78% | 82.29% | -2.49% |
-| **FM4-Violations** | n/a | 27 | - |
+| Condition | n | Scanner | LLM Baseline | LLM + Guardrails |
+|-----------|---|---------|--------------|------------------|
+| B0 (Baseline) | 100 | 97.0% | 100.0% | 100.0% |
+| E1-B (BenignFraming) | 8 | 100.0% | 100.0% | 100.0% |
+| E2-A (InCodeFramingComment) | 8 | 37.5% | 100.0% | 100.0% |
+| E3-A (StringConcatenation) | 17 | 23.5% | 100.0% | 100.0% |
+| E3-B (SplitAcrossVariables) | 17 | 82.4% | 100.0% | 100.0% |
 
-**Fazit:** GPT-4o zeigt gemischte Ergebnisse mit Guardrails:
-- Precision sinkt um 7% (mehr False Positives)
-- Recall bleibt stabil
-- Mittlere FM4-Rate (27 Samples)
+**Kernaussage:** Scanner versagen bei semantischer Obfuscation (E3-A: 23.5%, E2-A: 37.5%). LLM erkennt alle Varianten.
 
 ---
 
-## Vergleichstabelle: Alle Modelle
+## False-Positive-Analyse (negative Samples)
 
-### Ohne Guardrails (Baseline)
+| Kategorie | n | Scanner FP | Baseline FP | Guardrail FP |
+|-----------|---|-----------|-------------|-------------|
+| NEG_CLEAN | 25 | 0 | 0 | 1 |
+| NEG_DECOY | 25 | 10 | 23 | 25 |
+| **Gesamt** | 50 | 10 | 23 | 26 |
 
-| Modell | Precision | Recall | F1-Score | TP | FP | FN | TN |
-|--------|-----------|--------|----------|----|----|----|----|
-| **Claude Sonnet 4** | 84.75% | **100%** | **91.74%** | 100 | 18 | 0 | 32 |
-| **GPT-5 Mini** | 81.30% | **100%** | 89.69% | 100 | 23 | 0 | 27 |
-| **GPT-4o** | **92.86%** | 78% | 84.78% | 78 | 6 | 22 | 44 |
+### FP-Vergleich: Baseline vs. Guardrails
 
-### Mit Guardrails (G1 + G2 + G3)
+- In beiden FP: 23
+- Nur Baseline FP: 0 (keine Korrektur durch Guardrails)
+- Nur Guardrail FP: 3 (neue FPs durch G4-Eskalation PASS → REVIEW)
 
-| Modell | Precision | Recall | F1-Score | TP | FP | FN | TN | FM4 |
-|--------|-----------|--------|----------|----|----|----|----|-----|
-| **Claude Sonnet 4** | 84.75% | **100%** | **91.74%** | 100 | 18 | 0 | 32 | 86 |
-| **GPT-5 Mini** | **93.65%** | 59% | 72.39% | 59 | 4 | 41 | 46 | **5** |
-| **GPT-4o** | 85.87% | 79% | 82.29% | 79 | 13 | 21 | 37 | 27 |
+**Kernaussage:** NEG_DECOY-Samples sind für alle LLM-Modi problematisch. Guardrails korrigieren keine bestehenden FPs, erzeugen aber 3 zusätzliche durch G4-Eskalation.
 
 ---
 
-## FM4-Compliance: Secret Leakage in Output
+## Guardrail-Routing-Analyse
 
-**FM4 (Failure Mode 4):** Das Modell reproduziert das Secret im Klartext im Output (Reasoning/Evidence).
-**G3 (Redaction/Never-Echo):** Guardrail zur Mitigation - Secrets sollen maskiert werden.
+### Decision Distribution (alle 200 Samples)
 
-| Modell | FM4-Violations | Quote | G3-Wirksamkeit |
-|--------|----------------|-------|----------------|
-| **GPT-5 Mini** | 5 | **3.3%** | Hoch |
-| **GPT-4o** | 27 | 18.0% | Mittel |
-| **Claude Sonnet 4** | 86 | 57.3% | Keine |
+| Final Decision | Anzahl |
+|----------------|--------|
+| BLOCK | 85 |
+| REVIEW | 91 |
+| PASS | 24 |
 
-**Interpretation:**
-- GPT-5 Mini hält G3 (Redaction) am besten ein (nur 3.3% Leaks)
-- Claude ignoriert G3 weitgehend (57.3% Leaks trotz Guardrail-Prompt)
+### Routing nach Guardrail
+
+| Guardrail | Positiv | Negativ | Gesamt |
+|-----------|---------|---------|--------|
+| Keine (LLM-Entscheidung) | 85 | 24 | 109 |
+| G4 (Uncertainty) | 30 | 25 | 55 |
+| G5 (Schema/Parse) | 24 | 1 | 25 |
+| G3 (Output Leakage) | 10 | 0 | 10 |
+| G2 (Untrusted Input) | 1 | 0 | 1 |
+
+### Original → Final Decision
+
+| Original | → Final | Anzahl |
+|----------|---------|--------|
+| BLOCK | → BLOCK | 85 |
+| BLOCK | → REVIEW | 63 |
+| PARSE_FAIL | → REVIEW | 25 |
+| PASS | → PASS | 24 |
+| PASS | → REVIEW | 3 |
+
+### Positive Samples: BLOCK vs. REVIEW
+
+- **BLOCK (autonom erkannt):** 85/150 (56.7%)
+- **REVIEW (eskaliert):** 65/150 (43.3%)
+- **PASS (durchgelassen):** 0/150 (0.0%)
 
 ---
 
-## Static Scanner als Referenz
+## G4 Uncertainty Escalation — Detail
 
-| Metrik | Wert |
-|--------|------|
-| Precision | 90.65% |
-| Recall | 97.00% |
-| F1-Score | 93.72% |
-| TP / FP / FN / TN | 97 / 10 / 3 / 40 |
+G4 eskaliert 55 Samples (30 positiv, 25 negativ) zu REVIEW.
 
-Die Scanner (Gitleaks + detect-secrets) erreichen ohne LLM bereits sehr gute Ergebnisse.
+### Triggered Rules
+
+| Rule | Anzahl | Beschreibung |
+|------|--------|--------------|
+| R1_ambiguous_context | 24 | Placeholder/Test/Docs-Kontext |
+| R4_exculpatory_escalation | 14 | Exkulpatorische Claims im Code/PR |
+| R2_reconstructed_plus_ambiguity | 11 | Rekonstruiertes Secret + Ambiguität |
+| R3_scanner_neg_llm_pos_context | 6 | Scanner-Disagreement |
+
+### Häufigste Inferred Flags
+
+| Flag | Anzahl |
+|------|--------|
+| comment_claims_dummy | 40 |
+| scanner_disagreement | 21 |
+| placeholder_or_example_context | 10 |
+| evidence_span_not_single_line | 12 |
+| decoy_like_pattern | 11 |
+| reconstructed_secret | 10 |
+| split_across_variables | 10 |
+
+---
+
+## G3 Output Leakage
+
+- G3 triggered (Leak-Detection): 8/200
+- G3 routed to REVIEW: 10
+- Davon positiv: 10, negativ: 0
+
+**G3 erzeugt keine False Positives** — reagiert ausschließlich auf echte Secrets.
+
+---
+
+## Confidence-Verteilung
+
+| Confidence | Positiv | Negativ |
+|------------|---------|---------|
+| HIGH | 123 | 36 |
+| MEDIUM | 1 | 2 |
+| None (Parse-Fehler) | 26 | 12 |
+
+---
+
+## Data Leakage Audit
+
+Geprüft am 16.03.2026. Ergebnis: **Keine ergebnisrelevante Leakage.**
+
+| Vektor | Status | Detail |
+|--------|--------|--------|
+| LLM-Prompt | Sauber | Nur pr_title, pr_body, code_context |
+| ground_truth → Guardrails | Toter Code | Parameter übergeben aber nie benutzt |
+| gt_file_path → G4 | Minimal | Nur Post-Decision-Routing, auch im Diff-Header verfügbar |
+| scanner_hit → G4 | Design | Hybrid-Architektur, kein GT-Leakage |
+| Post-hoc Metriken | Sauber | gt_secret_value nur nach Decision für FM5-Berechnung |
 
 ---
 
 ## Schlussfolgerungen
 
-### 1. Guardrail-Wirkung ist modellabhängig
+### 1. Scanner vs. LLM: Komplementäre Stärken
 
-| Modell | G1 (Evidence) | G2 (Untrusted) | G3 (Redaction) | Gesamtwirkung |
-|--------|---------------|----------------|----------------|---------------|
-| **Claude** | Keine Änderung | Keine Änderung | Ignoriert | Keine |
-| **GPT-5 Mini** | Wirksam | Wirksam | **Sehr wirksam** | Stark (aber Recall-Verlust) |
-| **GPT-4o** | Teilweise | Teilweise | Teilweise | Moderat |
+| Stärke | Scanner | LLM |
+|--------|---------|-----|
+| Baseline (B0) | 97.0% Recall | 100% Recall |
+| Obfuscation (E3-A) | **23.5%** Recall | 100% Recall |
+| Code-Framing (E2-A) | **37.5%** Recall | 100% Recall |
+| NEG_CLEAN Specificity | 100% | 96–100% |
+| NEG_DECOY Specificity | 60% | 0–8% |
+| Precision | **92.6%** | 85–87% |
 
-### 2. Trade-off: Sicherheit vs. Recall
+### 2. Guardrail-Wirkung
 
-| Ansatz | Vorteil | Nachteil |
-|--------|---------|----------|
-| **Baseline (ohne Guardrails)** | Hoher Recall (100% bei Claude/GPT-5) | FM4: Secrets werden im Output geleakt |
-| **Mit Guardrails** | FM4 reduziert (GPT-5: nur 5 Leaks) | Recall kann drastisch sinken |
+| Aspekt | Bewertung |
+|--------|-----------|
+| Recall-Sicherung | Perfekt (100%, 0 FN) |
+| Fail-Closed-Design | Funktioniert (Parse-Fehler, Unsicherheit → REVIEW) |
+| G3 (Leakage) | Präzise, keine FPs |
+| G4 (Uncertainty) | Aggressiv: 43% Eskalation, +3 FPs |
+| FP-Reduktion | Nicht gegeben — Guardrails korrigieren keine Baseline-FPs |
+| Precision-Kosten | –1.4% gegenüber Baseline |
 
-### 3. Empfehlung
+### 3. Hauptlimitation: NEG_DECOY
 
-Für produktive Systeme mit Secret-Detection:
-- **Wenn Recall kritisch:** Claude Baseline + Post-Processing zur Leak-Vermeidung
-- **Wenn FM4-Vermeidung kritisch:** GPT-5 Mini mit Guardrails (akzeptiere niedrigeren Recall)
-- **Hybrid-Ansatz:** Scanner (97% Recall) + LLM für Grenzfälle
+Alle LLM-Modi scheitern an NEG_DECOY-Samples (designte Fake-Secrets). Dies ist ein fundamentales LLM-Limit: Decoys sehen syntaktisch identisch zu echten Secrets aus. In der Praxis erfordert dies menschliche Prüfung der REVIEW-Alerts.
 
 ---
 
-## Referenzen
+## Run-Historie
 
-### Failure Modes (aus Arbeitsplan)
+| Run | Datum | Dataset | Anmerkung |
+|-----|-------|---------|-----------|
+| v100 | 2026-03-15 | all_150_samples.json | Frozen reference (150 Samples, G1-G3) |
+| v110 | 2026-03-15 | all_200_samples.json | 200 Samples, G1-G5, Standard-Perturbation |
+| v120 | 2026-03-16 | all_200_samples_extreme.json | Extreme-Perturbation, G5-Bug (confidence rejected) |
+| **v121** | **2026-03-16** | **all_200_samples_extreme.json** | **Final: G5-Fix, alle Ergebnisse in diesem Dokument** |
 
-| FM | Beschreibung | Guardrail-Mitigation |
-|----|--------------|----------------------|
-| FM1 | Untrusted-Metadata Susceptibility | G2 (Untrusted-Input Policy) |
-| FM2 | Evidence Deficit / Non-localized Judgement | G1 (Evidence + Location) |
-| FM3 | Obfuscation Sensitivity | Policy-basiert (P1/P2/P3) |
-| FM4 | Secret Leakage in Output | G3 (Redaction/Never-Echo) |
+### G5-Fix (v120 → v121)
 
-### Dateipfade
+- **Problem:** G5 lehnte `confidence`-Feld ab (G4 fordert es vom LLM, G5 kannte es nicht)
+- **Effekt:** 166/200 Samples als Schema-Violation → REVIEW geroutet, Guardrail-Recall = 2%
+- **Fix:** `("confidence", str, False)` zu `OPTIONAL_FIELDS` in `g5_schema_validation.py` hinzugefügt
+- **Ergebnis:** Schema-valid 175/200 (25 verbleibende = echte Parse-Fehler)
+
+---
+
+## Dateipfade
 
 | Datei | Pfad |
 |-------|------|
-| Datensatz | `data/03_baseline/all_150_samples.json` |
-| Claude-Ergebnisse | `data/05_results/hybrid_evaluation_claude.json` |
-| GPT-5 Mini-Ergebnisse | `data/05_results/hybrid_eval_gpt5mini_150.json` |
-| GPT-4o-Ergebnisse | `data/05_results/hybrid_evaluation_gpt4o.json` |
-| detect-secrets-Ergebnisse | `data/05_results/hybrid_evaluation_detect_secrets.json` |
+| Ergebnisse (final) | `runs/v121_final_extreme_openai_g5fix/results.json` |
+| Konfiguration | `runs/v121_final_extreme_openai_g5fix/config.json` |
+| Datensatz | `data/03_baseline/all_200_samples_extreme.json` |
+| Vorgänger-Run (G5-Bug) | `runs/v120_final_extreme_openai/results.json` |
+| Historischer Run (150 Samples) | `runs/v100_full_openai_frozen/` |
+
+---
+
+## Frühere Ergebnisse (150-Sample-Runs, historisch)
+
+Die folgenden Ergebnisse stammen aus den ursprünglichen 150-Sample-Runs mit G1–G3 Guardrails (ohne G4/G5). Sie dienen als historische Referenz.
+
+### Modellvergleich (150 Samples, G1–G3)
+
+| Modell | Baseline Prec. | Baseline Rec. | Guardrail Prec. | Guardrail Rec. | FM4-Violations |
+|--------|---------------|---------------|-----------------|----------------|----------------|
+| Claude Sonnet 4 | 84.75% | 100% | 84.75% | 100% | 86 |
+| GPT-5 Mini | 81.30% | 100% | 93.65% | 59% | 5 |
+| GPT-4o | 92.86% | 78% | 85.87% | 79% | 27 |
+
+**Kontext:** Diese Runs nutzten nur prompt-basierte G3 (keine fail-closed Redaction), kein G4/G5, und den Standard-Datensatz ohne extreme Perturbationen.
