@@ -1,270 +1,298 @@
 """
 Compute All Metrics for HybridGate Evaluation Results
 
-CLI script to compute comprehensive metrics from evaluation results.
+Comprehensive, reproducible evaluation script for the final BA run.
+Produces structured output artefacts (JSON, CSV, Markdown).
 
-Usage:
-    python src/metrics/compute_all.py --input data/05_results/hybrid_eval.json
+CLI:
+    python -m src.metrics.compute_all \\
+        --results runs/v121_final_extreme_openai_g5fix/results.json \\
+        --config  runs/v121_final_extreme_openai_g5fix/config.json \\
+        --outdir  runs/v121_final_extreme_openai_g5fix/evaluation_outputs
+
+Outputs (all in --outdir):
+    metrics_summary.json     Full nested metrics
+    metrics_tables.csv       Mode comparison (4 rows)
+    slice_metrics.csv        All slice × mode breakdowns
+    policy_metrics.csv       3 policies × 2 variants × 2 views = 12 rows
+    guardrail_metrics.json   G1–G5 KPIs
+    evaluation_summary.md    Human-readable tables (descriptive, no interpretation)
 
 Author: Cecilia Nothstein
 """
 
 import argparse
+import csv
 import json
 import logging
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Any, Dict, List, Optional
 
-from .model_metrics import (
-    compute_model_metrics,
-    compute_metrics_by_condition,
-    compute_metrics_by_secret_type
+from .evaluation_utils import (
+    build_dataset_summary,
+    compute_all_mode_metrics,
+    compute_all_policy_metrics,
+    compute_guardrail_kpis,
+    compute_slice_metrics,
+    generate_markdown_report,
 )
-from .gate_metrics import (
-    compute_gate_metrics,
-    compare_policies
-)
-from .statistical_tests import (
-    compare_detectors_mcnemar
-)
+from .leakage_metrics import compare_baseline_vs_guardrail_leakage
+from .statistical_tests import compare_detectors_mcnemar
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
+    format="%(asctime)s %(levelname)s %(message)s",
 )
 logger = logging.getLogger(__name__)
 
 
-def compute_all_metrics(results: List[Dict[str, Any]]) -> Dict[str, Any]:
+# ═══════════════════════════════════════════════════════════════════════
+#  I/O helpers
+# ═══════════════════════════════════════════════════════════════════════
+
+def _load_json(path: str) -> Any:
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _write_json(data: Any, path: Path) -> None:
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    logger.info(f"  → {path}")
+
+
+def _write_csv(rows: List[Dict], path: Path) -> None:
+    if not rows:
+        logger.warning(f"  → {path}  (empty — no rows)")
+        return
+
+    # Stable column order: pull known important columns to front
+    priority = [
+        "mode", "slice_name", "slice_value", "policy", "variant", "view",
+        "n", "total_evaluated",
+        "TP", "FP", "TN", "FN", "skipped",
+        "precision", "recall", "f1", "specificity", "accuracy",
+        "escape_rate", "escape_count", "reviewer_load",
+    ]
+    all_keys = list(dict.fromkeys(
+        k for row in rows for k in row.keys()
+        if not isinstance(row[k], (dict, list))  # skip nested
+    ))
+    ordered = [k for k in priority if k in all_keys]
+    ordered += [k for k in all_keys if k not in ordered]
+
+    with open(path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=ordered, extrasaction="ignore")
+        writer.writeheader()
+        for row in rows:
+            # Flatten: skip nested dicts/lists
+            flat = {k: v for k, v in row.items() if not isinstance(v, (dict, list))}
+            writer.writerow(flat)
+    logger.info(f"  → {path}  ({len(rows)} rows)")
+
+
+def _write_text(text: str, path: Path) -> None:
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(text)
+    logger.info(f"  → {path}")
+
+
+# ═══════════════════════════════════════════════════════════════════════
+#  Statistical tests (wrapper around existing module)
+# ═══════════════════════════════════════════════════════════════════════
+
+def run_statistical_tests(results: List[Dict]) -> Dict[str, Any]:
     """
-    Compute all metrics from evaluation results.
+    McNemar tests for key detector pairs.
 
-    Args:
-        results: List of evaluation result dictionaries
-
-    Returns:
-        Comprehensive metrics dictionary
+    Compares on the binary hit-level (autonomous classification).
     """
-    metrics = {
-        "summary": {},
-        "model_metrics": {},
-        "gate_metrics": {},
-        "statistical_tests": {},
-        "by_condition": {},
-        "by_secret_type": {}
-    }
-
-    total = len(results)
-    with_secrets = sum(1 for r in results if r.get("gt_has_secret"))
-
-    metrics["summary"] = {
-        "total_samples": total,
-        "samples_with_secrets": with_secrets,
-        "samples_without_secrets": total - with_secrets
-    }
-
-    # Model metrics for different detectors
-    logger.info("Computing model metrics...")
-
-    # Scanner (combined)
-    scanner_results = [{
-        **r,
-        "pred_has_secret": r.get("scanner_hit", False)
-    } for r in results]
-    metrics["model_metrics"]["scanner_combined"] = compute_model_metrics(
-        scanner_results, detector_name="scanner_combined"
-    )
-
-    # Gitleaks
-    gitleaks_results = [{
-        **r,
-        "pred_has_secret": r.get("gitleaks_hit", False)
-    } for r in results]
-    metrics["model_metrics"]["gitleaks"] = compute_model_metrics(
-        gitleaks_results, detector_name="gitleaks"
-    )
-
-    # TruffleHog
-    trufflehog_results = [{
-        **r,
-        "pred_has_secret": r.get("trufflehog_hit", False)
-    } for r in results]
-    metrics["model_metrics"]["trufflehog"] = compute_model_metrics(
-        trufflehog_results, detector_name="trufflehog"
-    )
-
-    # LLM Baseline
-    baseline_results = [{
-        **r,
-        "pred_has_secret": r.get("llm_baseline_hit", False),
-        "pred_location_start": r.get("llm_baseline", {}).get("pred_location_start") if r.get("llm_baseline") else None,
-        "pred_location_end": r.get("llm_baseline", {}).get("pred_location_end") if r.get("llm_baseline") else None,
-    } for r in results]
-    metrics["model_metrics"]["llm_baseline"] = compute_model_metrics(
-        baseline_results, detector_name="llm_baseline"
-    )
-
-    # LLM Guardrail
-    guardrail_results = [{
-        **r,
-        "pred_has_secret": r.get("llm_guardrail_hit", False),
-        "pred_location_start": r.get("llm_guardrail", {}).get("pred_location_start") if r.get("llm_guardrail") else None,
-        "pred_location_end": r.get("llm_guardrail", {}).get("pred_location_end") if r.get("llm_guardrail") else None,
-    } for r in results]
-    metrics["model_metrics"]["llm_guardrail"] = compute_model_metrics(
-        guardrail_results, detector_name="llm_guardrail"
-    )
-
-    # Gate metrics for all policies
-    logger.info("Computing gate metrics...")
-    metrics["gate_metrics"]["policy_p1"] = compute_gate_metrics(results, "policy_p1")
-    metrics["gate_metrics"]["policy_p2"] = compute_gate_metrics(results, "policy_p2")
-    metrics["gate_metrics"]["policy_p3"] = compute_gate_metrics(results, "policy_p3")
-    metrics["gate_metrics"]["comparison"] = compare_policies(results)
-
-    # Statistical tests
-    logger.info("Running statistical tests...")
+    tests = {}
 
     # Scanner vs LLM Baseline
-    metrics["statistical_tests"]["scanner_vs_llm_baseline"] = compare_detectors_mcnemar(
+    tests["scanner_vs_baseline"] = compare_detectors_mcnemar(
         results,
         method1_key="scanner_hit",
         method2_key="llm_baseline_hit",
         method1_name="Scanner",
-        method2_name="LLM Baseline"
+        method2_name="LLM_Baseline",
     )
 
-    # LLM Baseline vs LLM Guardrail
-    metrics["statistical_tests"]["baseline_vs_guardrail"] = compare_detectors_mcnemar(
+    # Scanner vs Guardrails (autonomous)
+    tests["scanner_vs_guardrail_autonomous"] = compare_detectors_mcnemar(
+        results,
+        method1_key="scanner_hit",
+        method2_key="llm_guardrail_hit",
+        method1_name="Scanner",
+        method2_name="Guardrails_Autonomous",
+    )
+
+    # Baseline vs Guardrails (autonomous)
+    tests["baseline_vs_guardrail_autonomous"] = compare_detectors_mcnemar(
         results,
         method1_key="llm_baseline_hit",
         method2_key="llm_guardrail_hit",
-        method1_name="LLM Baseline",
-        method2_name="LLM Guardrail"
+        method1_name="LLM_Baseline",
+        method2_name="Guardrails_Autonomous",
     )
 
-    # Gitleaks vs TruffleHog
-    metrics["statistical_tests"]["gitleaks_vs_trufflehog"] = compare_detectors_mcnemar(
-        results,
-        method1_key="gitleaks_hit",
-        method2_key="trufflehog_hit",
-        method1_name="Gitleaks",
-        method2_name="TruffleHog"
+    # Alert-level comparisons need a synthetic hit field
+    alert_results = []
+    for s in results:
+        gr = s.get("llm_guardrail") or {}
+        fd = gr.get("final_decision")
+        alert_results.append({
+            **s,
+            "_guardrail_alert_hit": fd in ("BLOCK", "REVIEW"),
+        })
+
+    tests["scanner_vs_guardrail_alert"] = compare_detectors_mcnemar(
+        alert_results,
+        method1_key="scanner_hit",
+        method2_key="_guardrail_alert_hit",
+        method1_name="Scanner",
+        method2_name="Guardrails_Alert",
     )
 
-    # Metrics by condition
-    logger.info("Computing metrics by condition...")
-    metrics["by_condition"]["scanner"] = compute_metrics_by_condition(
-        scanner_results, pred_key="pred_has_secret"
-    )
-    metrics["by_condition"]["llm_baseline"] = compute_metrics_by_condition(
-        baseline_results, pred_key="pred_has_secret"
-    )
-    metrics["by_condition"]["llm_guardrail"] = compute_metrics_by_condition(
-        guardrail_results, pred_key="pred_has_secret"
+    tests["baseline_vs_guardrail_alert"] = compare_detectors_mcnemar(
+        alert_results,
+        method1_key="llm_baseline_hit",
+        method2_key="_guardrail_alert_hit",
+        method1_name="LLM_Baseline",
+        method2_name="Guardrails_Alert",
     )
 
-    # Metrics by secret type
-    logger.info("Computing metrics by secret type...")
-    metrics["by_secret_type"]["scanner"] = compute_metrics_by_secret_type(
-        scanner_results, pred_key="pred_has_secret"
-    )
-    metrics["by_secret_type"]["llm_baseline"] = compute_metrics_by_secret_type(
-        baseline_results, pred_key="pred_has_secret"
-    )
-    metrics["by_secret_type"]["llm_guardrail"] = compute_metrics_by_secret_type(
-        guardrail_results, pred_key="pred_has_secret"
-    )
-
-    return metrics
+    return tests
 
 
-def print_summary(metrics: Dict[str, Any]) -> None:
-    """Print a formatted summary of metrics."""
-    print("\n" + "=" * 60)
-    print("HYBRIDGATE EVALUATION METRICS SUMMARY")
-    print("=" * 60)
+# ═══════════════════════════════════════════════════════════════════════
+#  Policy audit hook (Section D2)
+# ═══════════════════════════════════════════════════════════════════════
 
-    summary = metrics["summary"]
-    print(f"\nTotal samples: {summary['total_samples']}")
-    print(f"  With secrets: {summary['samples_with_secrets']}")
-    print(f"  Without secrets: {summary['samples_without_secrets']}")
+def policy_resimulation_hook(
+    results: List[Dict],
+) -> Optional[List[Dict]]:
+    """
+    Placeholder for future policy re-simulation.
 
-    print("\n--- Model Performance ---")
-    for name, m in metrics["model_metrics"].items():
-        print(f"\n{name}:")
-        print(f"  Precision: {m['precision']:.3f}")
-        print(f"  Recall:    {m['recall']:.3f}")
-        print(f"  F1:        {m['f1']:.3f}")
-        cm = m['confusion_matrix']
-        print(f"  TP={cm['tp']} FP={cm['fp']} TN={cm['tn']} FN={cm['fn']}")
-
-    print("\n--- Gate Effectiveness ---")
-    for policy in ["policy_p1", "policy_p2", "policy_p3"]:
-        g = metrics["gate_metrics"][policy]
-        print(f"\n{policy}:")
-        print(f"  Leak-Escape-Rate:  {g['leak_escape_rate']:.3f}")
-        print(f"  False-Block-Rate:  {g['false_block_rate']:.3f}")
-        print(f"  Review-Load:       {g['review_load']:.3f}")
-
-    print("\n--- Statistical Significance ---")
-    for name, test in metrics["statistical_tests"].items():
-        print(f"\n{test['comparison']}:")
-        print(f"  McNemar p-value: {test['mcnemar_test']['p_value']:.6f}")
-        print(f"  Significant (α=0.05): {test['mcnemar_test']['significant_at_005']}")
-
-    print("\n" + "=" * 60)
+    Currently returns None — only the stored policy decisions from
+    results.json are evaluated (Section D1).  To add re-simulation,
+    implement custom P1/P2/P3 logic here and return a list of dicts
+    with the same schema as compute_all_policy_metrics() output.
+    """
+    return None
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Compute metrics from HybridGate evaluation results")
-    parser.add_argument(
-        "--input",
-        type=str,
-        required=True,
-        help="Path to evaluation results JSON"
+# ═══════════════════════════════════════════════════════════════════════
+#  Main
+# ═══════════════════════════════════════════════════════════════════════
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Compute comprehensive evaluation metrics for HybridGate results",
     )
     parser.add_argument(
-        "--output",
-        type=str,
-        default=None,
-        help="Path for metrics output JSON (optional)"
+        "--results", required=True,
+        help="Path to results.json",
     )
     parser.add_argument(
-        "--quiet",
-        action="store_true",
-        help="Suppress summary output"
+        "--config", default=None,
+        help="Path to config.json (optional, for run metadata)",
     )
-
+    parser.add_argument(
+        "--dataset", default=None,
+        help="Path to dataset JSON (optional, not used for computation)",
+    )
+    parser.add_argument(
+        "--outdir", required=True,
+        help="Output directory for all metric files",
+    )
     args = parser.parse_args()
 
-    # Load results
-    logger.info(f"Loading results from {args.input}")
-    with open(args.input, "r") as f:
-        results = json.load(f)
-    logger.info(f"Loaded {len(results)} results")
+    outdir = Path(args.outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
 
-    # Compute metrics
-    metrics = compute_all_metrics(results)
+    # ── Load inputs ────────────────────────────────────────────────
+    logger.info(f"Loading results from {args.results}")
+    results = _load_json(args.results)
+    logger.info(f"Loaded {len(results)} samples")
 
-    # Print summary
-    if not args.quiet:
-        print_summary(metrics)
+    config = _load_json(args.config) if args.config else None
 
-    # Save if output path specified
-    if args.output:
-        output_path = Path(args.output)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(output_path, "w") as f:
-            json.dump(metrics, f, indent=2)
-        logger.info(f"Saved metrics to {args.output}")
-    else:
-        # Default output path
-        input_path = Path(args.input)
-        output_path = input_path.parent / f"{input_path.stem}_metrics.json"
-        with open(output_path, "w") as f:
-            json.dump(metrics, f, indent=2)
-        logger.info(f"Saved metrics to {output_path}")
+    # ── 1. Dataset summary ─────────────────────────────────────────
+    logger.info("Building dataset summary ...")
+    ds_summary = build_dataset_summary(results, config)
+
+    # ── 2. Mode comparison (Section A) ─────────────────────────────
+    logger.info("Computing mode metrics (Scanner / Baseline / Guardrails Alert / Guardrails Autonomous) ...")
+    mode_metrics = compute_all_mode_metrics(results)
+
+    # ── 3. Guardrail KPIs (Section B) ─────────────────────────────
+    logger.info("Computing guardrail KPIs (G1–G5) ...")
+    guardrail_kpis = compute_guardrail_kpis(results)
+
+    # ── 4. Slice metrics (Section C) ──────────────────────────────
+    logger.info("Computing slice metrics ...")
+    slice_rows = compute_slice_metrics(results)
+
+    # ── 5. Policy metrics (Section D1) ────────────────────────────
+    logger.info("Computing policy metrics (P1–P3 × baseline/guardrail × alert/autonomous) ...")
+    policy_rows = compute_all_policy_metrics(results)
+
+    # Section D2: hook for future re-simulation
+    resim = policy_resimulation_hook(results)
+    if resim:
+        policy_rows.extend(resim)
+
+    # ── 6. Statistical tests ──────────────────────────────────────
+    logger.info("Running statistical tests (McNemar) ...")
+    stat_tests = run_statistical_tests(results)
+
+    # ── 7. Leakage comparison (FM5) ───────────────────────────────
+    logger.info("Computing leakage metrics (FM5) ...")
+    leakage = compare_baseline_vs_guardrail_leakage(results)
+
+    # ══════════════════════════════════════════════════════════════
+    #  Write outputs
+    # ══════════════════════════════════════════════════════════════
+    logger.info("Writing output files ...")
+
+    # metrics_summary.json — full nested metrics
+    _write_json(
+        {
+            "dataset": ds_summary,
+            "mode_comparison": mode_metrics,
+            "guardrail_kpis": guardrail_kpis,
+            "policy_metrics": policy_rows,
+            "statistical_tests": stat_tests,
+            "leakage": leakage,
+        },
+        outdir / "metrics_summary.json",
+    )
+
+    # metrics_tables.csv — mode comparison flat
+    _write_csv(
+        [{"mode": name, **m} for name, m in mode_metrics.items()],
+        outdir / "metrics_tables.csv",
+    )
+
+    # slice_metrics.csv
+    _write_csv(slice_rows, outdir / "slice_metrics.csv")
+
+    # policy_metrics.csv
+    _write_csv(policy_rows, outdir / "policy_metrics.csv")
+
+    # guardrail_metrics.json
+    _write_json(guardrail_kpis, outdir / "guardrail_metrics.json")
+
+    # evaluation_summary.md
+    md = generate_markdown_report(
+        mode_metrics, guardrail_kpis, policy_rows,
+        slice_rows, ds_summary,
+    )
+    _write_text(md, outdir / "evaluation_summary.md")
+
+    logger.info(f"Done — all outputs in {outdir}/")
 
 
 if __name__ == "__main__":
