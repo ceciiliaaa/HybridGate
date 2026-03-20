@@ -1,0 +1,5 @@
+mode,total_evaluated,TP,FP,TN,FN,skipped,precision,recall,f1,specificity,accuracy,description
+Scanner,200,126,10,40,24,0,0.9265,0.84,0.8811,0.8,0.83,Gitleaks + detect-secrets combined (scanner_hit)
+LLM_Baseline,200,150,24,26,0,0,0.8621,1.0,0.9259,0.52,0.88,LLM without guardrails (llm_baseline_hit)
+Guardrails_Alert,200,150,26,24,0,0,0.8523,1.0,0.9202,0.48,0.87,"LLM + Guardrails, alert-level: BLOCK or REVIEW = detection"
+Guardrails_Autonomous,200,80,0,50,70,0,1.0,0.5333,0.6957,1.0,0.65,"LLM + Guardrails, autonomous: BLOCK only = detection"

@@ -1,0 +1,6 @@
+guardrail,trigger_count,trigger_rate,routed_count,routed_rate
+G5,27,0.135,27,0.135
+G2,3,0.015,3,0.015
+G4,62,0.31,56,0.28
+G1,0,0.0,0,0.0
+G3,141,0.705,10,0.05

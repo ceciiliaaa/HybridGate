@@ -1,0 +1,6 @@
+failure_mode,mapped_guardrail,n_baseline_evaluable,prevalence_count,prevalence_rate,intervention_count,intervention_rate_given_prevalence,residual_count,residual_rate_given_prevalence,residual_observability
+FM1_evidence_location,G1,190,16,0.0842,0,0.0,0,0.0,partial
+FM2_untrusted_input,G2,190,0,0.0,,,,,n/a
+FM3_secret_leakage,G3,190,103,0.5421,89,0.8641,0,0.0,direct
+FM4_uncertainty_miscalibration,G4,190,52,0.2737,48,0.9231,43,0.8269,partial
+FM5_schema_output_failure,G5,200,27,0.135,27,1.0,,,not_robustly_observable

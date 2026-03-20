@@ -1,0 +1,6 @@
+trigger_combination,count,rate
+G3,82,0.41
+G4+G3,56,0.28
+G5,21,0.105
+G5+G4,6,0.03
+G2+G3,3,0.015

@@ -1,0 +1,4 @@
+mode,n_gt_pos_evaluable,pass_count_gt_pos,block_count_gt_pos,review_count_gt_pos
+Scanner,150,24,126,0
+LLM_Baseline,150,0,144,6
+LLM_Guardrails,150,0,80,70

@@ -1,0 +1,2 @@
+n_total_guardrail_samples,n_evaluable_guardrail_samples,n_missing_guardrail_samples,samples_with_any_trigger_count,samples_with_any_trigger_rate,single_trigger_samples_count,single_trigger_rate,multi_trigger_samples_count,multi_trigger_rate,max_triggers_on_single_sample
+200,200,0,168,0.84,103,0.515,65,0.325,2

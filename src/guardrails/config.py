@@ -7,6 +7,7 @@ for reproducibility of previous experiments.
 Design decision:
 - Default: G1, G2, G3 enabled (for backward compatibility)
 - G4, G5 disabled by default (opt-in for new experiments)
+- G6 disabled by default (opt-in for format-familiarity exploratory experiment)
 """
 
 from dataclasses import dataclass, field
@@ -24,6 +25,7 @@ class GuardrailSettings:
     Default Configuration:
     - G1, G2, G3: Enabled (backward compatible baseline)
     - G4, G5: Disabled (opt-in for new experiments)
+    - G6: Disabled (opt-in for format-familiarity exploratory experiment)
     """
     active_guardrails: Set[str] = field(default_factory=lambda: {"G1", "G2", "G3"})
 
@@ -40,13 +42,17 @@ class GuardrailSettings:
         self.active_guardrails.discard(guardrail.upper())
 
     def enable_all(self) -> None:
-        """Enable all guardrails including G4 and G5."""
-        self.active_guardrails = {"G1", "G2", "G3", "G4", "G5"}
+        """Enable all guardrails including G4, G5, and G6."""
+        self.active_guardrails = {"G1", "G2", "G3", "G4", "G5", "G6"}
 
     def enable_g4_g5(self) -> None:
         """Enable G4 and G5 in addition to existing guardrails."""
         self.active_guardrails.add("G4")
         self.active_guardrails.add("G5")
+
+    def enable_g6(self) -> None:
+        """Enable G6 (Format-Familiarity Pre-Scan) for exploratory experiment."""
+        self.active_guardrails.add("G6")
 
     @classmethod
     def baseline(cls) -> "GuardrailSettings":
@@ -55,8 +61,13 @@ class GuardrailSettings:
 
     @classmethod
     def full(cls) -> "GuardrailSettings":
-        """Create full config with all guardrails enabled."""
+        """Create full config with all guardrails enabled (G1–G5, no G6)."""
         return cls(active_guardrails={"G1", "G2", "G3", "G4", "G5"})
+
+    @classmethod
+    def full_with_g6(cls) -> "GuardrailSettings":
+        """Create config with all guardrails including G6."""
+        return cls(active_guardrails={"G1", "G2", "G3", "G4", "G5", "G6"})
 
 
 # Global default settings (can be overridden per evaluation run)

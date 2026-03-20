@@ -1,0 +1,2 @@
+baseline_leakage_count,baseline_leakage_rate,g3_triggered_count,g3_triggered_rate,residual_guardrail_leakage_count,residual_guardrail_leakage_rate,residual_guardrail_leakage_share_of_baseline_leak,g3_on_gt_pos_count,g3_on_gt_pos_rate
+103,0.515,141,0.705,0,0.0,0.0,117,0.78

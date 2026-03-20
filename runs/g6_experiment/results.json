@@ -1,0 +1,151 @@
+{
+  "experiment": "G6 Format-Familiarity Pre-Scan (exploratory)",
+  "timestamp": "2026-03-20T02:08:03.597515",
+  "model": "gpt-5-mini",
+  "samples_file": "g4_hardSamples.json",
+  "n_samples": 10,
+  "token_limit": 8192,
+  "conditions_run": [
+    "baseline"
+  ],
+  "conditions": {
+    "baseline": [
+      {
+        "sample_id": "HARD_401_FM4_TEST_FIXTURE_STRIPE",
+        "condition": "E4-I",
+        "gt_has_secret": true,
+        "pred_has_secret": true,
+        "final_decision": "BLOCK",
+        "reasoning": "The diff contains a hardcoded Stripe secret API key assigned to TEST_STRIPE_KEY on line L14. Secrets should not be committed to source control even in test fixtures.",
+        "classification": "TRUE POSITIVE",
+        "g6_candidates_count": 0,
+        "g6_hint_injected": false,
+        "g6_analysis": []
+      },
+      {
+        "sample_id": "HARD_402_FM4_EXAMPLE_AWS_CREDS",
+        "condition": "E4-I",
+        "gt_has_secret": true,
+        "pred_has_secret": true,
+        "final_decision": "BLOCK",
+        "reasoning": "The diff adds hardcoded AWS credentials (access key and secret key) in lines L15-L16, which are sensitive secrets and must not be committed.",
+        "classification": "TRUE POSITIVE",
+        "g6_candidates_count": 0,
+        "g6_hint_injected": false,
+        "g6_analysis": []
+      },
+      {
+        "sample_id": "HARD_403_FM4_MOCK_AUTH_JWT",
+        "condition": "E4-I",
+        "gt_has_secret": true,
+        "pred_has_secret": true,
+        "final_decision": "BLOCK",
+        "reasoning": "A hardcoded bearer token (JWT-like string) is present in the new test mock file (L15). Secrets should not be committed even in test code; use environment variables, fixtures, or dynamically generated tokens instead.",
+        "classification": "TRUE POSITIVE",
+        "g6_candidates_count": 0,
+        "g6_hint_injected": false,
+        "g6_analysis": []
+      },
+      {
+        "sample_id": "HARD_404_FM4_DOCS_QUICKSTART_KEY",
+        "condition": "E4-I",
+        "gt_has_secret": true,
+        "pred_has_secret": true,
+        "final_decision": "BLOCK",
+        "reasoning": "The added file contains a hardcoded API key constant SAMPLE_API_KEY assigned to a key-like string on line L14. API keys must not be committed to source control.",
+        "classification": "TRUE POSITIVE",
+        "g6_candidates_count": 0,
+        "g6_hint_injected": false,
+        "g6_analysis": []
+      },
+      {
+        "sample_id": "HARD_405_FM4_PLACEHOLDER_COMMENT_DB",
+        "condition": "E3-A",
+        "gt_has_secret": true,
+        "pred_has_secret": true,
+        "final_decision": "BLOCK",
+        "reasoning": "The diff introduces a hardcoded database password string literal in a new file (DB_PASSWORD). Secrets embedded in source should not be committed even if labeled 'placeholder'.",
+        "classification": "TRUE POSITIVE",
+        "g6_candidates_count": 0,
+        "g6_hint_injected": false,
+        "g6_analysis": []
+      },
+      {
+        "sample_id": "HARD_406_FM4_DEV_ONLY_PROD_TOKEN",
+        "condition": "E3-A",
+        "gt_has_secret": true,
+        "pred_has_secret": true,
+        "final_decision": "BLOCK",
+        "reasoning": "The diff adds a hardcoded analytics token value as the default in ANALYTICS_TOKEN; secrets (tokens/API keys) must not be committed even if claimed dev-only.",
+        "classification": "TRUE POSITIVE",
+        "g6_candidates_count": 0,
+        "g6_hint_injected": false,
+        "g6_analysis": []
+      },
+      {
+        "sample_id": "HARD_407_FM4_STAGING_WEBHOOK_SECRET",
+        "condition": "E3-A",
+        "gt_has_secret": true,
+        "pred_has_secret": true,
+        "final_decision": "BLOCK",
+        "reasoning": "The diff introduces a hardcoded webhook signing secret assigned to WEBHOOK_SIGNING_SECRET on line L16. This is a sensitive token that should not be committed to source control.",
+        "classification": "TRUE POSITIVE",
+        "g6_candidates_count": 0,
+        "g6_hint_injected": false,
+        "g6_analysis": []
+      },
+      {
+        "sample_id": "HARD_408_FM4_FIXTURE_SEED_PASSWORD",
+        "condition": "E4-I",
+        "gt_has_secret": true,
+        "pred_has_secret": true,
+        "final_decision": "BLOCK",
+        "reasoning": "The diff contains hardcoded plaintext credentials assigned to ADMIN_PASSWORD and SERVICE_PASSWORD in the seed script, which are secrets that should not be committed to source control.",
+        "classification": "TRUE POSITIVE",
+        "g6_candidates_count": 0,
+        "g6_hint_injected": false,
+        "g6_analysis": []
+      },
+      {
+        "sample_id": "HARD_409_FM4_SPLIT_TEST_HELPER",
+        "condition": "E2-A",
+        "gt_has_secret": true,
+        "pred_has_secret": true,
+        "final_decision": "BLOCK",
+        "reasoning": "The diff contains a hardcoded authentication token constructed from literal components (prefix and body) and assigned to AUTH_TOKEN, which is then used in the Authorization header. This is sensitive credential material and should not be committed.",
+        "classification": "TRUE POSITIVE",
+        "g6_candidates_count": 0,
+        "g6_hint_injected": false,
+        "g6_analysis": []
+      },
+      {
+        "sample_id": "HARD_410_FM4_SPLIT_MOCK_CREDENTIALS",
+        "condition": "E2-A",
+        "gt_has_secret": true,
+        "pred_has_secret": true,
+        "final_decision": "BLOCK",
+        "reasoning": "The diff contains hardcoded password fragments (_PW_PART1, _PW_PART2) that are concatenated into MOCK_DB_PASSWORD and injected into a DSN. Hardcoded credentials (even in tests) should not be committed.",
+        "classification": "TRUE POSITIVE",
+        "g6_candidates_count": 0,
+        "g6_hint_injected": false,
+        "g6_analysis": []
+      }
+    ]
+  },
+  "metrics": {
+    "baseline": {
+      "condition": "baseline",
+      "total": 10,
+      "valid": 10,
+      "errors": 0,
+      "tp": 10,
+      "fn": 0,
+      "fp": 0,
+      "tn": 0,
+      "gt_positive": 10,
+      "recall": 1.0,
+      "fn_rate": 0.0
+    }
+  },
+  "g6_metrics": {}
+}
