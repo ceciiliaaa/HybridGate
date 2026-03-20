@@ -42,7 +42,7 @@ logger = logging.getLogger(__name__)
 # Import existing components
 from .run_evaluation import (
     LLMClient, OpenAIClient, AnthropicClient,
-    SYSTEM_PROMPT, USER_PROMPT_TEMPLATE,
+    SYSTEM_PROMPT, BASELINE_PROMPT, USER_PROMPT_TEMPLATE,
     number_lines, extract_json, extract_secret_from_context,
     MAX_RETRIES, RETRY_BASE_DELAY
 )
@@ -51,7 +51,8 @@ from .run_evaluation import (
 from ..scanners import GitleaksScanner, DetectSecretsScanner, ScanResult
 from ..guardrails import (
     get_guardrail_bundle, apply_guardrails, apply_guardrails_with_routing,
-    GuardrailSettings, DEFAULT_SETTINGS
+    GuardrailSettings, DEFAULT_SETTINGS,
+    G1EvidenceLocation, G2UntrustedInput, G4Uncertainty,
 )
 from ..policies import compute_all_policies
 
@@ -61,8 +62,13 @@ from ..policies import compute_all_policies
 # ---------------------------------------------------------------------------
 
 def get_baseline_prompt() -> str:
-    """Get the baseline system prompt without guardrails."""
-    return SYSTEM_PROMPT
+    """Get the baseline system prompt without guardrails.
+
+    Uses BASELINE_PROMPT which does NOT instruct the LLM to mask secrets
+    or suppress reasoning.  This ensures the baseline reflects unguarded
+    LLM behaviour so that G3's leakage prevention value is measurable.
+    """
+    return BASELINE_PROMPT
 
 
 def get_guardrail_prompt(settings: GuardrailSettings = None) -> str:
@@ -276,8 +282,13 @@ class HybridEvaluationClient:
                     "validation_errors": guardrail_result["validation_errors"],
                     "error_categories": guardrail_result.get("error_categories", []),
                     "routed_by_guardrail": guardrail_result["routed_by_guardrail"],
+                    "triggered_guardrails": guardrail_result.get("triggered_guardrails", []),
                     "original_decision": None,
-                    "final_decision": "REVIEW"
+                    "final_decision": "REVIEW",
+                    # G3 details
+                    "g3_triggered": guardrail_result.get("g3_triggered", False),
+                    "g3_leak_detected": guardrail_result.get("g3_leak_detected", False),
+                    "g3_details": guardrail_result.get("g3_details", {}),
                 }
 
             # Schema valid - extract fields from parsed output
@@ -306,6 +317,11 @@ class HybridEvaluationClient:
                 "g4_valid": guardrail_result.get("g4_valid"),
                 "g4_details": guardrail_result.get("g4_details"),
                 "g5_valid": guardrail_result.get("g5_valid"),
+                # Multi-trigger + G3 details
+                "triggered_guardrails": guardrail_result.get("triggered_guardrails", []),
+                "g3_triggered": guardrail_result.get("g3_triggered", False),
+                "g3_leak_detected": guardrail_result.get("g3_leak_detected", False),
+                "g3_details": guardrail_result.get("g3_details", {}),
                 # Optional schema fields (pass through if present)
                 "uncertainty_flags": parsed.get("uncertainty_flags"),
                 "decision_basis": parsed.get("decision_basis"),
@@ -367,6 +383,12 @@ class HybridEvaluationClient:
             else:
                 result["llm_baseline"] = None
                 result["llm_baseline_hit"] = False
+
+        # Stage 2b: Baseline Failure-Mode Analysis (annotation only, no routing)
+        result["baseline_failure_modes"] = self._analyze_baseline_failure_modes(
+            sample, result.get("llm_baseline"),
+            scanner_hit=result.get("scanner_hit"),
+        )
 
         # Stage 3: LLM with Guardrails
         if self.run_llm_guardrails:
@@ -469,6 +491,74 @@ class HybridEvaluationClient:
         result["metrics"] = self._compute_metrics(sample, result)
 
         return result
+
+    @staticmethod
+    def _analyze_baseline_failure_modes(
+        sample: Dict[str, Any],
+        llm_baseline: Optional[Dict[str, Any]],
+        scanner_hit: bool = None,
+    ) -> Dict[str, Any]:
+        """
+        Run analytical G1/G2/G4 checks on baseline output (annotation only).
+
+        This does NOT modify any baseline decisions or trigger routing.
+        It produces failure-mode annotations so that baseline and guardrail
+        outputs can be compared on the same failure-mode dimensions.
+        """
+        if llm_baseline is None:
+            return {"analysis_executed": False}
+
+        fm: Dict[str, Any] = {"analysis_executed": True}
+
+        # --- G1: Evidence / Location ---
+        try:
+            g1 = G1EvidenceLocation()
+            diff_context = sample.get("code_context", "")
+            diff_lines = diff_context.split("\n") if diff_context else None
+            g1_valid, g1_issues = g1.validate_output_with_context(
+                llm_baseline, diff_lines,
+            )
+            fm["g1_valid"] = g1_valid
+            fm["g1_issues"] = g1_issues
+        except Exception:
+            fm["g1_valid"] = None
+            fm["g1_issues"] = []
+
+        # --- G2: Untrusted Input Influence ---
+        try:
+            g2 = G2UntrustedInput()
+            g2_valid, g2_issues = g2.validate_with_details(
+                llm_baseline,
+                pr_title=sample.get("pr_title", ""),
+                pr_body=sample.get("pr_body", ""),
+            )
+            fm["g2_valid"] = g2_valid
+            fm["g2_issues"] = g2_issues
+        except Exception:
+            fm["g2_valid"] = None
+            fm["g2_issues"] = []
+
+        # --- G4: Uncertainty / Ambiguity ---
+        try:
+            g4 = G4Uncertainty()
+            diff_context = sample.get("code_context", "")
+            guardrail_context = {
+                "file_path": sample.get("gt_file_path", ""),
+                "pr_title": sample.get("pr_title", ""),
+                "pr_body": sample.get("pr_body", ""),
+                "code_context": diff_context,
+                "scanner_hit": scanner_hit,
+                "schema_repaired": False,
+                "g2_issues": fm.get("g2_issues", []),
+            }
+            g4_details = g4.validate_with_details(llm_baseline, guardrail_context)
+            fm["g4_valid"] = g4_details.get("g4_valid")
+            fm["g4_details"] = g4_details
+        except Exception:
+            fm["g4_valid"] = None
+            fm["g4_details"] = {}
+
+        return fm
 
     def _compute_metrics(self, sample: Dict[str, Any], result: Dict[str, Any]) -> Dict[str, Any]:
         """Compute evaluation metrics for a sample."""

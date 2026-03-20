@@ -1,0 +1,4 @@
+mode,escape_rate,n_total,n_evaluable,n_missing,pass_rate,block_rate,review_rate
+Scanner,0.16,200,200,0,0.32,0.68,0.0
+LLM_Baseline,0.0,200,200,0,0.13,0.825,0.045
+LLM_Guardrails,0.0,200,200,0,0.12,0.4,0.48

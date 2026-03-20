@@ -1,0 +1,95 @@
+{
+  "g1": {
+    "trigger_count": 0,
+    "trigger_rate": 0.0,
+    "routed_count": 0,
+    "g1_valid_false_count": 0,
+    "issue_breakdown": {}
+  },
+  "g2": {
+    "trigger_count": 5,
+    "trigger_rate": 0.025,
+    "routed_count": 3,
+    "g2_valid_false_count": 3,
+    "issue_breakdown": {
+      "G2_UNREPORTED: PR metadata contains exculpatory claims (placeholder, example, not real) in pr_body, but LLM reported used_untrusted_input=false with PASS/no-secret — potential unacknowledged influence": 1,
+      "G2_EXCULPATORY: untrusted_effect='exculpatory_claim' (role=pr_body) — untrusted input must not exculpate findings": 3,
+      "G2_UNREPORTED: PR metadata contains exculpatory claims (placeholder, example) in pr_title, but LLM reported used_untrusted_input=false with PASS/no-secret — potential unacknowledged influence": 1
+    }
+  },
+  "g3": {
+    "g3_initial_leak_count": 10,
+    "g3_post_mitigation_leak_count": 0,
+    "leak_escape_rate_total": 0.0,
+    "leak_escape_rate_of_detected": 0.0,
+    "routed_count": 10,
+    "g3_valid_false_count": 10
+  },
+  "g4": {
+    "escalation_count": 56,
+    "escalation_rate": 0.28,
+    "routed_count": 56,
+    "rule_breakdown": {
+      "R1_ambiguous_context": 23,
+      "R4_exculpatory_escalation": 17,
+      "R2_reconstructed_plus_ambiguity": 9,
+      "R3_scanner_neg_llm_pos_context": 7
+    },
+    "flag_breakdown": {
+      "comment_claims_dummy": 46,
+      "placeholder_or_example_context": 43,
+      "test_or_docs_context": 30,
+      "scanner_disagreement": 21,
+      "decoy_like_pattern": 13,
+      "evidence_span_not_single_line": 12,
+      "reconstructed_secret": 10,
+      "split_across_variables": 10,
+      "low_specificity_literal": 6,
+      "g2_unreported_influence": 2
+    },
+    "on_positive": 33,
+    "on_negative": 23
+  },
+  "g5": {
+    "trigger_count": 27,
+    "trigger_rate": 0.135,
+    "routed_count": 27,
+    "schema_fail_count": 27,
+    "schema_fail_rate": 0.135,
+    "error_category_breakdown": {
+      "PARSE_ERROR": 27
+    },
+    "repair_success_count": 0,
+    "repair_fail_count": 0,
+    "repair_success_rate": null,
+    "note_repair": "repair_success_rate is None when no REPAIR_SUCCESS/REPAIR_FAIL categories are present in results"
+  },
+  "routing_summary": {
+    "None": 104,
+    "G4": 56,
+    "G5": 27,
+    "G3": 10,
+    "G2": 3
+  },
+  "triggered_guardrails_summary": {
+    "samples_with_any_trigger_count": 168,
+    "single_trigger_samples_count": 103,
+    "multi_trigger_samples_count": 65,
+    "multi_trigger_rate": 0.325,
+    "max_triggers_on_single_sample": 2,
+    "per_guardrail_trigger_count": {
+      "G5": 27,
+      "G2": 3,
+      "G4": 62,
+      "G1": 0,
+      "G3": 141
+    },
+    "trigger_combination_counts": {
+      "G3": 82,
+      "G4+G3": 56,
+      "G5": 21,
+      "G5+G4": 6,
+      "G2+G3": 3
+    }
+  }
+}

@@ -1,0 +1,4 @@
+mode,n_total,n_evaluable,n_missing,tp_alert,fp_alert,tn_alert,fn_alert,precision_alert,recall_alert,f1_alert,specificity_alert
+Scanner,200,200,0,126,10,40,24,0.9265,0.84,0.8811,0.8
+LLM_Baseline,200,200,0,150,24,26,0,0.8621,1.0,0.9259,0.52
+LLM_Guardrails,200,200,0,150,26,24,0,0.8523,1.0,0.9202,0.48

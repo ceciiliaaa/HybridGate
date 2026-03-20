@@ -1,0 +1,62 @@
+{
+  "run_id": "v130_baseline_fm_multitrigger",
+  "run_type": "full_evaluation",
+  "run_date": "2026-03-17",
+  "description": "Full re-run with 4 code changes vs v121: (1) separate BASELINE_PROMPT without masking/reasoning suppression, (2) triggered_guardrails multi-trigger field, (3) G5 fail-closed with downstream guardrail pass-through, (4) baseline_failure_modes analytical G1/G2/G4 annotation on baseline output.",
+
+  "predecessor_run": {
+    "run_id": "v121_final_extreme_openai_g5fix",
+    "path": "runs/v121_final_extreme_openai_g5fix/"
+  },
+
+  "code_changes_vs_v121": {
+    "baseline_prompt": "BASELINE_PROMPT created: no MASKED instruction, reasoning field allowed — measures unguarded LLM leakage for G3 value quantification",
+    "multi_trigger": "triggered_guardrails field added to apply_guardrails_with_routing() and serialized in results — captures all guardrails that fired per sample",
+    "g5_passthrough": "G5 fail-closed routing preserved, but downstream G2/G4/G1/G3 now execute on parsed_output or {} for failure-mode annotation",
+    "baseline_failure_modes": "G1/G2/G4 validators run analytically on baseline output (annotation only, no routing) — enables before/after failure-mode comparison"
+  },
+
+  "model": {
+    "provider": "openai",
+    "model_id": "gpt-5-mini",
+    "max_completion_tokens": 2048,
+    "response_format": "json_object"
+  },
+
+  "api_config": {
+    "MAX_RETRIES": 5,
+    "RETRY_BASE_DELAY": 4.0
+  },
+
+  "guardrails": {
+    "enabled": ["G1", "G2", "G3", "G4", "G5"],
+    "pipeline_order": "G5 → G2 → G4 → G1 → G3",
+    "g5_behavior": "fail-closed with downstream pass-through for annotation"
+  },
+
+  "dataset": {
+    "path": "data/03_baseline/all_200_samples_extreme.json",
+    "total_samples": 200,
+    "variant": "extreme"
+  },
+
+  "evaluation_modes": {
+    "scanners": true,
+    "llm_baseline": true,
+    "llm_guardrails": true,
+    "enable_g4_g5": true
+  },
+
+  "new_result_fields": [
+    "llm_guardrail.triggered_guardrails",
+    "llm_guardrail.g3_triggered",
+    "llm_guardrail.g3_leak_detected",
+    "llm_guardrail.g3_details",
+    "baseline_failure_modes.g1_valid",
+    "baseline_failure_modes.g1_issues",
+    "baseline_failure_modes.g2_valid",
+    "baseline_failure_modes.g2_issues",
+    "baseline_failure_modes.g4_valid",
+    "baseline_failure_modes.g4_details"
+  ]
+}

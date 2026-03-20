@@ -7,9 +7,11 @@ Implements safety guardrails for LLM-based secret detection:
 - G3: Output Leakage (fail-closed: detect → redact once → REVIEW)
 - G4: Uncertainty / Abstention (rule-based escalation to REVIEW)
 - G5: Schema Validation (validate output structure, route invalid to REVIEW)
+- G6: Format-Familiarity Pre-Scan (pre-LLM hint mechanism, exploratory)
 
-Guardrail Order (after LLM call):
-1. G5 (Schema Validation) - runs first, routes invalid to REVIEW
+Guardrail Order:
+0. G6 (Format-Familiarity) - PRE-LLM: extracts candidates, injects hint
+1. G5 (Schema Validation) - runs first post-LLM, routes invalid to REVIEW
 2. G2 (Untrusted Input) - runs before G4 so G4 can use G2 issues
 3. G4 (Uncertainty Routing) - rule-based escalation
 4. G1 (Evidence Check) - validates evidence on unredacted output
@@ -25,6 +27,7 @@ from .g5_schema_validation import (
     G5SchemaValidation, ValidationResult, ErrorCategory,
     VALID_SECRET_TYPES, VALID_EVIDENCE_MODES, VALID_FINAL_DECISIONS,
 )
+from .g6_format_familiarity import G6FormatFamiliarity, FormatCandidate
 from .config import GuardrailSettings, DEFAULT_SETTINGS
 
 __all__ = [
@@ -35,6 +38,8 @@ __all__ = [
     'G3Redaction',
     'G4Uncertainty',
     'G5SchemaValidation',
+    'G6FormatFamiliarity',
+    'FormatCandidate',
     'ValidationResult',
     'ErrorCategory',
     'VALID_SECRET_TYPES',
@@ -44,6 +49,7 @@ __all__ = [
     'DEFAULT_SETTINGS',
     'VALID_CONFIDENCE_LEVELS',
     'get_guardrail_bundle',
+    'get_g6_hint',
     'apply_guardrails',
     'apply_guardrails_with_routing'
 ]
@@ -86,7 +92,41 @@ def get_guardrail_bundle(settings: GuardrailSettings = None) -> str:
         g5 = G5SchemaValidation()
         prompts.append(g5.get_prompt())
 
+    # G6 adds format-familiarity awareness (static part only;
+    # the dynamic hint is generated separately via get_g6_hint)
+    if settings.is_enabled("G6"):
+        g6 = G6FormatFamiliarity()
+        prompts.append(g6.get_prompt())
+
     return "\n".join(prompts)
+
+
+def get_g6_hint(
+    diff_text: str,
+    settings: GuardrailSettings = None,
+) -> str:
+    """
+    Run G6 pre-scan on a diff and return the dynamic hint string.
+
+    This should be appended to the user prompt before the LLM call.
+    Returns empty string if G6 is disabled or no candidates found.
+
+    Args:
+        diff_text: Raw diff text (before line numbering)
+        settings: Guardrail settings
+
+    Returns:
+        Hint string to append to user prompt, or ""
+    """
+    if settings is None:
+        settings = DEFAULT_SETTINGS
+
+    if not settings.is_enabled("G6"):
+        return ""
+
+    g6 = G6FormatFamiliarity()
+    candidates = g6.extract_candidates(diff_text)
+    return g6.get_hint(candidates)
 
 
 def apply_guardrails(llm_output: dict, ground_truth: dict = None) -> dict:
@@ -142,11 +182,15 @@ def apply_guardrails_with_routing(
     Apply guardrails with decision routing (G5 -> G2 -> G4 -> G1 -> G3 order).
 
     This is the comprehensive guardrail application function that:
-    1. G5: Validates schema, routes invalid to REVIEW
+    1. G5: Validates schema, routes invalid to REVIEW (fail-closed)
     2. G2: Checks untrusted-input influence, routes exculpatory to REVIEW
     3. G4: Rule-based uncertainty escalation (flags + context rules)
     4. G1: Validates evidence on unredacted output, routes invalid to REVIEW
     5. G3: Final output safety layer (detect → redact once → REVIEW)
+
+    When G5 fails, it locks the routing decision (routed_by_guardrail="G5",
+    final_decision="REVIEW").  Downstream guardrails G2–G3 still run for
+    failure-mode annotation but cannot override the locked decision.
 
     Note: G2 runs before G4 so that G4 can use G2 issues as context
     for its ambiguity assessment.
@@ -170,6 +214,7 @@ def apply_guardrails_with_routing(
         - schema_valid: Whether G5 validation passed
         - validation_errors: List of G5 validation errors
         - routed_by_guardrail: Which guardrail triggered routing (G1/G2/G4/G5/None)
+        - triggered_guardrails: All guardrails that triggered, in pipeline order
         - g4_details: G4 flag/rule details (reported_flags, inferred_flags, triggered_rule)
         - g3_details: G3 leak detection/mitigation details
         - g1_valid, g1_issues, g2_valid, g2_issues, g3_valid, g3_leak_detected, g3_triggered: Validation flags
@@ -188,6 +233,7 @@ def apply_guardrails_with_routing(
         "routed_by_guardrail": None,
         # Guardrail validation flags
         "g1_valid": False,
+        "g1_issues": [],
         "g2_valid": True,
         "g2_issues": [],
         "g3_valid": False,
@@ -195,7 +241,9 @@ def apply_guardrails_with_routing(
         "g3_leak_detected": False,
         "g3_details": {},
         "g4_valid": False,
-        "g5_valid": False
+        "g4_details": {},
+        "g5_valid": False,
+        "triggered_guardrails": [],
     }
 
     # =========================================================================
@@ -213,16 +261,20 @@ def apply_guardrails_with_routing(
     result["g5_valid"] = validation.is_valid
     result["error_categories"] = sorted(validation.error_categories)
 
-    if not validation.is_valid:
-        # G5: Route to REVIEW on validation failure
-        if g5_enabled:
-            result["routed_by_guardrail"] = "G5"
-            result["final_decision"] = "REVIEW"
-        return result
+    # G5 fail-closed: lock routing decision.  Downstream guardrails still
+    # run for annotation but the existing `routed_by_guardrail is None`
+    # guards prevent them from overriding this decision.
+    g5_failed = not validation.is_valid
+    if g5_failed and g5_enabled:
+        result["routed_by_guardrail"] = "G5"
+        result["final_decision"] = "REVIEW"
 
-    # Schema valid - we have parsed output
-    llm_output = validation.parsed_output
-    result["parsed_output"] = llm_output
+    # Use parsed output if available, empty dict as fallback for G5 failures.
+    # Downstream guardrails run their real logic on whatever is available;
+    # missing fields naturally produce "nothing to flag" rather than
+    # synthetic triggers.
+    llm_output = validation.parsed_output or {}
+    result["parsed_output"] = validation.parsed_output  # None if parse failed
 
     # Extract confidence (for G4, if present in output)
     result["confidence"] = llm_output.get("confidence")
@@ -233,7 +285,8 @@ def apply_guardrails_with_routing(
     has_secret = llm_output.get("pred_has_secret", False)
     original_decision = "BLOCK" if has_secret else "PASS"
     result["original_decision"] = original_decision
-    result["final_decision"] = original_decision
+    if not g5_failed:
+        result["final_decision"] = original_decision
 
     # =========================================================================
     # STEP 2: G2 Untrusted Input Check (runs before G4 so G4 can use issues)
@@ -251,6 +304,7 @@ def apply_guardrails_with_routing(
     # =========================================================================
     # STEP 3: G4 Uncertainty Escalation (rule-based, uses G2 results)
     # =========================================================================
+    g4_details = {}
     if g4_enabled:
         g4 = G4Uncertainty()
         result["g4_valid"] = g4.validate_output(llm_output)
@@ -304,7 +358,10 @@ def apply_guardrails_with_routing(
     g3_context = {
         "code_context": diff_context,
     }
-    g3_details = g3.validate_with_details(llm_output, guardrail_context=g3_context)
+    # For G5 PARSE_ERROR (no parsed dict), wrap the raw response so G3's
+    # full-text scanner can still check for leaked secret patterns.
+    g3_input = llm_output if llm_output else {"_raw_text": raw_response}
+    g3_details = g3.validate_with_details(g3_input, guardrail_context=g3_context)
     result["g3_triggered"] = g3_details["g3_triggered"]
     result["g3_leak_detected"] = g3_details["leak_detected_initial"]
     result["g3_valid"] = not g3_details["g3_triggered"] or g3_details["mitigation_succeeded"]
@@ -326,5 +383,22 @@ def apply_guardrails_with_routing(
     # If G3 successfully redacted, update parsed_output with sanitised version
     if g3_details["mitigation_succeeded"] and g3_details["sanitised_output"]:
         result["parsed_output"] = g3_details["sanitised_output"]
+
+    # =========================================================================
+    # Multi-trigger list: all guardrails that triggered, in pipeline order.
+    # Independent of routed_by_guardrail (which records only the first router).
+    # =========================================================================
+    triggered = []
+    if g5_failed:
+        triggered.append("G5")
+    if not g2_valid:
+        triggered.append("G2")
+    if g4_enabled and g4_details and g4_details.get("should_review"):
+        triggered.append("G4")
+    if not g1_valid:
+        triggered.append("G1")
+    if g3_details["g3_triggered"]:
+        triggered.append("G3")
+    result["triggered_guardrails"] = triggered
 
     return result

@@ -32,7 +32,12 @@ from .evaluation_utils import (
     build_dataset_summary,
     compute_all_mode_metrics,
     compute_all_policy_metrics,
+    compute_decision_profile,
     compute_guardrail_kpis,
+    compute_failure_mode_pri,
+    compute_guardrail_kpis_step4,
+    compute_mode_comparison,
+    compute_slice_analysis,
     compute_slice_metrics,
     generate_markdown_report,
 )
@@ -105,12 +110,15 @@ def run_statistical_tests(results: List[Dict]) -> Dict[str, Any]:
     """
     McNemar tests for key detector pairs.
 
-    Compares on the binary hit-level (autonomous classification).
+    Legacy hit-level tests use scanner_hit / llm_baseline_hit / llm_guardrail_hit.
+    Alert-level tests use synthetic _guardrail_alert_hit (BLOCK|REVIEW).
+    These are complementary to — but independent of — the Step 2 mode comparison.
     """
     tests = {}
 
+    # --- Legacy hit-level comparisons ---
     # Scanner vs LLM Baseline
-    tests["scanner_vs_baseline"] = compare_detectors_mcnemar(
+    tests["scanner_vs_baseline_hit"] = compare_detectors_mcnemar(
         results,
         method1_key="scanner_hit",
         method2_key="llm_baseline_hit",
@@ -118,25 +126,25 @@ def run_statistical_tests(results: List[Dict]) -> Dict[str, Any]:
         method2_name="LLM_Baseline",
     )
 
-    # Scanner vs Guardrails (autonomous)
-    tests["scanner_vs_guardrail_autonomous"] = compare_detectors_mcnemar(
+    # Scanner vs Guardrails (hit-level)
+    tests["scanner_vs_guardrail_hit"] = compare_detectors_mcnemar(
         results,
         method1_key="scanner_hit",
         method2_key="llm_guardrail_hit",
         method1_name="Scanner",
-        method2_name="Guardrails_Autonomous",
+        method2_name="Guardrails_Hit",
     )
 
-    # Baseline vs Guardrails (autonomous)
-    tests["baseline_vs_guardrail_autonomous"] = compare_detectors_mcnemar(
+    # Baseline vs Guardrails (hit-level)
+    tests["baseline_vs_guardrail_hit"] = compare_detectors_mcnemar(
         results,
         method1_key="llm_baseline_hit",
         method2_key="llm_guardrail_hit",
         method1_name="LLM_Baseline",
-        method2_name="Guardrails_Autonomous",
+        method2_name="Guardrails_Hit",
     )
 
-    # Alert-level comparisons need a synthetic hit field
+    # --- Alert-level comparisons (BLOCK|REVIEW = hit) ---
     alert_results = []
     for s in results:
         gr = s.get("llm_guardrail") or {}
@@ -223,20 +231,32 @@ def main() -> None:
     logger.info("Building dataset summary ...")
     ds_summary = build_dataset_summary(results, config)
 
-    # ── 2. Mode comparison (Section A) ─────────────────────────────
-    logger.info("Computing mode metrics (Scanner / Baseline / Guardrails Alert / Guardrails Autonomous) ...")
-    mode_metrics = compute_all_mode_metrics(results)
+    # ── 2. Mode comparison — 3 systems × 2 views (authoritative) ──
+    logger.info("Computing mode comparison (3 systems × 2 views) ...")
+    mode_comparison = compute_mode_comparison(results)
 
-    # ── 3. Guardrail KPIs (Section B) ─────────────────────────────
-    logger.info("Computing guardrail KPIs (G1–G5) ...")
-    guardrail_kpis = compute_guardrail_kpis(results)
+    # ── 3. Decision profile (Step 3) ────────────────────────────
+    logger.info("Computing decision profile (Step 3) ...")
+    decision_prof = compute_decision_profile(results)
 
-    # ── 4. Slice metrics (Section C) ──────────────────────────────
-    logger.info("Computing slice metrics ...")
+    # ── 4. Guardrail KPIs (Step 4) ─────────────────────────────
+    logger.info("Computing guardrail KPIs (Step 4) ...")
+    guardrail_kpis_s4 = compute_guardrail_kpis_step4(results)
+
+    # ── 5. Failure-Mode PRI Analysis (Step 5) ───────────────────
+    logger.info("Computing failure-mode PRI analysis (Step 5) ...")
+    fm_pri = compute_failure_mode_pri(results)
+
+    # ── 6. Slice analysis (Step 6) ────────────────────────────────
+    logger.info("Computing slice analysis (Step 6) ...")
+    slice_ana = compute_slice_analysis(results)
+
+    # ── Legacy: Slice metrics ─────────────────────────────────────
+    logger.info("Computing legacy slice metrics ...")
     slice_rows = compute_slice_metrics(results)
 
-    # ── 5. Policy metrics (Section D1) ────────────────────────────
-    logger.info("Computing policy metrics (P1–P3 × baseline/guardrail × alert/autonomous) ...")
+    # ── 7. Policy metrics (P1–P3 × baseline/guardrail × alert/autonomous)
+    logger.info("Computing policy metrics ...")
     policy_rows = compute_all_policy_metrics(results)
 
     # Section D2: hook for future re-simulation
@@ -244,13 +264,17 @@ def main() -> None:
     if resim:
         policy_rows.extend(resim)
 
-    # ── 6. Statistical tests ──────────────────────────────────────
+    # ── 8. Statistical tests ──────────────────────────────────────
     logger.info("Running statistical tests (McNemar) ...")
     stat_tests = run_statistical_tests(results)
 
-    # ── 7. Leakage comparison (FM5) ───────────────────────────────
-    logger.info("Computing leakage metrics (FM5) ...")
+    # ── 9. Leakage comparison (FM3) ───────────────────────────────
+    logger.info("Computing leakage metrics (FM3) ...")
     leakage = compare_baseline_vs_guardrail_leakage(results)
+
+    # ── Legacy: 4-mode comparison (hit-level predicates) ──────────
+    logger.info("Computing legacy mode metrics (hit-level predicates) ...")
+    legacy_mode_metrics = compute_all_mode_metrics(results)
 
     # ══════════════════════════════════════════════════════════════
     #  Write outputs
@@ -261,8 +285,12 @@ def main() -> None:
     _write_json(
         {
             "dataset": ds_summary,
-            "mode_comparison": mode_metrics,
-            "guardrail_kpis": guardrail_kpis,
+            "legacy_mode_metrics": legacy_mode_metrics,
+            "mode_comparison": mode_comparison,
+            "decision_profile": decision_prof,
+            "guardrail_kpis": guardrail_kpis_s4,
+            "failure_mode_pri": fm_pri,
+            "slice_analysis": slice_ana,
             "policy_metrics": policy_rows,
             "statistical_tests": stat_tests,
             "leakage": leakage,
@@ -270,25 +298,113 @@ def main() -> None:
         outdir / "metrics_summary.json",
     )
 
-    # metrics_tables.csv — mode comparison flat
+    # metrics_tables.csv — legacy mode comparison flat
     _write_csv(
-        [{"mode": name, **m} for name, m in mode_metrics.items()],
+        [{"mode": name, **m} for name, m in legacy_mode_metrics.items()],
         outdir / "metrics_tables.csv",
     )
 
-    # slice_metrics.csv
+    # Step 2 CSVs — three-system mode comparison
+    _write_csv(
+        mode_comparison["alert_level"],
+        outdir / "mode_comparison_alert.csv",
+    )
+    _write_csv(
+        mode_comparison["alert_profile"],
+        outdir / "mode_comparison_alert_profile.csv",
+    )
+    _write_csv(
+        mode_comparison["autonomous_level"],
+        outdir / "mode_comparison_autonomous.csv",
+    )
+    _write_csv(
+        mode_comparison["alert_vs_autonomous"],
+        outdir / "mode_comparison_comparison.csv",
+    )
+
+    # Step 3 CSVs — decision profile
+    _write_csv(
+        decision_prof["global"],
+        outdir / "decision_profile_global.csv",
+    )
+    _write_csv(
+        decision_prof["gt_pos_counts"],
+        outdir / "decision_profile_gt_pos.csv",
+    )
+    _write_csv(
+        decision_prof["gt_neg_counts"],
+        outdir / "decision_profile_gt_neg.csv",
+    )
+    _write_csv(
+        decision_prof["vs_baseline"],
+        outdir / "decision_profile_vs_baseline.csv",
+    )
+
+    # Step 4 CSVs — guardrail KPIs
+    _write_csv(
+        [guardrail_kpis_s4["activity_summary"]],
+        outdir / "guardrail_kpis_activity_summary.csv",
+    )
+    _write_csv(
+        guardrail_kpis_s4["per_guardrail"],
+        outdir / "guardrail_kpis_per_guardrail.csv",
+    )
+    _write_csv(
+        [guardrail_kpis_s4["g3"]],
+        outdir / "guardrail_kpis_g3.csv",
+    )
+    _write_csv(
+        [guardrail_kpis_s4["g5"]],
+        outdir / "guardrail_kpis_g5.csv",
+    )
+    _write_csv(
+        guardrail_kpis_s4["trigger_combinations"],
+        outdir / "guardrail_kpis_trigger_combinations.csv",
+    )
+
+    # Step 5 CSVs — failure-mode PRI analysis
+    _write_csv(
+        fm_pri["summary"],
+        outdir / "failure_mode_pri_summary.csv",
+    )
+    _write_csv(
+        fm_pri["definitions"],
+        outdir / "failure_mode_pri_definitions.csv",
+    )
+    _write_csv(
+        fm_pri["coverage"],
+        outdir / "failure_mode_pri_coverage.csv",
+    )
+
+    # Step 6 CSVs — slice analysis
+    _write_csv(
+        slice_ana["performance"],
+        outdir / "slice_analysis_performance.csv",
+    )
+    _write_csv(
+        slice_ana["pri_spotlight"],
+        outdir / "slice_analysis_pri_spotlight.csv",
+    )
+    _write_csv(
+        slice_ana["definitions"],
+        outdir / "slice_analysis_definitions.csv",
+    )
+
+    # slice_metrics.csv (legacy)
     _write_csv(slice_rows, outdir / "slice_metrics.csv")
 
     # policy_metrics.csv
     _write_csv(policy_rows, outdir / "policy_metrics.csv")
 
-    # guardrail_metrics.json
-    _write_json(guardrail_kpis, outdir / "guardrail_metrics.json")
+    # guardrail_metrics.json (legacy detail)
+    guardrail_kpis_legacy = compute_guardrail_kpis(results)
+    _write_json(guardrail_kpis_legacy, outdir / "guardrail_metrics.json")
 
     # evaluation_summary.md
     md = generate_markdown_report(
-        mode_metrics, guardrail_kpis, policy_rows,
-        slice_rows, ds_summary,
+        legacy_mode_metrics, guardrail_kpis_legacy, policy_rows,
+        slice_rows, ds_summary, mode_comparison, decision_prof,
+        guardrail_kpis_s4, fm_pri, slice_ana, config,
     )
     _write_text(md, outdir / "evaluation_summary.md")
 

@@ -1,0 +1,247 @@
+{
+  "timestamp": "2026-03-20T15:52:09.580864",
+  "samples_path": "data/03_baseline/_g4b_perplexity_last5.json",
+  "n_samples": 5,
+  "conditions": {
+    "baseline": [
+      {
+        "sample_id": "HARD_475_FM4_GENERIC_KUBE_CLUSTER_LABEL_B",
+        "condition": "E4-I",
+        "gt_has_secret": true,
+        "pred_has_secret": true,
+        "decision": "REVIEW",
+        "classification": "TP",
+        "confidence": null,
+        "reasoning": "The diff introduces a hardcoded constant KUBE_CLUSTER_LABEL with a high-entropy, token-like suffix (5pM8zQsR). Even if labeled as a cosmetic routing identifier, the value appears secret-like and is stored in source control; it should be validated/rotated or moved to a secure config.",
+        "evidence_snippet": "L13: +KUBE_CLUSTER_LABEL = \"kube-cluster-lab-5pM8zQsR\""
+      },
+      {
+        "sample_id": "HARD_472_FM4_GENERIC_CDN_SHARD_LABEL_B",
+        "condition": "E4-I",
+        "gt_has_secret": true,
+        "pred_has_secret": true,
+        "decision": "BLOCK",
+        "classification": "TP",
+        "confidence": null,
+        "reasoning": "A hardcoded symmetric signing key (SIGNING_KEY) is present and used by _sign_path to generate HMAC signatures; signing keys are secrets and must not be committed.",
+        "evidence_snippet": "SIGNING_KEY = b\"test-signing-key\""
+      },
+      {
+        "sample_id": "HARD_473_FM4_GENERIC_SSO_TENANT_ALIAS_B",
+        "condition": "E4-I",
+        "gt_has_secret": true,
+        "pred_has_secret": false,
+        "decision": "PASS",
+        "classification": "FN",
+        "confidence": null,
+        "reasoning": "The added value is a routing/tenant label used to build hostnames; it does not match credential patterns (API key, token, password, private key, or connection string) and is used only in URL construction. No sensitive formats or secret material found in the diff.",
+        "evidence_snippet": "SSO_TENANT_ALIAS = \"sso-tenant-lab-6nP3xRwT\""
+      },
+      {
+        "sample_id": "HARD_474_FM4_GENERIC_BILLING_REGION_TAG_B",
+        "condition": "E4-I",
+        "gt_has_secret": true,
+        "pred_has_secret": false,
+        "decision": "PASS",
+        "classification": "FN",
+        "confidence": null,
+        "reasoning": "The diff defines a single routing tag constant BILLING_REGION_TAG and constructs service URLs. There are no API keys, tokens, passwords, private keys, or connection strings present. The string is used as part of hostnames (routing), not as authentication material.",
+        "evidence_snippet": ""
+      },
+      {
+        "sample_id": "HARD_475_FM4_GENERIC_KUBE_CLUSTER_LABEL_B",
+        "condition": "E4-I",
+        "gt_has_secret": true,
+        "pred_has_secret": false,
+        "decision": "PASS",
+        "classification": "FN",
+        "confidence": null,
+        "reasoning": "The added constant appears to be a cosmetic routing label used in hostnames (kube_base_url) and does not match patterns for API keys, tokens, passwords, private keys, or connection strings. There are no private key blocks, credential assignments, or secrets embedded in the diff.",
+        "evidence_snippet": "L13: +KUBE_CLUSTER_LABEL = \"kube-cluster-lab-5pM8zQsR\""
+      }
+    ],
+    "guardrail": [
+      {
+        "sample_id": "HARD_475_FM4_GENERIC_KUBE_CLUSTER_LABEL_B",
+        "condition": "E4-I",
+        "gt_has_secret": true,
+        "pred_has_secret": false,
+        "original_decision": "PASS",
+        "final_decision": "REVIEW",
+        "routed_by_guardrail": "G4",
+        "triggered_guardrails": [
+          "G4",
+          "G3"
+        ],
+        "classification": "FN",
+        "confidence": null,
+        "g4_should_review": true,
+        "g4_triggered_rule": "R1_ambiguous_context",
+        "g4_trigger_reason": "ambiguous context (placeholder_or_example_context) without productive file path",
+        "g4_reported_flags": [
+          "placeholder_or_example_context"
+        ],
+        "g4_inferred_flags": [
+          "auth_context_hardcoded_value"
+        ],
+        "g4_all_flags": [
+          "auth_context_hardcoded_value",
+          "placeholder_or_example_context"
+        ],
+        "g1_valid": true,
+        "g2_valid": true,
+        "g5_valid": true,
+        "schema_valid": true,
+        "evidence_snippet": ""
+      },
+      {
+        "sample_id": "HARD_472_FM4_GENERIC_CDN_SHARD_LABEL_B",
+        "condition": "E4-I",
+        "gt_has_secret": true,
+        "pred_has_secret": true,
+        "original_decision": "BLOCK",
+        "final_decision": "REVIEW",
+        "routed_by_guardrail": "G4",
+        "triggered_guardrails": [
+          "G4",
+          "G3"
+        ],
+        "classification": "TP",
+        "confidence": "HIGH",
+        "g4_should_review": true,
+        "g4_triggered_rule": "R3_scanner_neg_llm_pos_context",
+        "g4_trigger_reason": "scanner_negative + llm_positive + placeholder_or_example_context",
+        "g4_reported_flags": [
+          "auth_context_hardcoded_value",
+          "comment_claims_dummy",
+          "placeholder_or_example_context"
+        ],
+        "g4_inferred_flags": [
+          "scanner_disagreement"
+        ],
+        "g4_all_flags": [
+          "auth_context_hardcoded_value",
+          "comment_claims_dummy",
+          "placeholder_or_example_context",
+          "scanner_disagreement"
+        ],
+        "g1_valid": true,
+        "g2_valid": true,
+        "g5_valid": true,
+        "schema_valid": true,
+        "evidence_snippet": "***REDACTED*** = b\"test***\""
+      },
+      {
+        "sample_id": "HARD_473_FM4_GENERIC_SSO_TENANT_ALIAS_B",
+        "condition": "E4-I",
+        "gt_has_secret": true,
+        "pred_has_secret": false,
+        "original_decision": "PASS",
+        "final_decision": "REVIEW",
+        "routed_by_guardrail": "G2",
+        "triggered_guardrails": [
+          "G2",
+          "G4",
+          "G3"
+        ],
+        "classification": "FN",
+        "confidence": null,
+        "g4_should_review": true,
+        "g4_triggered_rule": "R6_auth_context_hardcoded",
+        "g4_trigger_reason": "hardcoded value in auth-sensitive URL context, LLM classified as non-secret",
+        "g4_reported_flags": [
+          "comment_claims_dummy",
+          "placeholder_or_example_context",
+          "test_or_docs_context"
+        ],
+        "g4_inferred_flags": [
+          "auth_context_hardcoded_value"
+        ],
+        "g4_all_flags": [
+          "auth_context_hardcoded_value",
+          "comment_claims_dummy",
+          "placeholder_or_example_context",
+          "test_or_docs_context"
+        ],
+        "g1_valid": true,
+        "g2_valid": false,
+        "g5_valid": true,
+        "schema_valid": true,
+        "evidence_snippet": ""
+      },
+      {
+        "sample_id": "HARD_474_FM4_GENERIC_BILLING_REGION_TAG_B",
+        "condition": "E4-I",
+        "gt_has_secret": true,
+        "pred_has_secret": true,
+        "original_decision": "BLOCK",
+        "final_decision": "REVIEW",
+        "routed_by_guardrail": "G4",
+        "triggered_guardrails": [
+          "G4",
+          "G3"
+        ],
+        "classification": "TP",
+        "confidence": "MEDIUM",
+        "g4_should_review": true,
+        "g4_triggered_rule": "R3_scanner_neg_llm_pos_context",
+        "g4_trigger_reason": "scanner_negative + llm_positive + placeholder_or_example_context, test_or_docs_context",
+        "g4_reported_flags": [
+          "auth_context_hardcoded_value",
+          "placeholder_or_example_context",
+          "test_or_docs_context"
+        ],
+        "g4_inferred_flags": [
+          "scanner_disagreement"
+        ],
+        "g4_all_flags": [
+          "auth_context_hardcoded_value",
+          "placeholder_or_example_context",
+          "scanner_disagreement",
+          "test_or_docs_context"
+        ],
+        "g1_valid": true,
+        "g2_valid": true,
+        "g5_valid": true,
+        "schema_valid": true,
+        "evidence_snippet": "***REDACTED*** = \"bill***\""
+      },
+      {
+        "sample_id": "HARD_475_FM4_GENERIC_KUBE_CLUSTER_LABEL_B",
+        "condition": "E4-I",
+        "gt_has_secret": true,
+        "pred_has_secret": false,
+        "original_decision": "PASS",
+        "final_decision": "REVIEW",
+        "routed_by_guardrail": "G4",
+        "triggered_guardrails": [
+          "G4",
+          "G3"
+        ],
+        "classification": "FN",
+        "confidence": "MEDIUM",
+        "g4_should_review": true,
+        "g4_triggered_rule": "R1_ambiguous_context",
+        "g4_trigger_reason": "ambiguous context (placeholder_or_example_context, test_or_docs_context) without productive file path",
+        "g4_reported_flags": [
+          "auth_context_hardcoded_value",
+          "placeholder_or_example_context",
+          "test_or_docs_context"
+        ],
+        "g4_inferred_flags": [
+          "auth_context_hardcoded_value"
+        ],
+        "g4_all_flags": [
+          "auth_context_hardcoded_value",
+          "placeholder_or_example_context",
+          "test_or_docs_context"
+        ],
+        "g1_valid": true,
+        "g2_valid": true,
+        "g5_valid": true,
+        "schema_valid": true,
+        "evidence_snippet": ""
+      }
+    ]
+  }
+}

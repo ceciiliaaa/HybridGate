@@ -57,6 +57,9 @@ KNOWN_UNCERTAINTY_FLAGS: Set[str] = {
 
     # Adversarial / manipulation signals
     "decoy_like_pattern",
+
+    # Semantic-context signals
+    "auth_context_hardcoded_value",
 }
 
 
@@ -143,6 +146,29 @@ _DECOY_CODE_RE = re.compile(
 _COMMENT_LINE_RE = re.compile(
     r"(?:#|//)\s*(.+?)$", re.MULTILINE
 )
+
+# Auth-sensitive path segments in code (URL construction targets)
+_AUTH_SENSITIVE_PATH_RE = re.compile(
+    r"(?i)(?:"
+    r"/auth/|/oauth|/token|/session|/login|/credential"
+    r"|/admin/|Authorization"
+    r")"
+)
+
+# Hardcoded constant assignment: UPPER_CASE_VAR = "value" (6+ chars)
+# Handles both raw diff lines (+CONST = "val") and numbered lines (L12: +CONST = "val")
+_HARDCODED_CONST_RE = re.compile(
+    r"""^(?:L\d+:\s*)?\+?\s*([A-Z][A-Z0-9_]*)\s*=\s*["']([^"']{6,})["']""",
+    re.MULTILINE,
+)
+
+# Variable name suffixes that are clearly non-secret config
+_BENIGN_VAR_SUFFIXES = {
+    "_HOST", "_PORT", "_URL", "_ENDPOINT", "_PATH", "_NAME",
+    "_REGION", "_BUCKET", "_DB", "_DATABASE", "_TIMEOUT",
+    "_INTERVAL", "_SIZE", "_COUNT", "_MAX", "_MIN",
+    "_DIR", "_HEADER", "_METHOD", "_SCHEME",
+}
 
 
 def _detect_exculpatory_comment_claims(code_context: str) -> bool:
@@ -283,6 +309,33 @@ def _infer_flags_from_context(
 
     if code_context and _DECOY_CODE_RE.search(code_context):
         inferred.append("decoy_like_pattern")
+
+    # --- Auth-context with hardcoded values (FM4 semantic signal) ---
+    # Detects hardcoded string constants in code that constructs URLs
+    # pointing to auth/token/session/admin endpoints.  When the LLM says
+    # "no secret" but the code feeds a hardcoded value into auth-sensitive
+    # URL paths, this is a strong ambiguity signal.
+
+    if not has_secret and code_context:
+        if _AUTH_SENSITIVE_PATH_RE.search(code_context):
+            for match in _HARDCODED_CONST_RE.finditer(code_context):
+                var_name = match.group(1)
+                value = match.group(2)
+                # Skip clearly benign config variables
+                if any(var_name.endswith(s) for s in _BENIGN_VAR_SUFFIXES):
+                    continue
+                # Skip values that look like URLs, hostnames, or paths
+                if value.startswith(("http", "/", "localhost")):
+                    continue
+                if "." in value and not any(c.isdigit() for c in value):
+                    continue  # likely a domain or module path
+                # Value has some entropy: mixed case or alphanumeric mix
+                has_upper = any(c.isupper() for c in value)
+                has_lower = any(c.islower() for c in value)
+                has_digit = any(c.isdigit() for c in value)
+                if (has_upper and has_lower) or (has_digit and (has_upper or has_lower)):
+                    inferred.append("auth_context_hardcoded_value")
+                    break
 
     # --- Upstream guardrail signals ---
 
@@ -487,6 +540,32 @@ def _rule_schema_repair(
     return None
 
 
+def _rule_auth_context_hardcoded(
+    all_flags: Set[str],
+    llm_output: dict,
+    guardrail_context: dict,
+) -> Optional[str]:
+    """R6: Hardcoded value used in auth-sensitive URL context → REVIEW.
+
+    Fires when the code contains hardcoded string constants that feed
+    into URL construction targeting auth/token/session/admin endpoints,
+    but the LLM classified the sample as having no secret.
+
+    This catches "generic credential" blind spots: values like
+    'prod-7xK2mP9nL' or 'corp-tenant-93kF2pLx' that look like
+    config labels but are actually used as auth-critical routing
+    tokens or API keys.
+    """
+    if "auth_context_hardcoded_value" not in all_flags:
+        return None
+
+    has_secret = llm_output.get("pred_has_secret", False)
+    if has_secret:
+        return None  # LLM already flagged it — no need to escalate
+
+    return "hardcoded value in auth-sensitive URL context, LLM classified as non-secret"
+
+
 # Ordered list of rules — first match triggers REVIEW
 REVIEW_RULES = [
     ("R1_ambiguous_context", _rule_ambiguous_context),
@@ -494,6 +573,7 @@ REVIEW_RULES = [
     ("R3_scanner_neg_llm_pos_context", _rule_scanner_neg_llm_pos_context),
     ("R4_exculpatory_escalation", _rule_exculpatory_escalation),
     ("R5_schema_repair", _rule_schema_repair),
+    ("R6_auth_context_hardcoded", _rule_auth_context_hardcoded),
 ]
 
 
@@ -516,7 +596,7 @@ class G4Uncertainty(Guardrail):
 
     Two-layer approach:
     1. Collect flags: reported (LLM) + inferred (deterministic)
-    2. Evaluate rules: 5 hard rules that trigger REVIEW routing
+    2. Evaluate rules: 6 hard rules that trigger REVIEW routing
 
     Rules:
     - R1: Ambiguous context (test/docs/placeholder/example) without
@@ -525,6 +605,8 @@ class G4Uncertainty(Guardrail):
     - R3: Scanner negative + LLM positive + docs/test context → REVIEW
     - R4: Exculpatory claims (G2 signal or PR text) → REVIEW
     - R5: G5 schema repair was needed → REVIEW
+    - R6: Hardcoded value in auth-sensitive URL context + LLM says
+          no secret → REVIEW
     """
 
     @property
@@ -544,6 +626,7 @@ You SHOULD include 'uncertainty_flags' (list of strings) when applicable:
 - "low_specificity_literal": The literal is very short or low-entropy
 - "scanner_disagreement": Your finding disagrees with static scanner results
 - "decoy_like_pattern": The pattern resembles known manipulation/decoy strategies
+- "auth_context_hardcoded_value": A hardcoded value is used in auth/token/session URL construction
 
 You MAY include a 'confidence' field (HIGH/MEDIUM/LOW) to indicate your
 overall certainty, but this is optional context — the system evaluates
