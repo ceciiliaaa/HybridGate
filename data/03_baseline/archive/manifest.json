@@ -1,0 +1,101 @@
+{
+  "version": "b2",
+  "created_at": "2026-03-10T18:54:00Z",
+  "generator_version": "2.0.0",
+  "seed": 42,
+  "description": "Improved dataset with realistic secrets and diverse contexts",
+
+  "composition": {
+    "real": {
+      "count": 50,
+      "source": "build_b2_baseline.py",
+      "method": "Template-based with 15 context families"
+    },
+    "synthetic": {
+      "count": 50,
+      "source": "b1_synthetic_samples.json (improved)",
+      "method": "LLM-generated with placeholder fixes"
+    },
+    "negative": {
+      "count": 50,
+      "source": "b1_negative_controls.json (unchanged)",
+      "method": "Decoy samples without secrets"
+    }
+  },
+
+  "quality_metrics": {
+    "total_samples": 150,
+    "positive_samples": 100,
+    "negative_samples": 50,
+    "unique_secrets": 97,
+    "unique_secret_ratio": 0.97,
+    "duplicate_rate": 0.03,
+    "context_diversity_score": 0.593,
+    "repeating_pattern_count": 5,
+    "placeholder_pattern_count": 11
+  },
+
+  "secret_type_distribution": {
+    "api_key": 35,
+    "token": 33,
+    "password": 19,
+    "private_key": 9,
+    "connection_string": 4
+  },
+
+  "real_context_families": {
+    "jwt_auth": 3,
+    "stripe_payment": 4,
+    "aws_s3": 3,
+    "postgres_db": 3,
+    "slack_notify": 4,
+    "sendgrid_email": 4,
+    "github_api": 3,
+    "twilio_sms": 3,
+    "redis_cache": 3,
+    "docker_registry": 4,
+    "firebase_admin": 3,
+    "openai_api": 3,
+    "ssh_deploy": 3,
+    "oauth2_client": 4,
+    "datadog_monitoring": 3
+  },
+
+  "improvements_over_b1": [
+    "REAL: 15 diverse context families (vs 1 in b1)",
+    "REAL: 15 unique PR titles (vs 1 in b1)",
+    "REAL: 15 unique file paths (vs 1 in b1)",
+    "REAL: 0 repeating patterns (vs 20 in b1)",
+    "REAL: 0 placeholder patterns (vs 8 in b1)",
+    "SECRET: No repeating hex blocks like 'abcdabcdabcd'",
+    "SECRET: Realistic format per secret type",
+    "SECRET: Proper character sets and lengths",
+    "SYNTH: Replaced 15 placeholder-like secrets",
+    "OVERALL: 97% unique secrets (vs 86% in b1)"
+  ],
+
+  "root_causes_fixed": [
+    "b1 used single template for all 50 REAL samples (src/auth/middleware.py)",
+    "b1 generate_unique_secret() repeated 8-char suffix 4x creating patterns",
+    "b1 SYNTH contained AKIAIOSFODNN7EXAMPLE and similar placeholders"
+  ],
+
+  "files": {
+    "real_samples.json": "50 samples with diverse contexts and realistic secrets",
+    "synthetic_samples.json": "50 samples with improved secrets",
+    "negative_controls.json": "50 samples (copy of b1)",
+    "all_150_samples.json": "Combined 150 samples",
+    "quality_report.json": "Extended quality metrics",
+    "manifest.json": "This file"
+  },
+
+  "regeneration_command": "python -m src.data_collection.build_b2_baseline --output data/03_baseline/real_samples.json --target-samples 50 --seed 42",
+
+  "verification": {
+    "b0_preserved": true,
+    "b1_preserved": true,
+    "real_context_diverse": true,
+    "secrets_realistic": true,
+    "no_obvious_placeholders_in_real": true
+  }
+}

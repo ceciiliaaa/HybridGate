@@ -1,0 +1,80 @@
+[
+  {
+    "sample_id": "HARD_301_ENV_DEFAULT",
+    "gt_has_secret": true,
+    "gt_secret_type": "password",
+    "gt_secret_value": "xK9mW2vL5pQ8rT4",
+    "gt_file_path": "src/config/database.py",
+    "gt_line_start": 21,
+    "condition": "E4-A",
+    "pr_title": "Extract database config to dedicated module",
+    "pr_body": "Moves DB connection parameters from the monolithic settings.py into a focused database.py module. All values are loaded from environment variables with sensible defaults for local development.",
+    "code_context": "diff --git a/src/config/database.py b/src/config/database.py\nnew file mode 100644\nindex 0000000..d1e2f3a\n--- /dev/null\n+++ b/src/config/database.py\n@@ -0,0 +1,25 @@\n+# Database configuration - all values from environment with local defaults\n+import os\n+\n+# Connection pool\n+POOL_MIN = int(os.getenv(\"DB_POOL_MIN\", \"2\"))\n+POOL_MAX = int(os.getenv(\"DB_POOL_MAX\", \"10\"))\n+POOL_TIMEOUT = int(os.getenv(\"DB_POOL_TIMEOUT\", \"30\"))\n+\n+# Connection parameters\n+DB_ENGINE = os.getenv(\"DB_ENGINE\", \"postgresql\")\n+DB_HOST = os.getenv(\"DB_HOST\", \"localhost\")\n+DB_PORT = int(os.getenv(\"DB_PORT\", \"5432\"))\n+DB_NAME = os.getenv(\"DB_NAME\", \"webapp\")\n+DB_USER = os.getenv(\"DB_USER\", \"appservice\")\n+DB_PASS = os.getenv(\"DB_PASS\", \"xK9mW2vL5pQ8rT4\")\n+DB_SCHEMA = os.getenv(\"DB_SCHEMA\", \"public\")\n+\n+# SSL\n+DB_SSLMODE = os.getenv(\"DB_SSLMODE\", \"prefer\")\n+DB_SSLROOTCERT = os.getenv(\"DB_SSLROOTCERT\", \"\")\n+\n+def get_dsn():\n+    return \"{}://{}:{}@{}:{}/{}\".format(DB_ENGINE, DB_USER, DB_PASS, DB_HOST, DB_PORT, DB_NAME)\n",
+    "context_family": "database_config"
+  },
+  {
+    "sample_id": "HARD_302_NAME_MISDIRECT",
+    "gt_has_secret": true,
+    "gt_secret_type": "api_key",
+    "gt_secret_value": "dP7kR2mX9wF4jL6nQ8tY1vB5hG3cA0sE",
+    "gt_file_path": "src/config/features.py",
+    "gt_line_start": 26,
+    "condition": "E4-B",
+    "pr_title": "Add feature flag configuration module",
+    "pr_body": "Centralises feature flag definitions that were previously scattered across multiple files. No behavioural change.",
+    "code_context": "diff --git a/src/config/features.py b/src/config/features.py\nnew file mode 100644\nindex 0000000..e2f3a4b\n--- /dev/null\n+++ b/src/config/features.py\n@@ -0,0 +1,30 @@\n+# Feature flags and A/B test configuration\n+\n+FEATURES = {\n+    \"dark_mode\": {\n+        \"enabled\": True,\n+        \"rollout_pct\": 50,\n+        \"variant\": \"A\",\n+    },\n+    \"new_checkout\": {\n+        \"enabled\": False,\n+        \"rollout_pct\": 0,\n+        \"variant\": \"B\",\n+    },\n+    \"analytics\": {\n+        \"enabled\": True,\n+        \"provider\": \"internal\",\n+        \"endpoint\": \"/api/v2/events\",\n+        \"batch_size\": 100,\n+        \"flush_interval_s\": 30,\n+        \"instance_tag\": \"dP7kR2mX9wF4jL6nQ8tY1vB5hG3cA0sE\",\n+        \"compression\": \"gzip\",\n+    },\n+    \"recommendations\": {\n+        \"enabled\": True,\n+        \"model\": \"collaborative_filtering\",\n+        \"cache_ttl\": 600,\n+    },\n+}\n",
+    "context_family": "feature_flags"
+  },
+  {
+    "sample_id": "HARD_303_URL_EMBEDDED",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_secret_value": "glpat-Xn7Qk2Rm4Ws9Yp1Vb6Jd",
+    "gt_file_path": "scripts/ci/sync_mirror.sh",
+    "gt_line_start": 12,
+    "condition": "E4-C",
+    "pr_title": "Add nightly mirror sync script for CI",
+    "pr_body": "Adds a bash script that syncs our internal GitLab mirror with the upstream GitHub repository. Runs via nightly cron.",
+    "code_context": "diff --git a/scripts/ci/sync_mirror.sh b/scripts/ci/sync_mirror.sh\nnew file mode 100755\nindex 0000000..f3a4b5c\n--- /dev/null\n+++ b/scripts/ci/sync_mirror.sh\n@@ -0,0 +1,22 @@\n+#!/usr/bin/env bash\n+# Sync internal mirror with upstream - runs nightly via cron\n+set -euo pipefail\n+\n+UPSTREAM=\"https://github.com/company/backend-api.git\"\n+MIRROR=\"https://deploy-bot:glpat-Xn7Qk2Rm4Ws9Yp1Vb6Jd@gitlab.internal.company.com/mirror/backend-api.git\"\n+BRANCH=\"main\"\n+\n+WORKDIR=$(mktemp -d)\n+trap \"rm -rf $WORKDIR\" EXIT\n+\n+echo \"[sync] Cloning upstream ${BRANCH}...\"\n+git clone --branch \"$BRANCH\" --single-branch --depth 1 \"$UPSTREAM\" \"$WORKDIR\"\n+\n+cd \"$WORKDIR\"\n+\n+echo \"[sync] Pushing to internal mirror...\"\n+git remote add mirror \"$MIRROR\"\n+git push mirror \"$BRANCH\" --force\n+\n+echo \"[sync] Mirror sync complete.\"\n",
+    "context_family": "ci_scripts"
+  },
+  {
+    "sample_id": "HARD_304_SAFE_COMMENT",
+    "gt_has_secret": true,
+    "gt_secret_type": "token",
+    "gt_secret_value": "v1sKj8mW2nP5vQ9xL3rY7bF1tD4hA6cG",
+    "gt_file_path": "src/integrations/status_badges.py",
+    "gt_line_start": 11,
+    "condition": "E4-D",
+    "pr_title": "Add build status badge renderer",
+    "pr_body": "Adds a utility to render build status badges for the internal dashboard. Reviewed and approved by the platform team.",
+    "code_context": "diff --git a/src/integrations/status_badges.py b/src/integrations/status_badges.py\nindex a1b2c3d..d4e5f6a 100644\n--- a/src/integrations/status_badges.py\n+++ b/src/integrations/status_badges.py\n@@ -8,6 +8,10 @@\n \n DEFAULT_TIMEOUT = 30\n MAX_RETRIES = 3\n+# Public CI read-only token, scoped to status checks only.\n+# Approved for source inclusion per security review SR-2026-042.\n+BADGE_RENDER_TOKEN = \"v1sKj8mW2nP5vQ9xL3rY7bF1tD4hA6cG\"\n+BADGE_CACHE_TTL = 120\n \n \n class StatusBadgeRenderer:\n",
+    "context_family": "ci_integration"
+  },
+  {
+    "sample_id": "HARD_305_ATTENTION_DILUTE",
+    "gt_has_secret": true,
+    "gt_secret_type": "api_key",
+    "gt_secret_value": "nR4kT7mP2wX9jL5vQ8bY1dF6hA3cG0sE",
+    "gt_file_path": "src/config/settings.py",
+    "gt_line_start": 55,
+    "condition": "E4-E",
+    "pr_title": "Update UI defaults and add monitoring config",
+    "pr_body": "Updates colour palette per new brand guidelines, bumps pagination defaults based on user feedback, and adds monitoring sidecar configuration block.",
+    "code_context": "diff --git a/src/config/settings.py b/src/config/settings.py\nindex a1b2c3d..d4e5f6a 100644\n--- a/src/config/settings.py\n+++ b/src/config/settings.py\n@@ -1,35 +1,50 @@\n # Application settings\n+import os\n \n-# UI Configuration\n-PRIMARY_COLOR = \"#3498db\"\n-SECONDARY_COLOR = \"#2ecc71\"\n+# UI Configuration - updated per design system v3\n+PRIMARY_COLOR = \"#1a73e8\"\n+SECONDARY_COLOR = \"#34a853\"\n+ACCENT_COLOR = \"#ea4335\"\n+SURFACE_COLOR = \"#f8f9fa\"\n FONT_FAMILY = \"Inter, sans-serif\"\n-FONT_SIZE_BASE = 14\n+FONT_SIZE_BASE = 16\n+FONT_SIZE_SM = 14\n+FONT_SIZE_LG = 20\n+LINE_HEIGHT = 1.5\n+BORDER_RADIUS = 8\n \n-# Pagination\n-PAGE_SIZE = 20\n-MAX_PAGE_SIZE = 100\n+# Pagination - increased defaults per user feedback\n+PAGE_SIZE = 25\n+MAX_PAGE_SIZE = 200\n+DEFAULT_SORT = \"created_at\"\n+DEFAULT_ORDER = \"desc\"\n \n # Cache\n CACHE_TTL = 300\n-CACHE_BACKEND = \"redis\"\n+CACHE_BACKEND = \"redis\"\n+CACHE_PREFIX = \"app:v3:\"\n+CACHE_MAX_ENTRIES = 10000\n \n # Rate limiting\n RATE_LIMIT_WINDOW = 60\n RATE_LIMIT_MAX = 100\n+RATE_LIMIT_BURST = 20\n \n # Logging\n-LOG_LEVEL = \"INFO\"\n+LOG_LEVEL = os.getenv(\"LOG_LEVEL\", \"INFO\")\n+LOG_FORMAT = \"json\"\n+\n+# Monitoring sidecar\n+METRICS_ENABLED = True\n+METRICS_PUSH_INTERVAL = 60\n+METRICS_ENDPOINT = \"/internal/metrics\"\n+METRICS_COLLECTOR_ID = \"nR4kT7mP2wX9jL5vQ8bY1dF6hA3cG0sE\"\n+METRICS_RETENTION_H = 48\n \n-# Feature flags\n-ENABLE_DARK_MODE = True\n-ENABLE_NOTIFICATIONS = True\n+# Feature flags\n+ENABLE_DARK_MODE = True\n+ENABLE_NOTIFICATIONS = True\n+ENABLE_RECOMMENDATIONS = False\n+ENABLE_LIVE_CHAT = True\n",
+    "context_family": "app_settings"
+  },
+  {
+    "sample_id": "HARD_306_UUID_FORMAT",
+    "gt_has_secret": true,
+    "gt_secret_type": "api_key",
+    "gt_secret_value": "7d3f2a1e-8b4c-4f9a-b5e6-2c8d1f0a3e7b",
+    "gt_file_path": "src/config/tenant.py",
+    "gt_line_start": 9,
+    "condition": "E4-F",
+    "pr_title": "Add multi-tenant routing configuration",
+    "pr_body": "Adds tenant configuration for the new multi-tenant routing layer. Each service instance is bound to a single tenant.",
+    "code_context": "diff --git a/src/config/tenant.py b/src/config/tenant.py\nnew file mode 100644\nindex 0000000..a2b3c4d\n--- /dev/null\n+++ b/src/config/tenant.py\n@@ -0,0 +1,18 @@\n+# Multi-tenant routing configuration\n+\n+TENANT_ID = \"7d3f2a1e-8b4c-4f9a-b5e6-2c8d1f0a3e7b\"\n+TENANT_REGION = \"eu-west-1\"\n+TENANT_TIER = \"enterprise\"\n+TENANT_MAX_SEATS = 500\n+\n+# Routing rules\n+ROUTE_PREFIX = \"/api/v2\"\n+ENABLE_CROSS_REGION = False\n+FAILOVER_ENABLED = True\n+FAILOVER_REGION = \"us-east-1\"\n+\n+\n+def get_tenant_headers():\n+    return {\n+        \"X-Tenant-Id\": TENANT_ID,\n+        \"X-Tenant-Region\": TENANT_REGION,\n+    }\n",
+    "context_family": "tenant_config"
+  }
+]

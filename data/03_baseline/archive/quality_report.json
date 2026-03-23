@@ -1,0 +1,301 @@
+{
+  "b0_all_150_samples": {
+    "total_samples": 150,
+    "positive_samples": 100,
+    "negative_samples": 50,
+    "unique_secrets": 38,
+    "unique_secret_ratio": 0.38,
+    "duplicate_rate": 0.62,
+    "duplicate_groups": [
+      [
+        "sk_test_4eC39HqLyjWDarjtT1zdp7...",
+        28
+      ],
+      [
+        "sk_test_26PkF8yTjKhEzPnr9876ab...",
+        15
+      ],
+      [
+        "sk_test_51HqLyjWDarjtT1zdp7dc3...",
+        15
+      ],
+      [
+        "AKIAIOSFODNN7EXAMPLE",
+        3
+      ],
+      [
+        "ACXXXXXXXXXXXXXXXXXXXXXXXXXXXX...",
+        3
+      ],
+      [
+        "s3cr3t_P@ssw0rd!",
+        2
+      ],
+      [
+        "https://hooks.slack.com/servic...",
+        2
+      ],
+      [
+        "123456789012345",
+        2
+      ]
+    ],
+    "secret_type_distribution": {
+      "token": 65,
+      "api_key": 12,
+      "password": 13,
+      "connection_string": 4,
+      "private_key": 6
+    },
+    "unique_pr_titles": 72,
+    "unique_file_paths": 86,
+    "unique_context_families": 0,
+    "context_diversity_score": 0.5267,
+    "repeating_pattern_count": 8,
+    "placeholder_pattern_count": 17,
+    "suspicious_secrets": [
+      "PLACEHOLDER: AKIAIOSFODNN7EXAMPLE...",
+      "REPEAT: https://hooks.slack.com/services/T000000...",
+      "REPEAT: ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...",
+      "PLACEHOLDER: SG.12345abcdeFghijklmNOpqrsTuVWxyz...",
+      "REPEAT: 123456789012345...",
+      "PLACEHOLDER: AKIAIOSFODNN7EXAMPLE...",
+      "PLACEHOLDER: ghp_exampleToken1234567890...",
+      "PLACEHOLDER: s3cr3t_stripe_test_key...",
+      "PLACEHOLDER: xoxb-1234567890-abcdefghijklmnopqrstuv...",
+      "REPEAT: ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX..."
+    ],
+    "secrets_per_type": {
+      "token": {
+        "count": 65,
+        "unique": 10,
+        "unique_ratio": 0.15384615384615385,
+        "repeating_patterns": 2,
+        "placeholder_patterns": 6,
+        "avg_length": 33.723076923076924
+      },
+      "api_key": {
+        "count": 12,
+        "unique": 7,
+        "unique_ratio": 0.5833333333333334,
+        "repeating_patterns": 6,
+        "placeholder_patterns": 10,
+        "avg_length": 26.916666666666668
+      },
+      "password": {
+        "count": 13,
+        "unique": 12,
+        "unique_ratio": 0.9230769230769231,
+        "repeating_patterns": 0,
+        "placeholder_patterns": 1,
+        "avg_length": 18.076923076923077
+      },
+      "connection_string": {
+        "count": 4,
+        "unique": 4,
+        "unique_ratio": 1.0,
+        "repeating_patterns": 0,
+        "placeholder_patterns": 0,
+        "avg_length": 59.5
+      },
+      "private_key": {
+        "count": 6,
+        "unique": 6,
+        "unique_ratio": 1.0,
+        "repeating_patterns": 0,
+        "placeholder_patterns": 0,
+        "avg_length": 148.66666666666666
+      }
+    }
+  },
+  "b1_all_150_samples": {
+    "total_samples": 150,
+    "positive_samples": 100,
+    "negative_samples": 50,
+    "unique_secrets": 86,
+    "unique_secret_ratio": 0.86,
+    "duplicate_rate": 0.14,
+    "duplicate_groups": [
+      [
+        "sk_test_4eC39HqLyjWDarjtT1zdp7...",
+        8
+      ],
+      [
+        "AKIAIOSFODNN7EXAMPLE",
+        3
+      ],
+      [
+        "ACXXXXXXXXXXXXXXXXXXXXXXXXXXXX...",
+        3
+      ],
+      [
+        "s3cr3t_P@ssw0rd!",
+        2
+      ],
+      [
+        "https://hooks.slack.com/servic...",
+        2
+      ],
+      [
+        "123456789012345",
+        2
+      ]
+    ],
+    "secret_type_distribution": {
+      "api_key": 37,
+      "token": 32,
+      "private_key": 13,
+      "password": 14,
+      "connection_string": 4
+    },
+    "unique_pr_titles": 72,
+    "unique_file_paths": 79,
+    "unique_context_families": 0,
+    "context_diversity_score": 0.5033,
+    "repeating_pattern_count": 28,
+    "placeholder_pattern_count": 25,
+    "suspicious_secrets": [
+      "REPEAT: sk-proj-66f0514866f0514866f0514866f05148...",
+      "PLACEHOLDER: https://hooks.slack.com/services/T000000...",
+      "REPEAT: AKIAD377E63DD377E63D...",
+      "REPEAT: sk-proj-f2757ad8f2757ad8f2757ad8f2757ad8...",
+      "REPEAT: SG.19f007e9_19f0.19f007e919f007e919f007e...",
+      "PLACEHOLDER: ghp_1234567890abcdefghijklmnopqrst0e04d4...",
+      "REPEAT: sk-proj-69be96e469be96e469be96e469be96e4...",
+      "REPEAT: SG.591325e0_5913.591325e0591325e0591325e...",
+      "REPEAT: SG.5f28168c_5f28.5f28168c5f28168c5f28168...",
+      "REPEAT: AKIA6EDEE1956EDEE195..."
+    ],
+    "secrets_per_type": {
+      "api_key": {
+        "count": 37,
+        "unique": 32,
+        "unique_ratio": 0.8648648648648649,
+        "repeating_patterns": 26,
+        "placeholder_patterns": 13,
+        "avg_length": 32.16216216216216
+      },
+      "token": {
+        "count": 32,
+        "unique": 25,
+        "unique_ratio": 0.78125,
+        "repeating_patterns": 2,
+        "placeholder_patterns": 11,
+        "avg_length": 42.53125
+      },
+      "private_key": {
+        "count": 13,
+        "unique": 13,
+        "unique_ratio": 1.0,
+        "repeating_patterns": 0,
+        "placeholder_patterns": 0,
+        "avg_length": 94.46153846153847
+      },
+      "password": {
+        "count": 14,
+        "unique": 13,
+        "unique_ratio": 0.9285714285714286,
+        "repeating_patterns": 0,
+        "placeholder_patterns": 1,
+        "avg_length": 18.142857142857142
+      },
+      "connection_string": {
+        "count": 4,
+        "unique": 4,
+        "unique_ratio": 1.0,
+        "repeating_patterns": 0,
+        "placeholder_patterns": 0,
+        "avg_length": 59.5
+      }
+    }
+  },
+  "b2_all_150_samples": {
+    "total_samples": 150,
+    "positive_samples": 100,
+    "negative_samples": 50,
+    "unique_secrets": 97,
+    "unique_secret_ratio": 0.97,
+    "duplicate_rate": 0.03,
+    "duplicate_groups": [
+      [
+        "s3cr3t_P@ssw0rd!",
+        2
+      ],
+      [
+        "https://hooks.slack.com/servic...",
+        2
+      ],
+      [
+        "123456789012345",
+        2
+      ]
+    ],
+    "secret_type_distribution": {
+      "api_key": 35,
+      "token": 33,
+      "password": 19,
+      "private_key": 9,
+      "connection_string": 4
+    },
+    "unique_pr_titles": 85,
+    "unique_file_paths": 93,
+    "unique_context_families": 15,
+    "context_diversity_score": 0.5933,
+    "repeating_pattern_count": 5,
+    "placeholder_pattern_count": 11,
+    "suspicious_secrets": [
+      "REPEAT: https://hooks.slack.com/services/T000000...",
+      "PLACEHOLDER: SG.12345abcdeFghijklmNOpqrsTuVWxyz...",
+      "REPEAT: 123456789012345...",
+      "PLACEHOLDER: ghp_exampleToken1234567890...",
+      "PLACEHOLDER: s3cr3t_stripe_test_key...",
+      "PLACEHOLDER: xoxb-1234567890-abcdefghijklmnopqrstuv...",
+      "REPEAT: SG.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...",
+      "REPEAT: 123456789012345...",
+      "PLACEHOLDER: sk_test_51JwA1KJ6OQY3Gx4I5H3ABCD12345678...",
+      "PLACEHOLDER: ghp_testSecretToken1234567890..."
+    ],
+    "secrets_per_type": {
+      "api_key": {
+        "count": 35,
+        "unique": 34,
+        "unique_ratio": 0.9714285714285714,
+        "repeating_patterns": 3,
+        "placeholder_patterns": 4,
+        "avg_length": 39.57142857142857
+      },
+      "token": {
+        "count": 33,
+        "unique": 32,
+        "unique_ratio": 0.9696969696969697,
+        "repeating_patterns": 2,
+        "placeholder_patterns": 6,
+        "avg_length": 45.54545454545455
+      },
+      "password": {
+        "count": 19,
+        "unique": 18,
+        "unique_ratio": 0.9473684210526315,
+        "repeating_patterns": 0,
+        "placeholder_patterns": 1,
+        "avg_length": 18.68421052631579
+      },
+      "private_key": {
+        "count": 9,
+        "unique": 9,
+        "unique_ratio": 1.0,
+        "repeating_patterns": 0,
+        "placeholder_patterns": 0,
+        "avg_length": 667.8888888888889
+      },
+      "connection_string": {
+        "count": 4,
+        "unique": 4,
+        "unique_ratio": 1.0,
+        "repeating_patterns": 0,
+        "placeholder_patterns": 0,
+        "avg_length": 59.5
+      }
+    }
+  }
+}
