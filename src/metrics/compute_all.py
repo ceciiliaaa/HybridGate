@@ -361,6 +361,10 @@ def main() -> None:
         guardrail_kpis_s4["trigger_combinations"],
         outdir / "guardrail_kpis_trigger_combinations.csv",
     )
+    _write_csv(
+        [guardrail_kpis_s4["g6"]],
+        outdir / "guardrail_kpis_g6.csv",
+    )
 
     # Step 5 CSVs — failure-mode PRI analysis
     _write_csv(

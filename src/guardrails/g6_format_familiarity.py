@@ -85,11 +85,25 @@ FORMAT_PATTERNS = [
     ),
     (
         "Prefixed hex ID",
-        re.compile(r'(?:exp|run|trace|span|req|sess|txn)_[0-9a-f]{16,}', re.IGNORECASE),
+        re.compile(r'(?:exp|run|trace|span|req|sess|txn|job)_[0-9a-f]{16,}', re.IGNORECASE),
     ),
     (
         "Locale/subtag with embedded hex",
         re.compile(r'[a-z]{2}(?:-[a-z]{1,8})*-[0-9a-f]{12,}', re.IGNORECASE),
+    ),
+    (
+        "BSON ObjectId",
+        re.compile(r'(?<![0-9a-f])[0-9a-f]{24}(?![0-9a-f])', re.IGNORECASE),
+    ),
+    (
+        "JWT / static assertion",
+        re.compile(
+            r'eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}',
+        ),
+    ),
+    (
+        "CUID",
+        re.compile(r'(?<![a-z0-9])c[a-z0-9]{24,}(?![a-z0-9])', re.IGNORECASE),
     ),
 ]
 
@@ -164,7 +178,11 @@ class G6FormatFamiliarity(Guardrail):
         Unlike get_prompt() (hint-only awareness), this version explicitly
         instructs the LLM that format match alone is NEVER sufficient to
         dismiss a value, and that variable names can be deliberately
-        misleading.  Used only in the isolated G6 experiment.
+        misleading.
+
+        Schema-compatible: does NOT require additional JSON fields beyond
+        the standard schema. Contrastive reasoning happens internally
+        before the LLM forms its JSON decision.
         """
         return (
             "\n## G6 — Format-Familiarity Bias Guard (Forced Reasoning)\n"
@@ -176,20 +194,23 @@ class G6FormatFamiliarity(Guardrail):
             "misleading — a value named 'TRACE_ID' or 'INTEGRITY_HASH' may "
             "still be a hardcoded credential.\n\n"
             "When a G6 FORMAT-FAMILIARITY ALERT is present in the user "
-            "prompt, you MUST populate the 'g6_analysis' array in your JSON "
-            "response with one entry per flagged candidate, using the exact "
-            "field schema specified in the alert. Evaluate BOTH sides — do "
-            "not skip the 'evidence_secret' field. Only after completing "
-            "all per-candidate entries, form your overall decision.\n"
+            "prompt, you MUST internally consider BOTH sides for each "
+            "flagged candidate BEFORE forming your decision: "
+            "(1) why it might be a genuine non-secret identifier, "
+            "(2) why it might STILL be a hardcoded credential despite its "
+            "format/name. Reflect on both arguments, then set "
+            "'pred_has_secret' accordingly. If in doubt, flag the value.\n"
+            "IMPORTANT: Do NOT add any extra fields to your JSON response. "
+            "Use ONLY the standard output schema fields.\n"
         )
 
     def get_forced_reasoning_hint(self, candidates: List[FormatCandidate]) -> str:
         """
-        Build the forced-reasoning hint with a fixed per-candidate field schema.
+        Build the forced-reasoning hint (schema-compatible version).
 
-        Unlike get_hint() (open-ended evaluation request), this version
-        requires the LLM to populate a structured JSON object per candidate
-        with explicit pro/contra fields, preventing the format-shortcut.
+        Instructs the LLM to perform contrastive reasoning internally
+        for each candidate before forming its JSON decision. Does NOT
+        require any additional JSON fields, so G5 schema validation passes.
 
         Args:
             candidates: List of FormatCandidate objects from extract_candidates()
@@ -205,30 +226,25 @@ class G6FormatFamiliarity(Guardrail):
             "\n--- G6 FORMAT-FAMILIARITY ALERT (FORCED REASONING) ---",
             "",
             "The following hardcoded values match known non-secret formats.",
-            "For EACH candidate below, you MUST add an entry to a "
-            "\"g6_analysis\" array in your JSON response with EXACTLY "
-            "these fields:",
+            "Before producing your JSON response, you MUST internally "
+            "consider BOTH sides for EACH candidate:",
             "",
-            "  {",
-            '    "candidate_index": <int>,',
-            '    "detected_format": "<format name>",',
-            '    "evidence_nonsecret": "<why this value might be a genuine '
-            'non-secret identifier>",',
-            '    "evidence_secret": "<why this value might STILL be a '
-            'hardcoded credential despite name/format — you MUST provide '
-            'at least one concrete reason>",',
-            '    "varname_trustworthy": <true|false — could the variable '
-            'name be deliberately misleading?>,',
-            '    "verdict": "<likely_nonsecret | uncertain | likely_secret>"',
-            "  }",
+            "For each candidate, think about:",
+            "  (a) Why it might be a genuine non-secret identifier",
+            "  (b) Why it might STILL be a hardcoded credential despite its "
+            "format/variable name — consider at least one concrete reason "
+            "even if you believe it is non-secret",
+            "  (c) Whether the variable name could be deliberately misleading",
             "",
             "RULES:",
-            "- You MUST fill evidence_secret even if you believe the value "
-            "is non-secret. Consider: What if the variable name is a decoy?",
-            "- Set varname_trustworthy to false if the variable name alone "
-            "(without code context) would be sufficient to disguise a secret.",
-            "- If ANY candidate has verdict 'uncertain' or 'likely_secret', "
-            "set pred_has_secret to true for the overall sample.",
+            "- You MUST consider BOTH sides for every candidate before "
+            "deciding.",
+            "- Consider: What if the variable name is a decoy to disguise a "
+            "credential as something harmless?",
+            "- If ANY candidate is uncertain or likely a secret, set "
+            "pred_has_secret to true.",
+            "- Do NOT add extra fields to your JSON. Use only the standard "
+            "output schema.",
             "",
             "Candidates:",
             "",

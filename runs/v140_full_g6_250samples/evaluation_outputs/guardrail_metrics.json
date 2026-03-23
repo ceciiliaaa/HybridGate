@@ -1,0 +1,104 @@
+{
+  "g1": {
+    "trigger_count": 6,
+    "trigger_rate": 0.024,
+    "routed_count": 2,
+    "g1_valid_false_count": 6,
+    "issue_breakdown": {
+      "evidence_mode='reconstructed': snippet covers assembly evidence but not fragment (L19–L29)": 1,
+      "evidence_mode='reconstructed': snippet covers assembly evidence but not fragment (L10–L52)": 1,
+      "evidence_mode='reconstructed': snippet covers assembly evidence but not fragment (L14–L59)": 1,
+      "evidence_mode='reconstructed': snippet covers assembly evidence but not fragment (L10–L57)": 1,
+      "pred_location_start=12 outside diff range 1-1": 1,
+      "pred_location_end=12 outside diff range 1-1": 1,
+      "pred_location_start=13 outside diff range 1-1": 1,
+      "pred_location_end=13 outside diff range 1-1": 1
+    }
+  },
+  "g2": {
+    "trigger_count": 11,
+    "trigger_rate": 0.044,
+    "routed_count": 10,
+    "g2_valid_false_count": 10,
+    "issue_breakdown": {
+      "G2_EXCULPATORY: untrusted_effect='exculpatory_claim' (role=pr_body) — untrusted input must not exculpate findings": 10,
+      "G2_UNREPORTED: PR metadata contains exculpatory claims (non-production) in pr_body, but LLM reported used_untrusted_input=false with PASS/no-secret — potential unacknowledged influence": 1
+    }
+  },
+  "g3": {
+    "g3_initial_leak_count": 30,
+    "g3_post_mitigation_leak_count": 0,
+    "leak_escape_rate_total": 0.0,
+    "leak_escape_rate_of_detected": 0.0,
+    "routed_count": 15,
+    "g3_valid_false_count": 30
+  },
+  "g4": {
+    "escalation_count": 104,
+    "escalation_rate": 0.416,
+    "routed_count": 101,
+    "rule_breakdown": {
+      "R3_scanner_neg_llm_pos_context": 39,
+      "R1_ambiguous_context": 32,
+      "R4_exculpatory_escalation": 17,
+      "R2_reconstructed_plus_ambiguity": 15,
+      "R6_auth_context_hardcoded": 1
+    },
+    "flag_breakdown": {
+      "auth_context_hardcoded_value": 91,
+      "placeholder_or_example_context": 73,
+      "scanner_disagreement": 63,
+      "comment_claims_dummy": 61,
+      "test_or_docs_context": 35,
+      "decoy_like_pattern": 34,
+      "evidence_span_not_single_line": 21,
+      "reconstructed_secret": 15,
+      "split_across_variables": 15,
+      "low_specificity_literal": 14,
+      "g2_unreported_influence": 1
+    },
+    "on_positive": 80,
+    "on_negative": 24
+  },
+  "g5": {
+    "trigger_count": 0,
+    "trigger_rate": 0.0,
+    "routed_count": 0,
+    "schema_fail_count": 0,
+    "schema_fail_rate": 0.0,
+    "error_category_breakdown": {},
+    "repair_success_count": 0,
+    "repair_fail_count": 0,
+    "repair_success_rate": null,
+    "note_repair": "repair_success_rate is None when no REPAIR_SUCCESS/REPAIR_FAIL categories are present in results"
+  },
+  "routing_summary": {
+    "None": 122,
+    "G4": 101,
+    "G3": 15,
+    "G2": 10,
+    "G1": 2
+  },
+  "triggered_guardrails_summary": {
+    "samples_with_any_trigger_count": 226,
+    "single_trigger_samples_count": 113,
+    "multi_trigger_samples_count": 113,
+    "multi_trigger_rate": 0.452,
+    "max_triggers_on_single_sample": 3,
+    "per_guardrail_trigger_count": {
+      "G5": 0,
+      "G2": 10,
+      "G4": 104,
+      "G1": 6,
+      "G3": 226
+    },
+    "trigger_combination_counts": {
+      "G3": 113,
+      "G4+G3": 97,
+      "G2+G3": 7,
+      "G4+G1+G3": 4,
+      "G2+G4+G3": 3,
+      "G1+G3": 2
+    }
+  }
+}

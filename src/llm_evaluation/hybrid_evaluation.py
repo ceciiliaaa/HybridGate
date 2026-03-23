@@ -3,11 +3,12 @@ Hybrid Evaluation Pipeline for HybridGate Framework
 
 Extends the base LLM evaluation with:
 - Classic scanner integration (Gitleaks, detect-secrets)
-- Guardrail-enhanced prompts (G1, G2, G3, G4, G5)
+- Guardrail-enhanced prompts (G1, G2, G3, G4, G5, G6)
 - Policy decision computation (P1, P2, P3)
 
-Guardrail Order (after LLM call):
-1. G5 (Schema Validation) - runs first, routes invalid to REVIEW
+Guardrail Order:
+0. G6 (Format-Familiarity) - PRE-LLM: forced-reasoning hint injected into user prompt
+1. G5 (Schema Validation) - POST-LLM: runs first, routes invalid to REVIEW
 2. G4 (Uncertainty Routing) - runs on valid output, routes LOW confidence to REVIEW
 3. G3 (Redaction Check) - runs last, checks for secret leakage
 
@@ -50,7 +51,7 @@ from .run_evaluation import (
 # Import new HybridGate components
 from ..scanners import GitleaksScanner, DetectSecretsScanner, ScanResult
 from ..guardrails import (
-    get_guardrail_bundle, apply_guardrails, apply_guardrails_with_routing,
+    get_guardrail_bundle, get_g6_hint, apply_guardrails, apply_guardrails_with_routing,
     GuardrailSettings, DEFAULT_SETTINGS,
     G1EvidenceLocation, G2UntrustedInput, G4Uncertainty,
 )
@@ -203,7 +204,8 @@ class HybridEvaluationClient:
         """
         Run LLM evaluation on a sample.
 
-        When use_guardrails=True and G4/G5 are enabled in settings:
+        When use_guardrails=True:
+        - G6 pre-LLM forced-reasoning hint injected into user prompt (if G6 enabled)
         - G5 validates schema and routes invalid outputs to REVIEW
         - G4 rule-based uncertainty escalation (flags + context rules)
 
@@ -226,6 +228,13 @@ class HybridEvaluationClient:
             pr_body=sample.get("pr_body", ""),
             code_context=numbered_diff,
         )
+
+        # G6 Pre-LLM: Inject forced-reasoning hint into user prompt
+        g6_hint = ""
+        if use_guardrails:
+            g6_hint = get_g6_hint(sample.get("code_context", ""), self.guardrail_settings)
+            if g6_hint:
+                user_prompt += "\n\n" + g6_hint
 
         raw_response: Optional[str] = None
 
@@ -289,6 +298,8 @@ class HybridEvaluationClient:
                     "g3_triggered": guardrail_result.get("g3_triggered", False),
                     "g3_leak_detected": guardrail_result.get("g3_leak_detected", False),
                     "g3_details": guardrail_result.get("g3_details", {}),
+                    # G6 pre-LLM metadata
+                    "g6_hint_injected": bool(g6_hint),
                 }
 
             # Schema valid - extract fields from parsed output
@@ -327,6 +338,8 @@ class HybridEvaluationClient:
                 "decision_basis": parsed.get("decision_basis"),
                 "untrusted_input_role": parsed.get("untrusted_input_role"),
                 "untrusted_effect": parsed.get("untrusted_effect"),
+                # G6 pre-LLM metadata
+                "g6_hint_injected": bool(g6_hint),
             }
 
         # =====================================================================
@@ -352,6 +365,8 @@ class HybridEvaluationClient:
             "routed_by_guardrail": None,
             "original_decision": None,
             "final_decision": prediction.get("final_decision"),
+            # G6 pre-LLM metadata
+            "g6_hint_injected": bool(g6_hint),
         }
 
     def evaluate_sample(self, sample: Dict[str, Any]) -> Dict[str, Any]:
@@ -970,6 +985,11 @@ def main() -> None:
         action="store_true",
         help="Enable G4 (uncertainty routing) and G5 (schema validation) guardrails",
     )
+    parser.add_argument(
+        "--enable-g6",
+        action="store_true",
+        help="Enable G6 (format-familiarity forced-reasoning pre-LLM hint)",
+    )
     resume_group = parser.add_mutually_exclusive_group()
     resume_group.add_argument(
         "--resume",
@@ -1004,6 +1024,10 @@ def main() -> None:
     else:
         guardrail_settings = GuardrailSettings.baseline()
         logger.info("G4/G5 guardrails DISABLED (baseline mode)")
+
+    if args.enable_g6:
+        guardrail_settings.enable_g6()
+        logger.info("G6 (format-familiarity forced-reasoning) ENABLED")
 
     # Build LLM client
     if args.model == "openai":
