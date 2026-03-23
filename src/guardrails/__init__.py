@@ -92,11 +92,11 @@ def get_guardrail_bundle(settings: GuardrailSettings = None) -> str:
         g5 = G5SchemaValidation()
         prompts.append(g5.get_prompt())
 
-    # G6 adds format-familiarity awareness (static part only;
-    # the dynamic hint is generated separately via get_g6_hint)
+    # G6 adds format-familiarity forced-reasoning system prompt;
+    # the dynamic hint is generated separately via get_g6_hint()
     if settings.is_enabled("G6"):
         g6 = G6FormatFamiliarity()
-        prompts.append(g6.get_prompt())
+        prompts.append(g6.get_prompt_forced_reasoning())
 
     return "\n".join(prompts)
 
@@ -126,7 +126,7 @@ def get_g6_hint(
 
     g6 = G6FormatFamiliarity()
     candidates = g6.extract_candidates(diff_text)
-    return g6.get_hint(candidates)
+    return g6.get_forced_reasoning_hint(candidates)
 
 
 def apply_guardrails(llm_output: dict, ground_truth: dict = None) -> dict:

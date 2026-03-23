@@ -767,7 +767,7 @@ def compute_guardrail_kpis(results: List[Dict]) -> Dict[str, Any]:
 #  Step 4: Guardrail KPIs (compact, operational)
 #  Measures the intervention layer: bundle activity, per-guardrail
 #  participation vs routing, G3 leakage containment, G5 fail-closed,
-#  and multi-trigger combinations.
+#  G6 pre-LLM hint coverage, and multi-trigger combinations.
 # ═══════════════════════════════════════════════════════════════════════
 
 _PIPELINE_ORDER = ["G5", "G2", "G4", "G1", "G3"]
@@ -896,6 +896,69 @@ def compute_guardrail_kpis_step4(results: List[Dict]) -> Dict[str, Any]:
         "g5_fail_closed_review_share_of_g5": _safe_div(g5_fail_closed_review, g5_routed),
     }
 
+    # ── 4F: G6 Pre-LLM Hint KPIs ───────────────────────────────────
+    # G6 is a pre-LLM guardrail: it injects a hint into the user prompt
+    # before the LLM call. It does not appear in triggered_guardrails.
+    g6_hint_injected = sum(
+        1 for s in evaluable
+        if _g(s, "llm_guardrail", "g6_hint_injected") is True
+    )
+    g6_no_hint = n_evaluable - g6_hint_injected
+
+    # Detection rate WITH G6 hint (pred_has_secret among G6-hinted samples)
+    g6_hint_detected = sum(
+        1 for s in evaluable
+        if _g(s, "llm_guardrail", "g6_hint_injected") is True
+        and _g(s, "llm_guardrail", "pred_has_secret") is True
+    )
+    # Detection rate WITHOUT G6 hint (pred_has_secret among non-hinted samples)
+    g6_no_hint_detected = sum(
+        1 for s in evaluable
+        if _g(s, "llm_guardrail", "g6_hint_injected") is not True
+        and _g(s, "llm_guardrail", "pred_has_secret") is True
+    )
+
+    # G6 hint on GT_POS samples
+    g6_hint_on_gt_pos = sum(
+        1 for s in evaluable
+        if _g(s, "llm_guardrail", "g6_hint_injected") is True
+        and s.get("gt_has_secret")
+    )
+    # G6 hint on GT_NEG samples (potential FP concern)
+    g6_hint_on_gt_neg = sum(
+        1 for s in evaluable
+        if _g(s, "llm_guardrail", "g6_hint_injected") is True
+        and not s.get("gt_has_secret")
+    )
+
+    # Schema validity among G6-hinted samples (G5 compatibility check)
+    g6_hint_schema_valid = sum(
+        1 for s in evaluable
+        if _g(s, "llm_guardrail", "g6_hint_injected") is True
+        and _g(s, "llm_guardrail", "schema_valid") is True
+    )
+    g6_hint_schema_fail = sum(
+        1 for s in evaluable
+        if _g(s, "llm_guardrail", "g6_hint_injected") is True
+        and _g(s, "llm_guardrail", "schema_valid") is False
+    )
+
+    g6_kpis = {
+        "g6_hint_injected_count": g6_hint_injected,
+        "g6_hint_injected_rate": _safe_div(g6_hint_injected, n_evaluable),
+        "g6_no_hint_count": g6_no_hint,
+        "g6_hint_detected_count": g6_hint_detected,
+        "g6_hint_detection_rate": _safe_div(g6_hint_detected, g6_hint_injected),
+        "g6_no_hint_detected_count": g6_no_hint_detected,
+        "g6_no_hint_detection_rate": _safe_div(g6_no_hint_detected, g6_no_hint),
+        "g6_hint_on_gt_pos_count": g6_hint_on_gt_pos,
+        "g6_hint_on_gt_pos_rate": _safe_div(g6_hint_on_gt_pos, gt_pos_evaluable),
+        "g6_hint_on_gt_neg_count": g6_hint_on_gt_neg,
+        "g6_hint_schema_valid_count": g6_hint_schema_valid,
+        "g6_hint_schema_fail_count": g6_hint_schema_fail,
+        "g6_hint_schema_valid_rate": _safe_div(g6_hint_schema_valid, g6_hint_injected),
+    }
+
     # ── 4E: Trigger Combination Summary (top 10) ────────────────────
     combo_counter: Counter = Counter()
     for tg in trigger_lists:
@@ -920,6 +983,7 @@ def compute_guardrail_kpis_step4(results: List[Dict]) -> Dict[str, Any]:
         "per_guardrail": per_guardrail_rows,
         "g3": g3_kpis,
         "g5": g5_kpis,
+        "g6": g6_kpis,
         "trigger_combinations": combo_rows,
     }
 
@@ -2023,6 +2087,24 @@ Scanner has no REVIEW concept; both views are identical for Scanner.
                     r["trigger_combination"], r["count"], _fmt(r["rate"]),
                 ])
             parts.append(_md_table(h4e, rows_4e))
+            parts.append("")
+
+        # 4F: G6 Pre-LLM Hint KPIs
+        g6 = guardrail_kpis_step4.get("g6", {})
+        if g6.get("g6_hint_injected_count", 0) > 0:
+            parts.append("### 4F. G6 Pre-LLM Hint KPIs\n")
+            h4f = ["Metric", "Value"]
+            rows_4f = [
+                ["g6_hint_injected", f"{g6.get('g6_hint_injected_count', '?')} ({_fmt(g6.get('g6_hint_injected_rate'))})"],
+                ["g6_no_hint", str(g6.get('g6_no_hint_count', '?'))],
+                ["g6_hint_detection_rate", _fmt(g6.get('g6_hint_detection_rate'))],
+                ["g6_no_hint_detection_rate", _fmt(g6.get('g6_no_hint_detection_rate'))],
+                ["g6_hint_on_gt_pos", f"{g6.get('g6_hint_on_gt_pos_count', '?')} ({_fmt(g6.get('g6_hint_on_gt_pos_rate'))})"],
+                ["g6_hint_on_gt_neg", str(g6.get('g6_hint_on_gt_neg_count', '?'))],
+                ["g6_hint_schema_valid", f"{g6.get('g6_hint_schema_valid_count', '?')} ({_fmt(g6.get('g6_hint_schema_valid_rate'))})"],
+                ["g6_hint_schema_fail", str(g6.get('g6_hint_schema_fail_count', '?'))],
+            ]
+            parts.append(_md_table(h4f, rows_4f))
             parts.append("")
 
     # ── Step 5: Failure-Mode PRI Analysis ────────────────────────────

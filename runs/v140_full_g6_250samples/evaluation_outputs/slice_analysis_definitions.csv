@@ -1,0 +1,11 @@
+slice_name,definition_logic,notes
+base,condition == B0,Baseline dataset: standard positive and negative samples.
+stress,"condition starts with E (E1-B, E2-A, E3-A, E3-B)",All stress/perturbation samples. All are GT positive.
+neg_clean,control_type == no_secret,Control-specific negative subgroup. Not intended as exhaustive partition of all GT-negative cases.
+neg_decoy,control_type == decoy,Control-specific negative subgroup (decoy/misleading patterns). Not intended as exhaustive partition of all GT-negative cases.
+real,sample_id starts with REAL,Samples derived from real-world code repositories. Does not cover NEG_* control samples — real + synthetic is not a full partition of the dataset.
+synthetic,sample_id starts with SYNTH,Synthetically generated samples. Does not cover NEG_* control samples — real + synthetic is not a full partition of the dataset.
+stress_untrusted_input,condition == E1-B,Stress samples targeting FM2 (untrusted-input influence).
+stress_uncertainty,condition == E2-A,Stress samples targeting FM4 (uncertainty/miscalibration).
+stress_multi_fm,condition == E3-A,"Multi-FM stress (FM6/general, FM1/FM3/FM5 targeted)."
+stress_hardened,condition == E3-B,Hardened positive samples with obfuscation patterns.

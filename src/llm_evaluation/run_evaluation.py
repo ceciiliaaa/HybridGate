@@ -355,7 +355,7 @@ class OpenAIClient(LLMClient):
             ],
             # Note: GPT-5-mini only supports temperature=1.0 (default)
             response_format={"type": "json_object"},
-            max_completion_tokens=2048,
+            max_completion_tokens=4096,
         )
         return response.choices[0].message.content
 
