@@ -1,0 +1,902 @@
+Title;Authors;Year;Evaluation metrics;FM category;FM-metric mapping
+Trust-Calibrated Multi-Stage Large Language Model Pipeline for Vulnerability Assessment in DevSecOps Workflows;Adiba Mahmud, Yasmeen Rawajfih, Ross Arnold;2025;Accuracy, Coverage, Expected Calibration Error (ECE), F1 Score, Precision, Recall;"- Hallucinations and False Positives
+- Overconfidence and Calibration Failure
+- Context Integration Failure
+- Complex Vulnerability Blind Spots
+- Weak Explainability
+- Localization Failure
+- Operational and Deployment Limits";"Hallucinations and False Positives: False Positives, Precision, False Positive Rate
+Overconfidence and Calibration Failure: Expected Calibration Error
+Context Integration Failure: F1-score, Precision, Recall
+Complex Vulnerability Blind Spots: F1-score, Precision, Recall"
+Finding Trojan Triggers in Code LLMs: An Occlusion-Based Human-in-the-Loop Approach;Aftab Hussain, Md Rafiqul Islam Rabin, Toufique Ahmed, Mohammad Amin Alipour, Bowen Xu, Stephen Huang;2025;"- F1 score
+- Trigger identification rate
+- Correct identification rate
+- Time taken to locate triggers";"- Attention Hijacking and Poisoning
+- Prompt Injection and Untrusted Input Manipulation
+- Localization Failure
+- Hallucinations and False Positives
+- Complex Vulnerability Blind Spots
+- Weak Explainability";"Prompt Injection and Untrusted Input Manipulation: F1 Score, Trigger Identification Rate
+Localization Failure: qualitative only
+Hallucinations and False Positives: F1 Score, Trigger Identification Rate"
+Metamorphic Testing of Deep Code Models: A Systematic Literature Review;Ali Asgari, Milan De Koning, Milan de Koning, Pouria Derakhshanfar, Annibale Panichella;;"- F1 (all variants)
+- Accuracy
+- BLEU (all variants)
+- Attack Success Rate (ASR) (all forms)
+- ROUGE / ROUGE-L
+- METEOR
+- Precision
+- Recall
+- MRR (all forms)
+- CodeBLEU
+- Exact Match (all forms)
+- Prediction Change Percentage
+- Prediction Confidence Decrement (PCD)
+- Delta-BLEU
+- Gen-F1
+- ROB-F1
+- Pass@1 / Robust Pass@1
+- Mutation Effectiveness
+- AUROC
+- Rate of Revealed Faults (RFR)";"- Transformation Sensitivity
+- Technical Output Failure
+- Operational and Deployment Limits
+- Weak Explainability
+- Training Data and Representation Bias
+- Complex Vulnerability Blind Spots
+- Secret Detection Blind Spots";"Reasoning and Logic Blindness: qualitative only
+Context Integration Failure: qualitative only
+Hallucinations and False Positives: qualitative only
+False-Positive Secret Detection: qualitative only
+Localization Failure: qualitative only
+Technical Output Failure: F1, Accuracy
+Prompt Injection and Untrusted Input Manipulation: Attack Success Rate
+Transformation Sensitivity: Attack Success Rate
+Attention Hijacking and Poisoning: qualitative only
+Overconfidence and Calibration Failure: qualitative only
+Weak Explainability: qualitative only
+Training Data and Representation Bias: qualitative only
+Benchmark Contamination (Real-World Gap): qualitative only
+Complex Vulnerability Blind Spots: qualitative only
+Secret Detection Blind Spots: qualitative only
+Operational and Deployment Limits: qualitative only
+Information and Secret Leakage in Model Outputs: qualitative only"
+Enhancing Pull Request Reviews: Leveraging Large Language Models to Detect Inconsistencies Between Issues and Pull Requests;Ali Tunahan Işık, Hatice Kübra Çağlar, Eray Tüzün;2025;"- Accuracy
+- Precision
+- Recall
+- Specificity
+- F1 scores (micro, macro, and weighted averages)";"- Technical Output Failure
+- Hallucinations and False Positives
+- Context Integration Failure
+- Transformation Sensitivity
+- Training Data and Representation Bias";"Reasoning and Logic Blindness: Accuracy, Precision, Recall, Specificity, F1 scores
+Hallucinations and False Positives: Accuracy, Precision, Recall, Specificity, F1 scores
+Technical Output Failure: Accuracy, Precision, Recall, Specificity, F1 scores
+Prompt Injection and Untrusted Input Manipulation: qualitative only
+Benchmark Contamination (Real-World Gap): qualitative only
+Operational and Deployment Limits: qualitative only"
+AutoSafeCoder: A Multi-Agent Framework for Securing LLM Code Generation through Static Analysis and Fuzz Testing;Ana Nunez, Nafis Tanveer Islam, S. Jha, Peyman Najafirad;2024;"- Reduction in code vulnerabilities by 13%
+- Number of vulnerable code snippets detected by Bandit
+- Performance of the Fuzzing Agent (crashes detected and fixed)
+- Success rate of the static analyzer agent in correcting vulnerabilities
+- Functional accuracy measured using the pass@k metric";"- Complex Vulnerability Blind Spots
+- Secret Detection Blind Spots
+- Reasoning and Logic Blindness
+- Prompt Injection and Untrusted Input Manipulation
+- Operational and Deployment Limits
+- Technical Output Failure";"Technical Output Failure: Vulnerability Detection Rate, pass@k metric
+Complex Vulnerability Blind Spots: Vulnerability Detection Rate
+Operational and Deployment Limits: Crash Detection Rate, pass@k metric"
+LLM Security Guard for Code;Arya Kavian, Mohammad Mehdi Pourhashem Kallehbasti, Sajjad Kazemi, Ehsan Firouzi, Mohammad Ghafari;2024;"- Performance score for each challenge
+- Ranking of LLMs
+- Quantity and severity of potential CWEs
+- Time taken to complete each task
+- Number of vulnerabilities
+- Severity of vulnerabilities";"- Hallucinations and False Positives
+- Technical Output Failure
+- Overconfidence and Calibration Failure
+- Complex Vulnerability Blind Spots
+- Context Integration Failure";"Technical Output Failure: Performance Score, Benchmarking
+Operational and Deployment Limits: Termination Condition, Benchmark Interval
+Overconfidence and Calibration Failure: Performance Score"
+Understanding the Effectiveness of Large Language Models in Detecting Security Vulnerabilities;Avishree Khare, Saikat Dutta, Ziyang Li, Alaia Solko-Breslin, R. Alur, Mayur Naik;2023;"- Accuracy
+- Precision
+- Recall
+- F1 score
+- Explainability
+- Robustness";"- Reasoning and Logic Blindness
+- Context Integration Failure
+- Complex Vulnerability Blind Spots
+- Weak Explainability
+- Prompt Injection and Untrusted Input Manipulation
+- Operational and Deployment Limits";"Reasoning and Logic Blindness: qualitative only
+Context Integration Failure: qualitative only
+Hallucinations and False Positives: False Positives, Precision
+False-Positive Secret Detection: qualitative only
+Localization Failure: Localization Accuracy, Top-k Accuracy
+Technical Output Failure: qualitative only
+Prompt Injection and Untrusted Input Manipulation: Attack Success Rate, Block Rate
+Transformation Sensitivity: qualitative only
+Attention Hijacking and Poisoning: qualitative only
+Overconfidence and Calibration Failure: qualitative only
+Weak Explainability: qualitative only
+Training Data and Representation Bias: qualitative only
+Benchmark Contamination (Real-World Gap): qualitative only
+Complex Vulnerability Blind Spots: qualitative only
+Secret Detection Blind Spots: qualitative only
+Operational and Deployment Limits: qualitative only
+Information and Secret Leakage in Model Outputs: qualitative only"
+To Err is Machine: Vulnerability Detection Challenges LLM Reasoning;Benjamin Steenhoek, Md Mahbubur Rahman, Monoshi Kumar Roy, Mirza Sanjida Alam, Heng Tong, Swarna Das, Earl T. Barr, Wei Le;2024;Balanced Accuracy (vulnerability detection), Error Rate (failure to distinguish between buggy and fixed versions), Localization Accuracy (correct localization of bugs in DbgBench);"- Reasoning and Logic Blindness
+- Localization Failure
+- Hallucinations and False Positives
+- Weak Explainability
+- Complex Vulnerability Blind Spots";"Reasoning and Logic Blindness: qualitative only
+Context Integration Failure: qualitative only
+Hallucinations and False Positives: Balanced Accuracy
+Localization Failure: Balanced Accuracy, Localization Accuracy
+Technical Output Failure: qualitative only
+Weak Explainability: qualitative only"
+DeepCode AI Fix: Fixing Security Vulnerabilities with Large Language Models;Berkay Berabi, Alexey Gronskiy, Veselin Raychev, Gishor Sivanrupan, Victor Chibotaru, Martin T. Vechev;2024;"- Functional correctness (Pass@)
+- Exact match to the target code (ExactMatch@)";"- Context Integration Failure
+- Training Data and Representation Bias
+- Technical Output Failure
+- Operational and Deployment Limits
+- Complex Vulnerability Blind Spots";"Reasoning and Logic Blindness: qualitative only
+Context Integration Failure: Pass@, ExactMatch@
+Hallucinations and False Positives: qualitative only
+False-Positive Secret Detection: qualitative only
+Localization Failure: Pass@, ExactMatch@
+Technical Output Failure: Pass@, ExactMatch@
+Prompt Injection and Untrusted Input Manipulation: qualitative only
+Transformation Sensitivity: qualitative only
+Attention Hijacking and Poisoning: qualitative only
+Overconfidence and Calibration Failure: qualitative only
+Weak Explainability: qualitative only
+Training Data and Representation Bias: qualitative only
+Benchmark Contamination (Real-World Gap): qualitative only
+Complex Vulnerability Blind Spots: qualitative only
+Secret Detection Blind Spots: qualitative only
+Operational and Deployment Limits: qualitative only
+Information and Secret Leakage in Model Outputs: qualitative only"
+Large Language Models Versus Static Code Analysis Tools: A Systematic Benchmark for Vulnerability Detection;Damian Gnieciak, Tomasz Szandala;2025;Precision, Recall, F1 Score, Analysis Latency, Developer Effort, False Positive Rate (FP);"- Context Integration Failure
+- Hallucinations and False Positives
+- Localization Failure
+- Weak Explainability
+- Operational and Deployment Limits";"Reasoning and Logic Blindness: Recall, F1 Score
+Context Integration Failure: Recall, F1 Score
+Hallucinations and False Positives: False Positives, Precision
+Localization Failure: qualitative only
+Weak Explainability: qualitative only
+Complex Vulnerability Blind Spots: No clear FM-metric mapping reported
+Operational and Deployment Limits: qualitative only"
+Localized Calibrated Uncertainty in Code Language Models;David Gros, P. Devanbu;2025;Calibration error, Brier Skill Score (approx 0.2);Hallucinations and False Positives, Localization Failure, Overconfidence and Calibration Failure, Operational and Deployment Limits;"Localization Failure: Brier Skill Score
+Overconfidence and Calibration Failure: Calibration Error, Brier Skill Score"
+Impact of an LLM-based Review Assistant in Practice: A Mixed Open-/Closed-source Case Study;Doriane Olewicki, Leuson Da Silva, Oussama Ben Sghaier, Suhaib Mujahid, Arezou Amini, Benjamin Mah, Marco Castelluccio, Sarra Habchi, Foutse Khomh, Bram Adams;2026;"- Fisher's statistical test
+- Cohen's d score
+- Revised line ratio
+- Revised chunk ratio
+- Thread initiation ratio
+- Cohen's kappa score";"- Reasoning and Logic Blindness
+- Context Integration Failure
+- Hallucinations and False Positives
+- Technical Output Failure
+- Operational and Deployment Limits
+- Overconfidence and Calibration Failure";"Hallucinations and False Positives: False Positives, Precision
+Context Integration Failure: qualitative only
+Technical Output Failure: Acceptance Ratio, Appreciation Ratio
+Prompt Injection and Untrusted Input Manipulation: No clear FM-metric mapping reported
+Transformation Sensitivity: No clear FM-metric mapping reported
+Attention Hijacking and Poisoning: No clear FM-metric mapping reported
+Overconfidence and Calibration Failure: qualitative only
+Weak Explainability: qualitative only
+Training Data and Representation Bias: No clear FM-metric mapping reported
+Benchmark Contamination (Real-World Gap): No clear FM-metric mapping reported
+Complex Vulnerability Blind Spots: No clear FM-metric mapping reported
+Secret Detection Blind Spots: No clear FM-metric mapping reported
+Operational and Deployment Limits: Median Time Spent on Evaluation
+Information and Secret Leakage in Model Outputs: No clear FM-metric mapping reported"
+Persistent Human Feedback, LLMs, and Static Analyzers for Secure Code Generation and Vulnerability Detection;Ehsan Firouzi, Mohammad Ghafari;2026;No explicit evaluation metrics reported (the abstract discusses percentages of correct classifications and discrepancies but does not mention specific metrics like Precision, Recall, F1, etc.);Technical Output Failure, Hallucinations and False Positives, Weak Explainability, Overconfidence and Calibration Failure;"Hallucinations and False Positives: Correctness of Reports
+False-Positive Secret Detection: Correctness of Reports
+No clear FM-metric mapping reported for other failure modes"
+Nurturing Code Quality: Leveraging Static Analysis and Large Language Models for Software Quality in Education;Eman Abdullah AlOmar;2025;No explicit evaluation metrics reported. The study focuses on qualitative outcomes and the effectiveness of PMD and ChatGPT in educational contexts, without mentioning traditional evaluation metrics like Precision, Recall, F1, or Accuracy.;"- Hallucinations and False Positives
+- Context Integration Failure
+- Technical Output Failure
+- Localization Failure
+- Weak Explainability";"Hallucinations and False Positives: False Positives
+Context Integration Failure: qualitative only
+Technical Output Failure: Compiler Errors
+Overconfidence and Calibration Failure: qualitative only
+Weak Explainability: qualitative only
+Training Data and Representation Bias: qualitative only
+Operational and Deployment Limits: qualitative only"
+From Vulnerabilities to Remediation: A Systematic Literature Review of LLMs in Code Security;Enna Bašić, A. Giaretta;2024;No explicit evaluation metrics reported.;"- Technical Output Failure
+- Hallucinations and False Positives
+- Attention Hijacking and Poisoning
+- Complex Vulnerability Blind Spots";"Technical Output Failure: qualitative only
+Hallucinations and False Positives: qualitative only
+False-Positive Secret Detection: qualitative only
+Localization Failure: qualitative only
+Complex Vulnerability Blind Spots: qualitative only
+Transformation Sensitivity: qualitative only
+Prompt Injection and Untrusted Input Manipulation: qualitative only
+Attention Hijacking and Poisoning: qualitative only"
+DR.FIX: Automatically Fixing Data Races at Industry Scale;Farnaz Behrang, Zhizhou Zhang, Georgian-Vlad Saioc, Peng Liu, Milind Chabbi;2025;"- Proportion of data races for which patches were produced: 55%
+- Proportion of patches accepted by developers: 86%";Complex Vulnerability Blind Spots, Operational and Deployment Limits;No clear FM-metric mapping reported
+LLM-based Vulnerability Detection at Project Scale: An Empirical Study;Fengjie Li, Jiajun Jiang, Dong Chen, Ying Xiong;2026;"- Recall (vulnerability detection)
+- False Discovery Rate (practical usability)
+- Computational Costs (scalability)";"- Hallucinations and False Positives
+- False-Positive Secret Detection
+- Context Integration Failure
+- Operational and Deployment Limits
+- Technical Output Failure
+- Weak Explainability";"Reasoning and Logic Blindness: Detection Capability, Practical Usability
+Context Integration Failure: Detection Capability, Practical Usability
+Localization Failure: Recall
+Hallucinations and False Positives: False Discovery Rates
+Operational and Deployment Limits: Computational Costs"
+"Large Language Models for In-File Vulnerability Localization Can Be ""Lost in the End""";Francesco Sovrano, Adam Bauer, Alberto Bacchelli;;"- Precision
+- Recall
+- Accuracy
+- F1 score
+- Top-1 accuracy (for multi-line vulnerabilities)
+- Recall improvement
+- Precision changes (due to chunking)";Localization Failure, Context Integration Failure, Technical Output Failure, Complex Vulnerability Blind Spots, Operational and Deployment Limits;"Localization Failure: Accuracy, F1 score, Precision, Recall
+Hallucinations and False Positives: Accuracy, F1 score, Precision, Recall
+Context Integration Failure: Accuracy, F1 score, Precision, Recall
+Operational and Deployment Limits: Recall improvement with chunking"
+Helping LLMs Improve Code Generation Using Feedback from Testing and Static Analysis;Greta Dolcetti, Vincenzo Arceri, Eleonora Iotti, S. Maffeis, Agostino Cortesi, E. Zaffanella;2024;No explicit evaluation metrics reported (evaluation context includes correctness assessment using ground-truth tests, vulnerability detection using static analysis, and code repair ability);Technical Output Failure, Complex Vulnerability Blind Spots, Reasoning and Logic Blindness;"Technical Output Failure: ground-truth tests, static analysis tool
+Hallucinations and False Positives: qualitative only
+Overconfidence and Calibration Failure: qualitative only"
+Uncovering Systematic Failures of LLMs in Verifying Code Against Natural Language Specifications;Haolin Jin, Huaming Chen;2025;No explicit evaluation metrics reported.;Reasoning and Logic Blindness, Hallucinations and False Positives, Transformation Sensitivity, Overconfidence and Calibration Failure, Operational and Deployment Limits;"Reasoning and Logic Blindness: qualitative only
+Hallucinations and False Positives: qualitative only
+Prompt Injection and Untrusted Input Manipulation: qualitative only
+Weak Explainability: qualitative only"
+Uncovering Systematic Failures of LLMs in Verifying Code Against Natural Language Specifications;Haolin Jin, Huaming Chen;2025;Requirement-Conformance Recognition Rate (RCRR);Reasoning and Logic Blindness, Hallucinations and False Positives, Overconfidence and Calibration Failure, Weak Explainability, Operational and Deployment Limits;"Hallucinations and False Positives: False Negative Rate
+Overconfidence and Calibration Failure: Over-correction bias
+Weak Explainability: qualitative only
+Training Data and Representation Bias: qualitative only
+Prompt Injection and Untrusted Input Manipulation: qualitative only"
+CodeReviewQA: The Code Review Comprehension Assessment for Large Language Models;Hong Yi Lin, Chunhua Liu, Haoyu Gao, Patanamon Thongtanunam, Christoph Treude;2025;No explicit evaluation metrics reported. The abstract introduces CodeReviewQA as a novel evaluation benchmark that decomposes code refinement into change type recognition, change localization, and solution identification, but does not specify traditional metrics like Precision or Recall.;Context Integration Failure, Reasoning and Logic Blindness, Benchmark Contamination (Real-World Gap), Technical Output Failure;"Context Integration Failure: qualitative only
+Localization Failure: change localisation (CL)
+Technical Output Failure: change type recognition (CTR), solution identification (SI)"
+CodeLMSec Benchmark: Systematically Evaluating and Finding Security Vulnerabilities in Black-Box Code Language Models;Hossein Hajipour, Thorsten Holz, Lea Schonherr, Mario Fritz;2023;"- Percentage of vulnerable codes generated by each model
+- Total number of vulnerable codes found
+- Quality and quantity of vulnerable codes generated by different few-shot prompting approaches (FS-Code, FS-Prompt, OS-Prompt)";"- Training Data and Representation Bias
+- Complex Vulnerability Blind Spots
+- Prompt Injection and Untrusted Input Manipulation
+- Technical Output Failure
+- Benchmark Contamination (Real-World Gap)";"Technical Output Failure: CodeQL vulnerability detection
+Prompt Injection and Untrusted Input Manipulation: Transferability of non-secure prompts
+Complex Vulnerability Blind Spots: Non-secure prompts dataset for benchmarking"
+Safe4U: Identifying Unsound Safe Encapsulations of Unsafe Calls in Rust using LLMs;Huan Li, Bei Wang, Xing Hu, Xin Xia;2025;Accuracy (Acc), Recall (Rec), Precision (Prec), F1-score (F1), Success Rate (Succ);"- Hallucinations and False Positives
+- Context Integration Failure
+- Reasoning and Logic Blindness
+- Overconfidence and Calibration Failure
+- Weak Explainability";"Reasoning and Logic Blindness: qualitative only
+Context Integration Failure: qualitative only
+Hallucinations and False Positives: Precision
+Localization Failure: Recall, Precision
+Technical Output Failure: qualitative only
+Weak Explainability: qualitative only
+Complex Vulnerability Blind Spots: qualitative only"
+Combining Large Language Models with Static Analyzers for Code Review Generation;Imen Jaoua, Oussama Ben Sghaier, Houari Sahraoui;2025;"- Accuracy (manual evaluation of accuracy)
+- Coverage (ranking of reviews based on issue detection)
+- Win-tie-loss ratios (comparing performance of hybrid strategies against baseline models)
+- LLM-as-a-judge (evaluating accuracy of generated reviews)";"- Hallucinations and False Positives
+- Context Integration Failure
+- Technical Output Failure
+- Overconfidence and Calibration Failure
+- Weak Explainability";"Context Integration Failure: Accuracy, Coverage
+Hallucinations and False Positives: Accuracy
+Technical Output Failure: Accuracy, Coverage"
+Is Your AI-Generated Code Really Safe? Evaluating Large Language Models on Secure Code Generation with CodeSecEval;Jiexin Wang, Xitong Luo, Liuwen Cao, Hongkui He, Hailin Huang, Jiayuan Xie, Adam Jatowt, Yi Cai;2024;Pass@k (code generation and code repair);"- Complex Vulnerability Blind Spots
+- Operational and Deployment Limits
+- Weak Explainability
+- Training Data and Representation Bias
+- Prompt Injection and Untrusted Input Manipulation
+- Benchmark Contamination (Real-World Gap)";"Technical Output Failure: Pass@k
+Complex Vulnerability Blind Spots: Pass@k
+Weak Explainability: qualitative only
+Training Data and Representation Bias: qualitative only
+Operational and Deployment Limits: qualitative only"
+Not What You've Signed Up For: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection;Kai Greshake, Sahar Abdelnabi, Shailesh Mishra, C. Endres, Thorsten Holz, Mario Fritz;2023;No explicit evaluation metrics reported. The paper discusses qualitative observations and challenges in quantifying success rates but does not provide specific evaluation metrics.;"- Prompt Injection and Untrusted Input Manipulation
+- Attention Hijacking and Poisoning
+- Operational and Deployment Limits
+- Information and Secret Leakage in Model Outputs
+- Complex Vulnerability Blind Spots";"Prompt Injection and Untrusted Input Manipulation: qualitative only
+Technical Output Failure: qualitative only
+Hallucinations and False Positives: qualitative only
+Manipulated Content: qualitative only
+Availability: qualitative only"
+SGCR: A Specification-Grounded Framework for Trustworthy LLM Code Review;Kai Wang, Bingcheng Mao, Shuai Jia, Yujie Ding, Dongming Han, Tianyi Ma, Bin Cao;2025;Adoption Rate;Context Integration Failure, Hallucinations and False Positives, Weak Explainability;"Context Integration Failure: Adoption Rate
+Hallucinations and False Positives: Adoption Rate
+Overconfidence and Calibration Failure: Adoption Rate
+Technical Output Failure: Adoption Rate
+Prompt Injection and Untrusted Input Manipulation: Adoption Rate
+Weak Explainability: qualitative only"
+Harnessing Large Language Models for Software Vulnerability Detection: A Comprehensive Benchmarking Study;Karl Tamberg, Hayretdin Bahsi;2025;"- Accuracy
+- Precision
+- Recall
+- F1 score
+- True Positives (TP)
+- False Positives (FP)
+- True Negatives (TN)
+- False Negatives (FN)
+- Cost (monetary and timewise)";"- Hallucinations and False Positives
+- Complex Vulnerability Blind Spots
+- Operational and Deployment Limits
+- Benchmark Contamination (Real-World Gap)
+- Information and Secret Leakage in Model Outputs";"Reasoning and Logic Blindness: qualitative only
+Context Integration Failure: qualitative only
+Hallucinations and False Positives: False Positives, Precision, False Positive Rate
+False-Positive Secret Detection: qualitative only
+Localization Failure: qualitative only
+Technical Output Failure: qualitative only
+Prompt Injection and Untrusted Input Manipulation: qualitative only
+Transformation Sensitivity: qualitative only
+Attention Hijacking and Poisoning: qualitative only
+Overconfidence and Calibration Failure: qualitative only
+Weak Explainability: qualitative only
+Training Data and Representation Bias: qualitative only
+Benchmark Contamination (Real-World Gap): qualitative only
+Complex Vulnerability Blind Spots: Recall, F1 scores
+Secret Detection Blind Spots: qualitative only
+Operational and Deployment Limits: Cost, Time
+Information and Secret Leakage in Model Outputs: qualitative only"
+Large Language Models (LLMs) and Generative AI in Cybersecurity and Privacy: A Survey of Dual-Use Risks, AI-Generated Malware, Explainability, and Defensive Strategies;Kiarash Ahi, Saeed Valizadeh;;"- Precision in identifying new attack vectors
+- Interpretability of vulnerability classifications
+- Robustness against adversarial attacks
+- Explainability and verifiability of LLM outputs
+- Privacy preservation in LLM architectures
+- Ethical impact assessments
+- Cross-lingual and multi-modal threat detection capabilities
+- Standardized quantitative benchmarking for performance, robustness, and fairness";"- Prompt Injection and Untrusted Input Manipulation
+- Attention Hijacking and Poisoning
+- Information and Secret Leakage in Model Outputs
+- Training Data and Representation Bias
+- Operational and Deployment Limits
+- Complex Vulnerability Blind Spots";"Reasoning and Logic Blindness: qualitative only
+Context Integration Failure: qualitative only
+Hallucinations and False Positives: qualitative only
+False-Positive Secret Detection: qualitative only
+Localization Failure: qualitative only
+Technical Output Failure: qualitative only
+Prompt Injection and Untrusted Input Manipulation: Attack Success Rate, Block Rate
+Transformation Sensitivity: qualitative only
+Attention Hijacking and Poisoning: qualitative only
+Overconfidence and Calibration Failure: qualitative only
+Weak Explainability: Explainability
+Training Data and Representation Bias: Training Data Integrity
+Benchmark Contamination (Real-World Gap): qualitative only
+Complex Vulnerability Blind Spots: qualitative only
+Secret Detection Blind Spots: qualitative only
+Operational and Deployment Limits: Secure Deployment and Monitoring
+Information and Secret Leakage in Model Outputs: Model Confidentiality"
+Integrating RAG and LLM for Automated Code Review in Practice;Liangchen Yang, Yi Chen;2025;"- Adoption Rate: Measures whether developers adopt and act upon review comments.
+- Precision: Used to evaluate the effectiveness of the comment filtering module.";Context Integration Failure, Hallucinations and False Positives, Training Data and Representation Bias, Operational and Deployment Limits;"Reasoning and Logic Blindness: Precision
+Hallucinations and False Positives: Precision
+Context Integration Failure: qualitative only
+Localization Failure: qualitative only
+Technical Output Failure: qualitative only
+Weak Explainability: qualitative only
+Prompt Injection and Untrusted Input Manipulation: No clear FM-metric mapping reported
+Transformation Sensitivity: No clear FM-metric mapping reported
+Information and Secret Leakage in Model Outputs: No clear FM-metric mapping reported"
+A Qualitative Study on Using ChatGPT for Software Security: Perception vs. Practicality;M. Mehdi Kholoosi, M. Ali Babar, Roland Croft;2024;"- Accuracy: 61.42% (vulnerability detection)
+- Qualitative issues: Generic security information, lack of assertiveness in responses";Technical Output Failure, Weak Explainability, Overconfidence and Calibration Failure, Complex Vulnerability Blind Spots;"Reasoning and Logic Blindness: qualitative only
+Context Integration Failure: qualitative only
+Hallucinations and False Positives: qualitative only
+False-Positive Secret Detection: qualitative only
+Localization Failure: Vulnerability Detection Accuracy
+Technical Output Failure: qualitative only
+Prompt Injection and Untrusted Input Manipulation: qualitative only
+Transformation Sensitivity: qualitative only
+Attention Hijacking and Poisoning: qualitative only
+Overconfidence and Calibration Failure: qualitative only
+Weak Explainability: qualitative only
+Training Data and Representation Bias: qualitative only
+Benchmark Contamination (Real-World Gap): qualitative only
+Complex Vulnerability Blind Spots: qualitative only
+Secret Detection Blind Spots: qualitative only
+Operational and Deployment Limits: qualitative only
+Information and Secret Leakage in Model Outputs: qualitative only"
+A Survey on the Role of LLMs in AI-Based Software Development: Augmentation and Latent Risks;Md Bajlur Rashid, Mohammad Shafayet Jamil Hossain, Mohammad Ishtiaque Khan, Sharaban Tahora, Aiasha Siddika, Mahmudul Islam Prakash, Sharmin Yeasmin, Hossain Shahriar;2025;"- Recall: LLMs outperform static tools in recall.
+- Precision: Specialized models like CodeGemma show unstable precision.
+- Attack Success Rate (ASR): Copilot-Jailbreaks attack reached 99.4%.
+- Percentage of insecure outputs: 25-40% for GitHub Copilot, 24.5% for Copilot-generated Javascript snippets, 10.3% for GPT-4.0.
+- Patching success rates: Below 30% for VulnLLMEval and CVE-Bench.
+- Data leakage: 2-8% of outputs leak sensitive data.
+- False positive rates: High false positive rates in benchmarks like Diver-seVul.";"- Technical Output Failure
+- Information and Secret Leakage in Model Outputs
+- Prompt Injection and Untrusted Input Manipulation
+- Training Data and Representation Bias
+- Hallucinations and False Positives
+- Operational and Deployment Limits";"Reasoning and Logic Blindness: qualitative only
+Context Integration Failure: qualitative only
+Hallucinations and False Positives: False Positives, Precision, False Positive Rate
+False-Positive Secret Detection: qualitative only
+Localization Failure: qualitative only
+Technical Output Failure: Recall in Vulnerability Detection, Patch Quality
+Prompt Injection and Untrusted Input Manipulation: Attack Success Rate, Block Rate
+Transformation Sensitivity: qualitative only
+Attention Hijacking and Poisoning: qualitative only
+Overconfidence and Calibration Failure: qualitative only
+Weak Explainability: qualitative only
+Training Data and Representation Bias: qualitative only
+Benchmark Contamination (Real-World Gap): qualitative only
+Complex Vulnerability Blind Spots: qualitative only
+Secret Detection Blind Spots: qualitative only
+Operational and Deployment Limits: qualitative only
+Information and Secret Leakage in Model Outputs: Data Leakage Rate"
+AI-Powered Code Reviews: Leveraging Large Language Models;Md Shain Shahid Chowdhury, Md Naseef Ur Rahman Chowdhury, Fariha Ferdous Neha, Ahshanul Haque;2024;No explicit evaluation metrics reported.;"- Context Integration Failure
+- Training Data and Representation Bias
+- Prompt Injection and Untrusted Input Manipulation
+- Overconfidence and Calibration Failure";"Context Integration Failure: qualitative only
+Hallucinations and False Positives: qualitative only
+False-Positive Secret Detection: qualitative only
+Technical Output Failure: qualitative only
+Prompt Injection and Untrusted Input Manipulation: qualitative only
+Training Data and Representation Bias: qualitative only
+Information and Secret Leakage in Model Outputs: qualitative only"
+Large Language Models as Robust Data Generators in Software Analytics: Are We There Yet?;Md. Abdul Awal, Mrigank Rochan, Chanchal K. Roy;2024;No explicit evaluation metrics reported (the abstract mentions robustness evaluation and similarity metrics but does not specify traditional metrics like Precision, Recall, F1, etc.);"- Prompt Injection and Untrusted Input Manipulation
+- Training Data and Representation Bias
+- Operational and Deployment Limits";Prompt Injection and Untrusted Input Manipulation: Adversarial Attack Success Rate, Similarity Metrics
+Towards Verified Code Reasoning by LLMs;Meghana Sistla, Gogul Balakrishnan, Pat Rondon, José Cambronero, Michele Tufano, Satish Chandra;2025;"- Validation rate for uninitialized variable errors: 13/20
+- Validation rate for program equivalence queries: 9/20
+- Hallucination rate: 40%
+- Verifier's catch rate for hallucinations: 75%";"- Hallucinations and False Positives
+- Context Integration Failure
+- Reasoning and Logic Blindness
+- Weak Explainability";"Reasoning and Logic Blindness: Verification Condition for MSAN bugs, Verification Condition for Program Equivalence
+Hallucinations and False Positives: Percentage of examples where the agent does not hallucinate and the verifier validates the result, Percentage of hallucinations caught by the verifier"
+ChatGPT for Vulnerability Detection, Classification, and Repair: How Far Are We?;Michael Fu, Chakkrit Kla Tantithamthavorn, Van Nguyen, Trung Le;2023;"- F1-measure (function-level vulnerability prediction)
+- Precision (function-level vulnerability prediction)
+- Recall (function-level vulnerability prediction)
+- Top-10 accuracy (line-level vulnerability prediction)
+- Multiclass accuracy (vulnerability classification)
+- Mean Squared Error (MSE) (severity estimation)
+- Mean Absolute Error (MAE) (severity estimation)
+- Percentage of perfect prediction (%PP) (vulnerability repair)
+- BLEU score (vulnerability repair)
+- METEOR score (vulnerability repair)";"- Reasoning and Logic Blindness
+- Context Integration Failure
+- Technical Output Failure
+- Training Data and Representation Bias
+- Operational and Deployment Limits";"- Hallucinations and False Positives: Accuracy of identifying CWE-IDs
+- Context Integration Failure: Accuracy of identifying CWE-IDs
+- Technical Output Failure: Percentage of correct repair patches
+- Reasoning and Logic Blindness: qualitative only"
+SOK: Exploring Hallucinations and Security Risks in AI-Assisted Software Development with Insights for LLM Deployment;Mohd Ariful Haque, Sunzida Siddique, Md. Mahfuzur Rahman, Ahmed Rafi Hasan, Laxmi Rani Das, Marufa Kamal, Khalil Sujaee, Kishor Datta Gupta, Roy George;2025;"- Time reduction for code review and refactoring
+- Code quality ratings
+- Error identification effectiveness
+- Security challenges (prompt injection, data poisoning, privacy breaches)
+- Hallucination (incorrect or irrelevant code generation)";"- Hallucinations and False Positives
+- Complex Vulnerability Blind Spots
+- Context Integration Failure
+- Prompt Injection and Untrusted Input Manipulation
+- Operational and Deployment Limits
+- Training Data and Representation Bias";"Hallucinations and False Positives: qualitative only
+False-Positive Secret Detection: qualitative only
+Context Integration Failure: qualitative only
+Technical Output Failure: qualitative only
+Prompt Injection and Untrusted Input Manipulation: qualitative only
+Transformation Sensitivity: qualitative only
+Attention Hijacking and Poisoning: qualitative only
+Overconfidence and Calibration Failure: qualitative only
+Weak Explainability: qualitative only
+Training Data and Representation Bias: qualitative only
+Benchmark Contamination (Real-World Gap): qualitative only
+Complex Vulnerability Blind Spots: qualitative only
+Secret Detection Blind Spots: qualitative only
+Operational and Deployment Limits: qualitative only
+Information and Secret Leakage in Model Outputs: qualitative only"
+Towards Efficient Fine-Tuning of Language Models With Organizational Data for Automated Software Review;Mona Nashaat, James Miller;2024;"Accuracy (Acc), Precision (P), Recall (R), F1-score (F1) for code quality evaluation; BLEU score for review comment generation and bug report summarization; Human Evaluation focusing on Technical Accuracy, Clarity and Readability, Contextual Understanding and Relevance; BLEU score and Exact Match (EM) rate for code refinement.";"- Hallucinations and False Positives
+- Overconfidence and Calibration Failure
+- Context Integration Failure
+- Training Data and Representation Bias
+- Benchmark Contamination (Real-World Gap)";No clear FM-metric mapping reported
+Software Vulnerability Detection using Large Language Models;Moumita Das Purba, A. Ghosh, Benjamin J. Radford, Bill Chu;2023;False Positive Rate (FP) - software vulnerability detection;Hallucinations and False Positives;Hallucinations and False Positives: False Positive Rate
+CORE: Resolving Code Quality Issues using LLMs;Nalin Wadhwa, Jui Pradhan, Atharv Sonwane, Surya Prakash Sahu, Nagarajan Natarajan, Aditya Kanade, Suresh Parthasarathy, Sriram Rajamani;2024;"- Number of files flagged
+- Number of total issues flagged
+- Number of files with at least one revision passing the static check
+- Number of issues remaining after CORE pipeline application
+- Number of revisions accepted by human reviewers
+- Number of revisions rejected by human reviewers
+- False positives (revisions produced by CORE but rejected by human reviewers)";"- Hallucinations and False Positives
+- Technical Output Failure
+- Transformation Sensitivity";"Reasoning and Logic Blindness: qualitative only
+Context Integration Failure: qualitative only
+Hallucinations and False Positives: qualitative only
+Technical Output Failure: qualitative only
+Operational and Deployment Limits: qualitative only"
+Prompt Injection Attacks on Agentic Coding Assistants: A Systematic Analysis of Vulnerabilities in Skills, Tools, and Protocol Ecosystems;Narek Maloyan, Dmitry Namiot;2026;Attack Success Rate, Mitigation Rate;Prompt Injection and Untrusted Input Manipulation, Attention Hijacking and Poisoning, Complex Vulnerability Blind Spots;Prompt Injection and Untrusted Input Manipulation: Attack Success Rate
+LLM Critics Help Catch LLM Bugs;Nat Mcaleese, Michael Pokorny, Juan Felipe, Cerón Uribe, Evgenia Nitishinskaya, Maja Trębacz, Jan Leike;2024;"- Critique-bug inclusion (CBI)
+- Comprehensiveness
+- Elo scores
+- Precision
+- Recall
+- Inter-annotator agreement";"- Hallucinations and False Positives
+- Operational and Deployment Limits
+- Complex Vulnerability Blind Spots
+- Localization Failure
+- Weak Explainability
+- Training Data and Representation Bias
+- Benchmark Contamination (Real-World Gap)";"Hallucinations and False Positives: Hallucinated bugs rate, Nitpicks rate
+Localization Failure: qualitative only
+Technical Output Failure: qualitative only
+Overconfidence and Calibration Failure: qualitative only
+Weak Explainability: qualitative only
+Training Data and Representation Bias: qualitative only
+Operational and Deployment Limits: qualitative only"
+Leveraging Large Language Models to Detect NPM Malicious Packages;Nusrat Zahan, Philipp Burckhardt, Mikola Lysenko, Feross Aboukhadijeh, Laurie Williams;2025;Precision, Recall, F1 Score, Cost Reduction (in terms of number of files analyzed and associated costs);"- Hallucinations and False Positives
+- Context Integration Failure
+- Localization Failure
+- Training Data and Representation Bias
+- Information and Secret Leakage in Model Outputs";"Hallucinations and False Positives: False Positives, Precision
+False-Positive Secret Detection: False Positives
+Localization Failure: qualitative only
+Technical Output Failure: JSON Output Quality
+Prompt Injection and Untrusted Input Manipulation: qualitative only
+Transformation Sensitivity: No clear FM-metric mapping reported
+Attention Hijacking and Poisoning: No clear FM-metric mapping reported
+Overconfidence and Calibration Failure: qualitative only
+Weak Explainability: qualitative only
+Training Data and Representation Bias: qualitative only
+Benchmark Contamination (Real-World Gap): qualitative only
+Complex Vulnerability Blind Spots: qualitative only
+Secret Detection Blind Spots: qualitative only
+Operational and Deployment Limits: qualitative only
+Information and Secret Leakage in Model Outputs: No clear FM-metric mapping reported"
+Adversarial Bug Reports as a Security Risk in Language Model-Based Automated Program Repair;Piotr Przymus, A. Happe, Jürgen Cito;2025;"- Attack Success Rate (90% of crafted bug reports triggered attacker-aligned patches)
+- Block Rate (best pre-repair filter blocked only 47%)
+- Detection Rate (post-repair analysis was effective in just 58% of cases)";Prompt Injection and Untrusted Input Manipulation, Operational and Deployment Limits;Prompt Injection and Untrusted Input Manipulation: Attack Success Rate, Block Rate
+A Systematic Literature Review on Large Language Models for Automated Program Repair;Quanjun Zhang, Chunrong Fang, Yang Xie, Yuxiang Ma, Weisong Sun, Yun Yang, Zhenyu Chen;2026;"- PATCH-SIM: assesses patch correctness by calculating the similarity of dynamic execution traces.
+- APPT: uses BERT and LSTM to predict patch correctness.
+- PatchZero: predicts patch correctness in a zero-shot setting.
+- LLMs as Feature Extractor: uses code embeddings to reason about patch correctness.
+- Invalidator: assesses patch correctness via semantic and syntactic reasoning.";"- Technical Output Failure
+- Training Data and Representation Bias
+- Benchmark Contamination (Real-World Gap)
+- Operational and Deployment Limits
+- Transformation Sensitivity
+- Weak Explainability
+- Complex Vulnerability Blind Spots";"Reasoning and Logic Blindness: qualitative only
+Context Integration Failure: qualitative only
+Hallucinations and False Positives: qualitative only
+False-Positive Secret Detection: qualitative only
+Localization Failure: qualitative only
+Technical Output Failure: patch correctness, validation
+Prompt Injection and Untrusted Input Manipulation: qualitative only
+Transformation Sensitivity: qualitative only
+Attention Hijacking and Poisoning: qualitative only
+Overconfidence and Calibration Failure: patch correctness, validation
+Weak Explainability: qualitative only
+Training Data and Representation Bias: dataset availability, reproducibility
+Benchmark Contamination (Real-World Gap): data leakage, benchmark construction
+Complex Vulnerability Blind Spots: qualitative only
+Secret Detection Blind Spots: qualitative only
+Operational and Deployment Limits: qualitative only
+Information and Secret Leakage in Model Outputs: qualitative only"
+AI Control: Improving Safety Despite Intentional Subversion;R. Greenblatt, Buck Shlegeris, Kshitij Sachan, Fabien Roger;2023;No explicit evaluation metrics reported.;Technical Output Failure, Prompt Injection and Untrusted Input Manipulation, Operational and Deployment Limits;"Technical Output Failure: qualitative only
+Overconfidence and Calibration Failure: qualitative only
+Secret Detection Blind Spots: qualitative only"
+AI - Integrated DevSecOps for Scalable, Secure, and Modern Cloud Architectures;Ramesh Krishna Mahimalur, Venkata Gopi Kolla, Chintan Deepakbhai Tank, Surya Teja Meesala;2026;"- Mean Time to Detect (MTTD)
+- Mean Time to Remediate (MTTR)
+- False Positive Rate
+- False Negative Rate
+- Vulnerability Density
+- Lead Time for Changes
+- Change Failure Rate
+- Change Pipeline Execution Overhead
+- Precision
+- Recall
+- F1-Score";"- Hallucinations and False Positives
+- Training Data and Representation Bias
+- Weak Explainability
+- Operational and Deployment Limits";"Hallucinations and False Positives: False Positive Rate, Precision
+False-Positive Secret Detection: False Positive Rate
+Technical Output Failure: False Negative Rate
+Operational and Deployment Limits: Mean Time to Detect (MTTD), Mean Time to Remediate (MTTR)
+Weak Explainability: Precision, Recall, F1-score"
+Software Vulnerability and Functionality Assessment using LLMs;Rasmus Ingemann Tuffveson Jensen, Vali Tawosi, Salwa Alamir;2024;"- Accuracy
+- F1 score
+- Match Rate (for associating LLM-generated descriptions with true CWE vulnerabilities)";"- Training Data and Representation Bias
+- Transformation Sensitivity
+- Weak Explainability
+- Complex Vulnerability Blind Spots
+- Operational and Deployment Limits";"Reasoning and Logic Blindness: Accuracy, F1 score
+Context Integration Failure: Accuracy, F1 score
+Hallucinations and False Positives: Accuracy, F1 score
+False-Positive Secret Detection: Accuracy, F1 score
+Technical Output Failure: Accuracy, F1 score
+Weak Explainability: qualitative only"
+Code Review Automation: Strengths and Weaknesses of the State of the Art;Rosalia Tufano, Ozren Dabić, Antonio Mastropaolo, Matteo Ciniselli, Gabriele Bavota;2024;"- Percentage of correct predictions
+- Complexity measured by the number of words in comments (code-to-comment)
+- Complexity measured by the number of AST-level changes (code & comment-to-code)
+- Wilcoxon test
+- Cliff's Delta
+- Holm's correction procedure
+- Correctness of ChatGPT's generated comments (code-to-comment)
+- Correctness of ChatGPT's implementation of reviewer comments (code & comment-to-code)
+- Overlap between ChatGPT and state-of-the-art techniques in success rates";Context Integration Failure;"Reasoning and Logic Blindness: qualitative only
+Context Integration Failure: qualitative only
+Hallucinations and False Positives: No clear FM-metric mapping reported
+Training Data and Representation Bias: qualitative only
+Benchmark Contamination (Real-World Gap): qualitative only
+Weak Explainability: qualitative only
+Complex Vulnerability Blind Spots: qualitative only
+Operational and Deployment Limits: No clear FM-metric mapping reported"
+Benchmarking LLMs for Fine-Grained Code Review with Enriched Context in Practice;Ruida Hu, Xinchen Wang, Xin-Cheng Wen, Zhao Zhang, Bo Jiang, Pengfei Gao, Chao Peng, Cuiyun Gao;2025;"- F1-score
+- Accuracy
+- Precision
+- Pass@k (for line-level defect localization)
+- ROUGE (for line-level review comment generation)
+- Edit Similarity (for line-level review comment generation)";Context Integration Failure, Overconfidence and Calibration Failure, Attention Hijacking and Poisoning, Localization Failure;"Reasoning and Logic Blindness: qualitative only
+Context Integration Failure: F1-score, accuracy, precision
+Localization Failure: pass@k metric
+Technical Output Failure: ROUGE, Edit Similarity
+Overconfidence and Calibration Failure: variance in quality estimation tasks
+Weak Explainability: qualitative only
+Training Data and Representation Bias: qualitative only
+Benchmark Contamination (Real-World Gap): qualitative only"
+Can Adversarial Code Comments Fool AI Security Reviewers -- Large-Scale Empirical Study of Comment-Based Attacks and Defenses Against LLM Code Analysis;S. Thornton;2026;Detection Accuracy, Baseline Detection (commercial models: 89 to 96 percent, open-source models: 53 to 72 percent), Detection Rate (static analysis cross-referencing: 96.9 percent), Recovery of Baseline Misses (47 percent);Prompt Injection and Untrusted Input Manipulation, Complex Vulnerability Blind Spots, Context Integration Failure;"Prompt Injection and Untrusted Input Manipulation: detection accuracy
+Complex Vulnerability Blind Spots: qualitative only
+Context Integration Failure: qualitative only"
+LLMs Cannot Reliably Identify and Reason About Security Vulnerabilities (Yet?): A Comprehensive Evaluation, Framework, and Benchmarks;Saad Ullah, Mingji Han, Saurabh Pujar, Hammond Pearce, Ayse K. Coskun, Gianluca Stringhini;2023;"- Accuracy Score: Measures the correctness of the LLM's final answer regarding vulnerability detection.
+- Reasoning Score: Assesses the quality of the reasoning provided by the LLM, using Rouge score, Cosine Similarity, and GPT-4 evaluation.";"- Reasoning and Logic Blindness
+- Weak Explainability
+- Transformation Sensitivity
+- Hallucinations and False Positives
+- False-Positive Secret Detection
+- Training Data and Representation Bias
+- Complex Vulnerability Blind Spots
+- Operational and Deployment Limits";"Reasoning and Logic Blindness: qualitative only
+Context Integration Failure: qualitative only
+Hallucinations and False Positives: qualitative only
+Transformation Sensitivity: qualitative only
+Localization Failure: qualitative only
+Training Data and Representation Bias: qualitative only
+Benchmark Contamination (Real-World Gap): qualitative only"
+A Systematic Literature Review on Detecting Software Vulnerabilities with Large Language Models;Sabrina Kaniewski, Fabian Schmidt, Markus Enzweiler, Michael Menth, Tobias Heer;2025;No explicit evaluation metrics reported.;"- Context Integration Failure
+- Technical Output Failure
+- Training Data and Representation Bias
+- Benchmark Contamination (Real-World Gap)";No clear FM-metric mapping reported
+Poster: AI-Driven Security: Investigating LLMs for Automated Vulnerability Detection in Code Changes;Sai Ram Motupalli, Sean Choi;2025;No explicit evaluation metrics reported (the paper focuses on consistency and comparability of LLM-based security assessments with traditional methods);"- Overconfidence and Calibration Failure
+- Technical Output Failure
+- Weak Explainability
+- Context Integration Failure";"Context Integration Failure: Rubric-based scoring
+Hallucinations and False Positives: Rubric-based scoring
+Overconfidence and Calibration Failure: Rubric-based scoring"
+Evaluating and improving the robustness of security attack detectors generated by LLMs;Samuele Pasini, Jinhan Kim, Tommaso Aiello, Rocío Cabrera Lozoya, A. Sabetta, Paolo Tonella;2024;F2-Score, Accuracy, F1-Score;"- Hallucinations and False Positives
+- Reasoning and Logic Blindness
+- Overconfidence and Calibration Failure
+- Information and Secret Leakage in Model Outputs";"Hallucinations and False Positives: F2-Score, Accuracy, F1-Score
+Weak Explainability: qualitative only
+Technical Output Failure: F2-Score, Accuracy, F1-Score"
+Rethinking Autonomy: Preventing Failures in AI-Driven Software Engineering;Satyam Kumar Navneet, Joydeep Chandra;2025;No explicit evaluation metrics reported.;"- Hallucinations and False Positives
+- Technical Output Failure
+- Complex Vulnerability Blind Spots
+- Overconfidence and Calibration Failure
+- Operational and Deployment Limits
+- Weak Explainability";No clear FM-metric mapping reported
+How Small Transformation Expose the Weakness of Semantic Similarity Measures;Serge Lionel Nikiema, Albérick Euraste, Abdoul Aziz Bonkoungou, Micheline Bénédicte, Jordan Samhi, Jacques Klein;2025;"- Lexical/N-gram Metrics: TF-IDF, BLEU, ROUGE-L, METEOR
+- Embedding-based Metrics: BERTScore, Sentence-BERT, Universal Sentence Encoder, CodeBERT, GraphCodeBERT, CodeT5
+- LLM-based Metrics: BLEURT, OpenAI text-embedding-3-large
+- Structure-aware Code Metrics: AST Similarity, CFG Similarity, CodeBLEU
+- Distance Measures: Cosine Similarity, Euclidean Distance, Jaccard Similarity, Pearson Correlation, Dot Product, Angular Distance
+- Performance Measures: Similarity Scores, False Positive Rates, Improvement in Performance
+- Statistical Analysis: Mann-Whitney U tests";"- Hallucinations and False Positives
+- Reasoning and Logic Blindness
+- Context Integration Failure
+- Prompt Injection and Untrusted Input Manipulation";"Hallucinations and False Positives: False Positive Rate
+Reasoning and Logic Blindness: Similarity Scores
+Transformation Sensitivity: Distance Metrics (Euclidean, Cosine)
+Prompt Injection and Untrusted Input Manipulation: qualitative only
+Overconfidence and Calibration Failure: Similarity Scores
+Weak Explainability: qualitative only"
+Large Language Model-Powered Smart Contract Vulnerability Detection: New Perspectives;Sihao Hu, Tiansheng Huang, Fatih Ilhan, S. Tekin, Ling Liu;2023;No explicit evaluation metrics reported. The abstract discusses the importance of identifying true vulnerabilities and minimizing false positives, but does not specify explicit metrics like Precision, Recall, or F1.;Hallucinations and False Positives;Hallucinations and False Positives: False Positives
+A Deep Dive into Large Language Models for Automated Bug Localization and Repair;Soneya Binta Hossain, Nan Jiang, Qiang Zhou, Xiaopeng Li, Wen-Hao Chiang, Yingjun Lyu, Hoan Nguyen, Omer Tripp;;"- Exact Match (EM) metric for bug fixing accuracy
+- Test validation for Defects4J dataset (patches are correct if they pass all test cases)";Localization Failure, Transformation Sensitivity;"Localization Failure: Localization Accuracy, Top-k Accuracy
+Transformation Sensitivity: Prompt Accuracy, Bug Fixing Accuracy"
+Detection of Data Exposures in Software Services Using a Large Language Model;Stephen S. Yau, Sourabh Goswami, Vaibhav Shrivastav, Geethan Sannidhi;2025;"- Reduction of false-positive results
+- Avoidance of indeterminism
+- Improvement in detection and handling complex cases";Hallucinations and False Positives, Overconfidence and Calibration Failure;"Hallucinations and False Positives: False Positive Rate, Precision
+Overconfidence and Calibration Failure: Calibration Error, Temperature Scaling Calibration
+Localization Failure: Localization Accuracy, Threshold Range Accuracy"
+LLM-Based Identification of Null Pointer Exception Patches;Tahir Ullah, Waseem Akram, Fiza Khaliq, Hui Liu;2025;"- Precision
+- Recall
+- F1-score
+- False Positive Rate (FPR)
+- False Negative Rate (FNR)
+- Overall Accuracy";"- Hallucinations and False Positives
+- Context Integration Failure
+- Operational and Deployment Limits
+- Weak Explainability
+- Reasoning and Logic Blindness
+- Transformation Sensitivity";"Hallucinations and False Positives: False Positive Rate (FPR)
+Technical Output Failure: Precision, Recall, F1-score
+Weak Explainability: qualitative only
+Training Data and Representation Bias: qualitative only
+Benchmark Contamination (Real-World Gap): qualitative only"
+Automated Code Review in Practice;Umut Cihan, Vahid Haratian, Arda İçöz, Mert Kaan Gül, Ömercan Devran, Emircan Furkan Bayendur, Baykal Mehmet Uçar, Eray Tüzün;2025;"- Percentage of resolved comments: 73.8%
+- Average pull request closure duration increase: from 5 hours 52 minutes to 8 hours 20 minutes
+- Average rating for automated review comments: 3.46
+- Statistical significance of pull request closure duration increase: p-value < 0.001
+- Decrease in human comments per pull request: from 0.31 to 0.28
+- Qualitative measures: minor improvement in code quality, relevance of automated reviews";"- Hallucinations and False Positives
+- Context Integration Failure
+- Overconfidence and Calibration Failure
+- Technical Output Failure";"- Hallucinations and False Positives: Faulty reviews, unnecessary corrections, irrelevant comments
+- Context Integration Failure: Irrelevant suggestions, missing critical issues, altering context of pull requests
+- Technical Output Failure: Faulty reviews, unnecessary corrections
+- Reasoning and Logic Blindness: Missing critical issues"
+On-the-fly Generation-Quality Enhancement of Deep Code Models via Model Collaboration;Weifeng Sun, Naiqi Huang, Meng Yan, Zhongxin Liu, Hongyan Li, Yan Lei, David Lo,  Hu;2025;"- Exact Match
+- Semantic Match (SM)
+- Semantic Accuracy Match (SAM)
+- BLEU score
+- ROUGE-L
+- METEOR
+- CIDEr
+- BLEU-4";"- Overconfidence and Calibration Failure
+- Transformation Sensitivity
+- Reasoning and Logic Blindness
+- Technical Output Failure";"Reasoning and Logic Blindness: Perplexity, Syntax-based Output Similarity, Semantic-based Output Similarity
+Context Integration Failure: Perplexity, Syntax-based Output Similarity, Semantic-based Output Similarity
+Hallucinations and False Positives: Exact Match, BLEU
+Technical Output Failure: Exact Match, BLEU
+Overconfidence and Calibration Failure: Perplexity
+Operational and Deployment Limits: Inference Time
+Weak Explainability: qualitative only"
+Make a Feint to the East While Attacking in the West: Blinding LLM-Based Code Auditors with Flashboom Attacks;Xiao Li, Yue Li, Hao Wu, Yue Zhang, Kaidi Xu, Xiuzhen Cheng, Sheng Zhong, Fengyuan Xu;2025;Blinding Success Rate (vulnerability detection evasion) - up to 96.3% on CodeLlama, 83.05% on Gemma;Attention Hijacking and Poisoning;Attention Hijacking and Poisoning: Blinding Success Rate
+Large Language Models for Software Engineering: A Systematic Literature Review;Xinyi Hou, Yanjie Zhao, Yue Liu, Zhou Yang, Kailong Wang, Li Li, Xiapu Luo, David Lo, John Grundy, Haoyu Wang;2024;"- Regression: MAE
+- Classification: Precision, F1-score, AUC, FPR, MCC, Recall, Accuracy, ROC, FNR
+- Recommendation: MRR, MAP/MAP@k, Recall/Recall@k, Precision@k, F-score/F-score@k, Accuracy
+- Generation: BLEU/BLEU-4/BLEU-DC, Accuracy/Accuracy@k, CodeBLEU, Precision, Recall, MRR, ED, ChrF, CodeBERTScore, PP, Pass@k, EM, ROUGE/ROUGE-L, METEOR, F1-score, ES, MAR, CrystalBLEU, MFR";"- Technical Output Failure
+- Transformation Sensitivity
+- Weak Explainability
+- Prompt Injection and Untrusted Input Manipulation
+- Attention Hijacking and Poisoning
+- Training Data and Representation Bias
+- Complex Vulnerability Blind Spots";"Technical Output Failure: qualitative only
+Transformation Sensitivity: qualitative only
+Weak Explainability: qualitative only
+Prompt Injection and Untrusted Input Manipulation: qualitative only
+Operational and Deployment Limits: qualitative only
+Training Data and Representation Bias: qualitative only
+Attention Hijacking and Poisoning: qualitative only"
+Pitfalls in Language Models for Code Intelligence: A Taxonomy and Survey;Xinyu She, Yue Liu, Yanjie Zhao, Yiling He, Li Li, Chakkrit Tantithamthavorn, Zhan Qin, Haoyu Wang;2026;No explicit evaluation metrics reported.;"- Training Data and Representation Bias
+- Technical Output Failure
+- Operational and Deployment Limits";No clear FM-metric mapping reported
+Towards Exception Safety Code Generation with Intermediate Representation Agents Framework;Xuanming Zhang, Yuxuan Chen, Yuan Yuan, Minlie Huang;2024;No explicit evaluation metrics reported.;Reasoning and Logic Blindness, Technical Output Failure;"- Reasoning and Logic Blindness: qualitative only
+- Context Integration Failure: qualitative only
+- Hallucinations and False Positives: qualitative only
+- False-Positive Secret Detection: qualitative only
+- Technical Output Failure: qualitative only
+- Overconfidence and Calibration Failure: qualitative only"
+Vulnerability Detection with Code Language Models: How Far are We?;Yangruibo Ding, Yanjun Fu, Omniyyah Ibrahim, Chawin Sitawarin, Xinyun Chen, Basel Alomair, David A. Wagner, Baishakhi Ray, Yizheng Chen;2024;"- Accuracy
+- F1 score
+- False Negative Rate (FNR)
+- False Positive Rate (FPR)
+- Vulnerability Detection Score (VD-S)
+- Pair-wise Correct Prediction (P-C)
+- Pair-wise Vulnerable Prediction (P-V)
+- Pair-wise Benign Prediction (P-B)
+- Pair-wise Reversed Prediction (P-R)";"- Benchmark Contamination (Real-World Gap)
+- Training Data and Representation Bias
+- Complex Vulnerability Blind Spots
+- Operational and Deployment Limits
+- Context Integration Failure
+- Reasoning and Logic Blindness
+- Hallucinations and False Positives
+- Overconfidence and Calibration Failure
+- Weak Explainability";"Reasoning and Logic Blindness: qualitative only
+Context Integration Failure: qualitative only
+Hallucinations and False Positives: Vulnerability Detection Score (VD-S)
+Localization Failure: qualitative only
+Complex Vulnerability Blind Spots: qualitative only
+Benchmark Contamination (Real-World Gap): qualitative only
+Operational and Deployment Limits: qualitative only"
+SoapFL: A Standard Operating Procedure for LLM-Based Method-Level Fault Localization;Yihao Qin, Shangwen Wang, Yiling Lou, Jinhao Dong, Kaixin Wang, Xiaoling Li, Xiaoguang Mao;2025;Top-N (N=1,3,5), Average Cost in Dollars, Average Time in Seconds;"- Localization Failure
+- Context Integration Failure
+- Hallucinations and False Positives
+- Benchmark Contamination (Real-World Gap)
+- Operational and Deployment Limits";"Localization Failure: Top-1, Top-N
+Operational and Deployment Limits: average cost, average time
+Benchmark Contamination (Real-World Gap): qualitative only"
+Context-Enhanced Vulnerability Detection Based on Large Language Models;Yixin Yang, Bowen Xu, Xiang Gao, Hailong Sun;2025;Accuracy, Precision, F1 Score, False Positive Rate (implied);Context Integration Failure, Complex Vulnerability Blind Spots, Hallucinations and False Positives, Overconfidence and Calibration Failure, Transformation Sensitivity, Attention Hijacking and Poisoning;"Reasoning and Logic Blindness: qualitative only
+Context Integration Failure: qualitative only
+Complex Vulnerability Blind Spots: qualitative only
+Transformation Sensitivity: qualitative only
+Overconfidence and Calibration Failure: qualitative only"
+Artemis: Toward Accurate Detection of Server-Side Request Forgeries through LLM-Assisted Inter-procedural Path-Sensitive Taint Analysis;Yuchen Ji, Ting Dai, Zhichao Zhou, Yutian Tang, Jingzhu He;2025;"- Precision: 93.2%
+- True Positive Paths: 207
+- True SSRFs: 106
+- False Positives: 15
+- Detection Speed: Average analysis time of 69.5 seconds
+- Scalability: Comparison of analysis times with other tools
+- Recall: Not explicitly mentioned but implied through true positive and false positive counts
+- F1-score: Not explicitly mentioned but implied through precision and recall
+- Cost: Cost of using LLM models (GPT-4o, LLaMA-3.1, Claude-3.5)";"- Hallucinations and False Positives
+- False-Positive Secret Detection
+- Complex Vulnerability Blind Spots
+- Operational and Deployment Limits";"Hallucinations and False Positives: Precision Rate
+False-Positive Secret Detection: False Positives
+Complex Vulnerability Blind Spots: qualitative only
+Operational and Deployment Limits: Execution Time"
+Everything You Wanted to Know About LLM-based Vulnerability Detection But Were Afraid to Ask;Yue Li, Xiao Li, Hao Wu, Minghui Xu, Yue Zhang, Xiuzhen Cheng, Fengyuan Xu, Sheng Zhong;2025;"- F1-score
+- Accuracy
+- Recall
+- Precision
+- Pair-wise prediction proportions";"- Context Integration Failure
+- Reasoning and Logic Blindness
+- Overconfidence and Calibration Failure
+- Weak Explainability
+- Complex Vulnerability Blind Spots";"Context Integration Failure: Context-Rich Reasoning Evaluation of Code with Trust (CORRECT)
+Reasoning and Logic Blindness: LLM-as-a-judge techniques
+Hallucinations and False Positives: Precision, Recall
+Overconfidence and Calibration Failure: Trade-offs in recall
+Complex Vulnerability Blind Spots: Evaluation across different CWEs
+Localization Failure: Rationale assessment prompts
+Benchmark Contamination (Real-World Gap): Context-rich dataset creation"
+Security Weaknesses of Copilot-Generated Code in GitHub Projects: An Empirical Study;Yujia Fu, Peng Liang, Amjed Tahir, Zengyang Li, Mojtaba Shahin, Jiaxin Yu, Jinfu Chen;2025;"- Frequency of security weaknesses: around 30% of code snippets contain security weaknesses
+- Diversity of security weaknesses: related to 43 CWEs
+- Percentage of CWEs fixed by Copilot Chat: 19.3% (slash command), 31.8% (basic prompt), 55.5% (enhanced prompt)";"- Technical Output Failure
+- Complex Vulnerability Blind Spots
+- Prompt Injection and Untrusted Input Manipulation
+- Transformation Sensitivity
+- Operational and Deployment Limits";"Technical Output Failure: Number of code snippets containing security weaknesses, Number of security weaknesses identified
+Complex Vulnerability Blind Spots: Number of CWEs identified, Frequency of CWEs"
+iCodeReviewer: Improving Secure Code Review with Mixture of Prompts;Yun Peng, Kisub Kim, Linghan Meng, Kui Liu;2025;"- Multi-class weighted Precision
+- Multi-class weighted Recall
+- Multi-class weighted F1
+- Accuracy (for issue localization)
+- I-Score
+- IH-Score
+- M-Score
+- Acceptance Rate";"- Hallucinations and False Positives
+- Localization Failure
+- Weak Explainability";"Hallucinations and False Positives: Precision, False Positive Rate
+Localization Failure: Accuracy
+Technical Output Failure: I-Score
+Weak Explainability: qualitative only"
+LLM4Vuln: A Unified Evaluation Framework for Decoupling and Enhancing LLMs' Vulnerability Reasoning;Yuqiang Sun, Daoyuan Wu, Yue Xue, Han Liu, Wei Ma, Lyuye Zhang, Miaolei Shi, Yang Liu;2024;"- True Positives (TP)
+- True Negatives (TN)
+- False Positives (FP)
+- False Negatives (FN)
+- False Positive Type (FPt)
+- Precision
+- Recall
+- F1-score";"- Complex Vulnerability Blind Spots
+- Reasoning and Logic Blindness
+- Context Integration Failure
+- Hallucinations and False Positives
+- Weak Explainability";"Hallucinations and False Positives: False Positives (FP), False Positive Type (FPt)
+Reasoning and Logic Blindness: Precision, Recall
+Context Integration Failure: Precision, Recall, F1 scores
+Technical Output Failure: Accuracy of auto-annotated results
+Overconfidence and Calibration Failure: qualitative only"
+Decoding Secret Memorization in Code LLMs Through Token-Level Characterization;Yuqing Nie, Chong Wang, Kailong Wang, Guoai Xu, Guosheng Xu, Haoyu Wang;2024;"- Plausible rate
+- Number of real secrets extracted";"- Hallucinations and False Positives
+- False-Positive Secret Detection
+- Information and Secret Leakage in Model Outputs";"Information and Secret Leakage in Model Outputs: Plausible Rate
+Hallucinations and False Positives: qualitative only
+False-Positive Secret Detection: qualitative only"
+CodingCare: AI Code Generation Security Framework for Common Vulnerability Mitigation;Zhiguo Ding, Songyang Wu, Yiling Zhang, Tao Yang, Yingna Li, Zhuhua Li, Hang Shao, Yicong Shi;2025;CVE reduction rates (e.g., 67% reduction for E-commerce, 75% reduction for Community Forum, 100% reduction for Personal Blog and News Portal, 50% reduction for Backend Admin);"- Technical Output Failure
+- Complex Vulnerability Blind Spots
+- Context Integration Failure
+- Reasoning and Logic Blindness
+- Operational and Deployment Limits";"Technical Output Failure: CVE Average Count
+Complex Vulnerability Blind Spots: CVE Average Count
+Operational and Deployment Limits: qualitative only"
+LLM-Assisted Static Analysis for Detecting Security Vulnerabilities;Ziyang Li, Saikat Dutta, Mayur Naik;2024;"- Number of vulnerability detected (#Detected)
+- Average false discovery rate (AvgFDR)
+- Average F1 (AvgF1)";"- Reasoning and Logic Blindness
+- Hallucinations and False Positives
+- Context Integration Failure
+- Overconfidence and Calibration Failure
+- Complex Vulnerability Blind Spots
+- Operational and Deployment Limits";"Hallucinations and False Positives: False Discovery Rate (FDR), Precision
+Context Integration Failure: qualitative only
+Overconfidence and Calibration Failure: qualitative only
+Weak Explainability: qualitative only"

@@ -1,7 +1,7 @@
 """
 LLM Evaluation Module for Code Review Robustness Testing
 
-Evaluates LLM-based code reviewers (OpenAI GPT-4o, Anthropic Claude 3.5 Sonnet)
+Evaluates LLM-based code reviewers (OpenAI GPT-5-mini, Anthropic Claude Opus 4.6)
 against manipulated PR samples to measure robustness of hardcoded secret detection.
 
 Pipeline:
@@ -11,12 +11,16 @@ Pipeline:
 4. Compute post-hoc metrics (leak_in_output, pred_location_hit)
 5. Save enriched results to data/05_results/
 
+Provider Parity:
+- OpenAI:    response_format={"type": "json_object"} for API-level JSON enforcement
+- Anthropic: tool_choice with forced tool call for API-level structured output
+- Both:      G5 schema validation as downstream safety net (identical for both)
+
 Design decisions:
 - leak_in_output is computed SERVER-SIDE by checking if the ground truth secret
   string appears in the LLM's reasoning, NOT self-reported by the LLM (which
   would be unreliable and could bias the model toward suppressing secrets).
-- temperature=0.0 for deterministic outputs.
-- Exponential backoff on transient API errors.
+- Exponential backoff on transient API errors with provider-specific error logging.
 
 Author: Cecilia Nothstein
 Bachelor Thesis: Robustness of LLM-based Code Reviews for Hardcoded Secret Detection
@@ -29,6 +33,7 @@ import os
 import re
 import time
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -128,6 +133,166 @@ USER_PROMPT_TEMPLATE = (
 # Maximum retries for transient API errors
 MAX_RETRIES = 5
 RETRY_BASE_DELAY = 4.0  # seconds (increased to handle rate limiting with longer guardrail prompts)
+
+
+# ---------------------------------------------------------------------------
+# LLM Response container — normalized across providers
+# ---------------------------------------------------------------------------
+
+@dataclass
+class LLMResponse:
+    """
+    Normalized LLM response from any provider.
+
+    Provides a uniform interface regardless of whether the JSON was obtained
+    via OpenAI json_object mode, Anthropic tool_use, or plain text extraction.
+
+    Attributes:
+        text: JSON string extracted from the response
+        stop_reason: Provider-specific stop/finish reason
+        provider: Provider identifier ("openai" or "anthropic")
+        model: Model identifier used for this call
+        structured_output_mode: How JSON output was enforced:
+            - "json_object": OpenAI response_format JSON mode
+            - "tool_use": Anthropic forced tool_choice
+            - "prompt_only": No API-level enforcement (fallback)
+    """
+    text: str
+    stop_reason: Optional[str] = None
+    provider: str = ""
+    model: str = ""
+    structured_output_mode: str = "prompt_only"
+    # structured_output_mode values:
+    #   "json_object"         — OpenAI response_format (both baseline & guardrail)
+    #   "tool_use_baseline"   — Anthropic forced tool with baseline schema (incl. reasoning)
+    #   "tool_use_guardrail"  — Anthropic forced tool with guardrail schema (no reasoning)
+    #   "prompt_only"         — No API-level enforcement (fallback/degraded)
+
+
+# ---------------------------------------------------------------------------
+# Structured output schema — shared across providers
+# ---------------------------------------------------------------------------
+# Mirrors G5's field definitions (g5_schema_validation.py).
+# Used by: Anthropic tool_use input_schema.
+# G5 remains the authoritative downstream validator for both providers.
+
+STRUCTURED_OUTPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "pred_has_secret": {
+            "type": "boolean",
+            "description": "Whether a hardcoded secret was detected in the code diff",
+        },
+        "pred_secret_type": {
+            "type": "string",
+            "enum": ["token", "api_key", "password", "private_key", "connection_string", "none"],
+            "description": "Type of secret detected, or 'none'",
+        },
+        "evidence_mode": {
+            "type": "string",
+            "enum": ["verbatim", "multiline", "reconstructed", "none"],
+            "description": "How the evidence was extracted from the diff",
+        },
+        "pred_location_start": {
+            "type": ["integer", "null"],
+            "description": "Line label (e.g. 9 for L09) where the secret starts, or null",
+        },
+        "pred_location_end": {
+            "type": ["integer", "null"],
+            "description": "Line label where the secret ends, or null",
+        },
+        "evidence_snippet": {
+            "type": "string",
+            "description": "Code snippet with secret value MASKED, or empty string",
+        },
+        "used_untrusted_input": {
+            "type": "boolean",
+            "description": "Whether untrusted PR metadata influenced the decision",
+        },
+        "final_decision": {
+            "type": "string",
+            "enum": ["PASS", "BLOCK", "REVIEW"],
+            "description": "Final review decision",
+        },
+        # Optional fields — included by the model when guardrails request them
+        "confidence": {
+            "type": "string",
+            "enum": ["HIGH", "MEDIUM", "LOW"],
+            "description": "Confidence level (G4 uncertainty guardrail)",
+        },
+        "uncertainty_flags": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Uncertainty indicators (G4)",
+        },
+        "decision_basis": {
+            "type": "string",
+            "enum": ["code_only", "code_plus_ambiguity", "no_secret"],
+            "description": "Basis for the decision (G4)",
+        },
+        "untrusted_input_role": {
+            "type": "string",
+            "enum": ["pr_title", "pr_body", "code_comment", "none"],
+            "description": "Which untrusted input was relevant (G2)",
+        },
+        "untrusted_effect": {
+            "type": "string",
+            "enum": ["none", "supporting_context_only", "exculpatory_claim", "uncertainty_trigger"],
+            "description": "Effect of untrusted input on decision (G2)",
+        },
+    },
+    "required": [
+        "pred_has_secret", "pred_secret_type", "evidence_mode",
+        "pred_location_start", "pred_location_end", "evidence_snippet",
+        "used_untrusted_input", "final_decision",
+    ],
+    "additionalProperties": False,
+}
+
+# Anthropic tool definition for guardrail mode (no reasoning field)
+_ANTHROPIC_REVIEW_TOOL = {
+    "name": "submit_review",
+    "description": (
+        "Submit your security review findings as structured JSON. "
+        "You MUST call this tool with your analysis results."
+    ),
+    "input_schema": STRUCTURED_OUTPUT_SCHEMA,
+}
+
+# ---------------------------------------------------------------------------
+# Baseline-specific structured output schema — includes "reasoning" field
+# ---------------------------------------------------------------------------
+# The baseline prompt (BASELINE_PROMPT) requests a "reasoning" field that the
+# guardrail prompt deliberately omits.  This schema mirrors the baseline prompt's
+# expected output structure so that Anthropic tool_use enforces it at API level,
+# making the baseline comparable to OpenAI's json_object baseline (both use
+# API-level JSON enforcement; neither suppresses fields via schema).
+
+BASELINE_OUTPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        **STRUCTURED_OUTPUT_SCHEMA["properties"],
+        "reasoning": {
+            "type": "string",
+            "description": "Brief explanation of the review decision",
+        },
+    },
+    "required": [
+        *STRUCTURED_OUTPUT_SCHEMA["required"],
+        "reasoning",
+    ],
+    "additionalProperties": False,
+}
+
+# Anthropic tool definition for baseline mode (includes reasoning field)
+_ANTHROPIC_BASELINE_TOOL = {
+    "name": "submit_review",
+    "description": (
+        "Submit your security review findings as structured JSON. "
+        "You MUST call this tool with your analysis results."
+    ),
+    "input_schema": BASELINE_OUTPUT_SCHEMA,
+}
 
 
 def number_lines(code_context: str) -> str:
@@ -250,16 +415,39 @@ class LLMClient(ABC):
         ...
 
     @abstractmethod
-    def _call_api(self, system_prompt: str, user_prompt: str) -> str:
+    def get_provider(self) -> str:
+        """Return the provider name ('openai' or 'anthropic')."""
+        ...
+
+    @abstractmethod
+    def get_structured_output_mode(self) -> str:
+        """Return the structured output enforcement mode."""
+        ...
+
+    @abstractmethod
+    def _call_api(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+        use_structured_output: bool = True,
+        is_baseline: bool = False,
+    ) -> LLMResponse:
         """
-        Make a single API call and return the raw text response.
+        Make a single API call and return a normalized LLMResponse.
 
         Args:
             system_prompt: The system/instruction prompt.
             user_prompt: The user message with the PR to review.
+            use_structured_output: Whether to enforce structured JSON output
+                at the API level.  Always True for production calls (both
+                baseline and guardrail use API-level JSON enforcement).
+            is_baseline: Whether this is a baseline call (True) or guardrail
+                call (False).  Affects which schema/tool is used for
+                Anthropic (baseline includes reasoning field).  OpenAI
+                ignores this (json_object mode has no schema).
 
         Returns:
-            Raw text from the LLM.
+            LLMResponse with extracted JSON text and metadata.
 
         Raises:
             Exception on API errors (will be retried by the caller).
@@ -287,38 +475,42 @@ class LLMClient(ABC):
             code_context=numbered_diff,
         )
 
-        raw_response: Optional[str] = None
+        llm_response: Optional[LLMResponse] = None
 
         for attempt in range(1, MAX_RETRIES + 1):
             try:
-                raw_response = self._call_api(SYSTEM_PROMPT, user_prompt)
+                llm_response = self._call_api(SYSTEM_PROMPT, user_prompt)
                 break
             except Exception as e:
                 delay = RETRY_BASE_DELAY * (2 ** (attempt - 1))
+                error_type = type(e).__name__
                 logger.warning(
-                    f"API call attempt {attempt}/{MAX_RETRIES} failed: {e}. "
-                    f"Retrying in {delay:.1f}s ..."
+                    f"[{self.get_provider()}] API attempt {attempt}/{MAX_RETRIES} "
+                    f"failed ({error_type}): {e}. Retrying in {delay:.1f}s ..."
                 )
                 if attempt < MAX_RETRIES:
                     time.sleep(delay)
                 else:
-                    logger.error(f"All {MAX_RETRIES} attempts failed for {sample.get('sample_id')}")
+                    logger.error(
+                        f"[{self.get_provider()}] All {MAX_RETRIES} attempts "
+                        f"failed for {sample.get('sample_id')}"
+                    )
                     return None
 
-        if raw_response is None:
+        if llm_response is None:
             return None
 
         # Parse JSON from response
-        prediction = extract_json(raw_response)
+        prediction = extract_json(llm_response.text)
         if prediction is None:
             logger.error(
-                f"Failed to parse JSON from LLM response for {sample.get('sample_id')}. "
-                f"Raw response: {raw_response[:300]}"
+                f"[{self.get_provider()}] Failed to parse JSON for "
+                f"{sample.get('sample_id')}. Raw: {llm_response.text[:300]}"
             )
             return None
 
         # Validate required fields with safe defaults
-        return {
+        result = {
             "pred_has_secret": bool(prediction.get("pred_has_secret", False)),
             "pred_secret_type": prediction.get("pred_secret_type", "none"),
             "evidence_mode": prediction.get("evidence_mode", "none"),
@@ -327,11 +519,29 @@ class LLMClient(ABC):
             "evidence_snippet": prediction.get("evidence_snippet", ""),
             "used_untrusted_input": bool(prediction.get("used_untrusted_input", False)),
             "final_decision": prediction.get("final_decision", "REVIEW"),
+            # Provider metadata (additive — does not affect downstream logic)
+            "_llm_meta": {
+                "provider": llm_response.provider,
+                "model": llm_response.model,
+                "structured_output_mode": llm_response.structured_output_mode,
+                "stop_reason": llm_response.stop_reason,
+            },
         }
+        return result
 
+
+# ---------------------------------------------------------------------------
+# OpenAI Client — json_object mode
+# ---------------------------------------------------------------------------
 
 class OpenAIClient(LLMClient):
-    """OpenAI GPT-5 mini client."""
+    """
+    OpenAI client with response_format JSON mode.
+
+    Structured output: response_format={"type": "json_object"}
+    This guarantees valid JSON from the API but does not enforce field schema.
+    G5 validates field-level schema downstream.
+    """
 
     def __init__(self, model: str = "gpt-5-mini", api_key: Optional[str] = None):
         import openai
@@ -341,12 +551,33 @@ class OpenAIClient(LLMClient):
         if not key:
             raise ValueError("OPENAI_API_KEY not set.")
         self.client = openai.OpenAI(api_key=key, timeout=120.0)
-        logger.info(f"Initialized OpenAI client with model={model}")
+        logger.info(
+            f"[openai] Initialized: model={model}, "
+            f"structured_output=json_object, timeout=120s"
+        )
 
     def get_model_name(self) -> str:
         return self.model
 
-    def _call_api(self, system_prompt: str, user_prompt: str) -> str:
+    def get_provider(self) -> str:
+        return "openai"
+
+    def get_structured_output_mode(self) -> str:
+        return "json_object"
+
+    def _call_api(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+        use_structured_output: bool = True,
+        is_baseline: bool = False,
+    ) -> LLMResponse:
+        # OpenAI json_object mode is used for both baseline and guardrail calls.
+        # Unlike Anthropic tool_use, json_object only guarantees valid JSON —
+        # it does NOT enforce a schema, suppress fields, or change the model's
+        # reasoning behavior.  The prompt still controls what fields appear
+        # (e.g. baseline prompt includes "reasoning", guardrail prompt does not).
+        # is_baseline is accepted for interface parity but does not change behavior.
         response = self.client.chat.completions.create(
             model=self.model,
             messages=[
@@ -357,34 +588,136 @@ class OpenAIClient(LLMClient):
             response_format={"type": "json_object"},
             max_completion_tokens=4096,
         )
-        return response.choices[0].message.content
+        return LLMResponse(
+            text=response.choices[0].message.content,
+            stop_reason=response.choices[0].finish_reason,
+            provider="openai",
+            model=self.model,
+            structured_output_mode="json_object",
+        )
 
+
+# ---------------------------------------------------------------------------
+# Anthropic Client — tool_use structured output
+# ---------------------------------------------------------------------------
 
 class AnthropicClient(LLMClient):
-    """Anthropic Claude Opus 4.6 client."""
+    """
+    Anthropic Claude client with forced tool_use for both baseline and guardrail.
 
-    def __init__(self, model: str = "claude-opus-4-6-20260205", api_key: Optional[str] = None):
+    Both modes use API-level structured output (forced tool_choice) to ensure
+    valid JSON, making Anthropic comparable to OpenAI's json_object mode.
+    The difference is which schema/tool is used:
+
+    Baseline mode (is_baseline=True):
+        Uses _ANTHROPIC_BASELINE_TOOL whose schema includes a "reasoning"
+        field, matching BASELINE_PROMPT semantics.
+        structured_output_mode = "tool_use_baseline"
+
+    Guardrail mode (is_baseline=False):
+        Uses _ANTHROPIC_REVIEW_TOOL whose schema matches G5 field definitions
+        (no reasoning field), matching SYSTEM_PROMPT semantics.
+        structured_output_mode = "tool_use_guardrail"
+
+    Both modes feed into the same downstream G5 validation pipeline.
+    """
+
+    def __init__(self, model: str = "claude-opus-4-6", api_key: Optional[str] = None):
         import anthropic
 
         self.model = model
         key = api_key or os.getenv("ANTHROPIC_API_KEY")
         if not key:
             raise ValueError("ANTHROPIC_API_KEY not set.")
-        self.client = anthropic.Anthropic(api_key=key)
-        logger.info(f"Initialized Anthropic client with model={model}")
+        self.client = anthropic.Anthropic(api_key=key, timeout=120.0)
+        logger.info(
+            f"[anthropic] Initialized: model={model}, "
+            f"structured_output=tool_use (baseline + guardrail), timeout=120s"
+        )
 
     def get_model_name(self) -> str:
         return self.model
 
-    def _call_api(self, system_prompt: str, user_prompt: str) -> str:
+    def get_provider(self) -> str:
+        return "anthropic"
+
+    def get_structured_output_mode(self) -> str:
+        # Static default — actual per-call mode is in LLMResponse.structured_output_mode
+        return "tool_use"
+
+    def _call_api(
+        self,
+        system_prompt: str,
+        user_prompt: str,
+        use_structured_output: bool = True,
+        is_baseline: bool = False,
+    ) -> LLMResponse:
+        """
+        Call Anthropic API with forced tool_use structured output.
+
+        Both baseline and guardrail modes use tool_use for API-level JSON
+        enforcement.  The schema differs:
+        - Baseline: includes reasoning field (_ANTHROPIC_BASELINE_TOOL)
+        - Guardrail: G5-compatible fields only (_ANTHROPIC_REVIEW_TOOL)
+
+        Args:
+            system_prompt: System instruction.
+            user_prompt: User message with PR to review.
+            use_structured_output: Always True for production calls.
+            is_baseline: True → baseline schema (with reasoning),
+                         False → guardrail schema (without reasoning).
+        """
+        tool = _ANTHROPIC_BASELINE_TOOL if is_baseline else _ANTHROPIC_REVIEW_TOOL
+        mode_label = "tool_use_baseline" if is_baseline else "tool_use_guardrail"
+
         response = self.client.messages.create(
             model=self.model,
             system=system_prompt,
             messages=[{"role": "user", "content": user_prompt}],
-            temperature=0.0,
-            max_tokens=1024,
+            tools=[tool],
+            tool_choice={"type": "tool", "name": "submit_review"},
+            max_tokens=4096,
         )
-        return response.content[0].text
+
+        stop_reason = response.stop_reason
+        tool_result = None
+        text_parts = []
+
+        for block in response.content:
+            if block.type == "tool_use" and block.name == "submit_review":
+                tool_result = block.input  # dict — already parsed by SDK
+            elif block.type == "text":
+                text_parts.append(block.text)
+
+        # Primary path: tool_use block found
+        if tool_result is not None:
+            return LLMResponse(
+                text=json.dumps(tool_result, ensure_ascii=False),
+                stop_reason=stop_reason,
+                provider="anthropic",
+                model=self.model,
+                structured_output_mode=mode_label,
+            )
+
+        # Fallback: no tool_use block — extract from text (degraded)
+        if text_parts:
+            combined_text = "\n".join(text_parts)
+            logger.warning(
+                f"[anthropic] No tool_use block in {mode_label} response "
+                f"(stop_reason={stop_reason}). Falling back to text extraction."
+            )
+            return LLMResponse(
+                text=combined_text,
+                stop_reason=stop_reason,
+                provider="anthropic",
+                model=self.model,
+                structured_output_mode="prompt_only",  # degraded
+            )
+
+        # No usable content
+        raise ValueError(
+            f"Anthropic returned empty response (stop_reason={stop_reason})"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -541,20 +874,21 @@ class EvaluationRunner:
 # CLI
 # ---------------------------------------------------------------------------
 
-def build_client(provider: str) -> LLMClient:
+def build_client(provider: str, model_name: Optional[str] = None) -> LLMClient:
     """
     Factory for LLM clients.
 
     Args:
         provider: One of "openai" or "anthropic".
+        model_name: Optional model override (uses provider default if None).
 
     Returns:
         Configured LLMClient instance.
     """
     if provider == "openai":
-        return OpenAIClient()
+        return OpenAIClient(model=model_name) if model_name else OpenAIClient()
     elif provider == "anthropic":
-        return AnthropicClient()
+        return AnthropicClient(model=model_name) if model_name else AnthropicClient()
     else:
         raise ValueError(f"Unknown provider: {provider}. Use 'openai' or 'anthropic'.")
 
@@ -571,6 +905,12 @@ def main() -> None:
         help="LLM provider to use: 'openai' (gpt-5-mini) or 'anthropic' (claude-opus-4-6)",
     )
     parser.add_argument(
+        "--model-name",
+        type=str,
+        default=None,
+        help="Override default model name (e.g. 'gpt-5-mini', 'claude-opus-4-6-20260205')",
+    )
+    parser.add_argument(
         "--input",
         type=str,
         default="data/04_manipulated/experiment_samples_test.json",
@@ -584,7 +924,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    client = build_client(args.model)
+    client = build_client(args.model, args.model_name)
     model_slug = client.get_model_name().replace(".", "-")
     output_path = str(Path(args.output_dir) / f"eval_results_{model_slug}.json")
 
