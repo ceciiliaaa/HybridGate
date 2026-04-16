@@ -7,10 +7,14 @@ Extends the base LLM evaluation with:
 - Policy decision computation (P1, P2, P3)
 
 Guardrail Order:
-0. G6 (Format-Familiarity) - PRE-LLM: forced-reasoning hint injected into user prompt
+0. G6 (Format-Familiarity) - PRE-LLM: forced-reasoning hint injected into user prompt;
+     post-hoc metadata (candidate count/formats) passed to G4 for R7 coupling
 1. G5 (Schema Validation) - POST-LLM: runs first, routes invalid to REVIEW
-2. G4 (Uncertainty Routing) - runs on valid output, routes LOW confidence to REVIEW
-3. G3 (Redaction Check) - runs last, checks for secret leakage
+2. G2 (Untrusted Input) - checks untrusted-input influence, routes to REVIEW
+3. G4 (Uncertainty Routing) - rule-based escalation (7 deterministic rules, incl.
+     R7 G6→G4 coupling); does NOT rely on LLM self-reported confidence
+4. G1 (Evidence Check) - validates evidence on unredacted output
+5. G3 (Redaction Check) - runs last, checks for secret leakage
 
 Scanner Selection Rationale:
 - Gitleaks: Regex-based, high recall for common patterns
@@ -42,7 +46,7 @@ logger = logging.getLogger(__name__)
 
 # Import existing components
 from .run_evaluation import (
-    LLMClient, OpenAIClient, AnthropicClient,
+    LLMClient, LLMResponse, OpenAIClient, AnthropicClient,
     SYSTEM_PROMPT, BASELINE_PROMPT, USER_PROMPT_TEMPLATE,
     number_lines, extract_json, extract_secret_from_context,
     MAX_RETRIES, RETRY_BASE_DELAY
@@ -51,7 +55,8 @@ from .run_evaluation import (
 # Import new HybridGate components
 from ..scanners import GitleaksScanner, DetectSecretsScanner, ScanResult
 from ..guardrails import (
-    get_guardrail_bundle, get_g6_hint, apply_guardrails, apply_guardrails_with_routing,
+    get_guardrail_bundle, get_g6_hint, get_g6_prescan,
+    apply_guardrails, apply_guardrails_with_routing,
     GuardrailSettings, DEFAULT_SETTINGS,
     G1EvidenceLocation, G2UntrustedInput, G4Uncertainty,
 )
@@ -205,9 +210,13 @@ class HybridEvaluationClient:
         Run LLM evaluation on a sample.
 
         When use_guardrails=True:
-        - G6 pre-LLM forced-reasoning hint injected into user prompt (if G6 enabled)
+        - G6 pre-LLM forced-reasoning hint injected into user prompt (if G6 enabled);
+          G6 metadata (candidate count/formats) passed to G4 for R7 coupling
         - G5 validates schema and routes invalid outputs to REVIEW
-        - G4 rule-based uncertainty escalation (flags + context rules)
+        - G2 checks untrusted-input influence
+        - G4 rule-based escalation (7 deterministic rules, incl. R7 G6→G4 coupling)
+        - G1 validates evidence on unredacted output
+        - G3 final output safety layer (detect → redact → REVIEW)
 
         Args:
             sample: Sample dictionary
@@ -231,38 +240,59 @@ class HybridEvaluationClient:
 
         # G6 Pre-LLM: Inject forced-reasoning hint into user prompt
         g6_hint = ""
+        g6_meta = {}
         if use_guardrails:
-            g6_hint = get_g6_hint(sample.get("code_context", ""), self.guardrail_settings)
+            g6_meta = get_g6_prescan(sample.get("code_context", ""), self.guardrail_settings)
+            g6_hint = g6_meta.get("hint", "")
             if g6_hint:
                 user_prompt += "\n\n" + g6_hint
 
-        raw_response: Optional[str] = None
+        llm_response: Optional[LLMResponse] = None
 
         for attempt in range(1, MAX_RETRIES + 1):
             try:
-                raw_response = self.llm_client._call_api(system_prompt, user_prompt)
+                llm_response = self.llm_client._call_api(
+                    system_prompt, user_prompt,
+                    use_structured_output=True,
+                    is_baseline=not use_guardrails,
+                )
                 break
             except Exception as e:
                 delay = RETRY_BASE_DELAY * (2 ** (attempt - 1))
+                error_type = type(e).__name__
                 logger.warning(
-                    f"API call attempt {attempt}/{MAX_RETRIES} failed: {e}. "
+                    f"[{self.llm_client.get_provider()}] API attempt "
+                    f"{attempt}/{MAX_RETRIES} failed ({error_type}): {e}. "
                     f"Retrying in {delay:.1f}s ..."
                 )
                 if attempt < MAX_RETRIES:
                     time.sleep(delay)
                 else:
-                    logger.error(f"All {MAX_RETRIES} attempts failed")
+                    logger.error(
+                        f"[{self.llm_client.get_provider()}] All {MAX_RETRIES} "
+                        f"attempts failed"
+                    )
                     return None
 
-        if raw_response is None:
+        if llm_response is None:
             return None
 
+        raw_response = llm_response.text
+
+        # Per-call metadata — attached to every return path below
+        _llm_meta = {
+            "provider": llm_response.provider,
+            "model": llm_response.model,
+            "structured_output_mode": llm_response.structured_output_mode,
+            "stop_reason": llm_response.stop_reason,
+        }
+
         # =====================================================================
-        # Apply G5 and G4 guardrails when guardrail mode is active
+        # Apply post-LLM guardrail pipeline when guardrail mode is active
+        # G5 → G2 → G4 (rule-based, incl. R7 G6→G4 coupling) → G1 → G3
         # =====================================================================
         if use_guardrails and (self.guardrail_settings.is_enabled("G4") or
                                self.guardrail_settings.is_enabled("G5")):
-            # G5 -> G4 -> G3 order (G3 applied later in evaluate_sample)
             ground_truth = {"gt_secret_value": sample.get("gt_secret_value")}
             guardrail_result = apply_guardrails_with_routing(
                 raw_response,
@@ -273,6 +303,7 @@ class HybridEvaluationClient:
                 pr_body=sample.get("pr_body", ""),
                 scanner_hit=scanner_hit,
                 file_path=sample.get("gt_file_path", ""),
+                g6_prescan=g6_meta,
             )
 
             # If schema validation failed completely, return minimal result
@@ -300,10 +331,16 @@ class HybridEvaluationClient:
                     "g3_details": guardrail_result.get("g3_details", {}),
                     # G6 pre-LLM metadata
                     "g6_hint_injected": bool(g6_hint),
+                    "g6_candidates_count": g6_meta.get("candidates_count", 0),
+                    "g6_candidate_formats": g6_meta.get("candidate_formats", []),
+                    "g6_r7_triggered": False,  # parse failure → R7 not evaluated
+                    "_llm_meta": _llm_meta,
                 }
 
             # Schema valid - extract fields from parsed output
             parsed = guardrail_result["parsed_output"]
+            g4_details = guardrail_result.get("g4_details") or {}
+            g6_r7 = g4_details.get("triggered_rule") == "R7_g6_format_candidate_pass"
             return {
                 "pred_has_secret": bool(parsed.get("pred_has_secret", False)),
                 "pred_secret_type": parsed.get("pred_secret_type", "none"),
@@ -326,7 +363,7 @@ class HybridEvaluationClient:
                 "g2_valid": guardrail_result.get("g2_valid"),
                 "g2_issues": guardrail_result.get("g2_issues", []),
                 "g4_valid": guardrail_result.get("g4_valid"),
-                "g4_details": guardrail_result.get("g4_details"),
+                "g4_details": g4_details,
                 "g5_valid": guardrail_result.get("g5_valid"),
                 # Multi-trigger + G3 details
                 "triggered_guardrails": guardrail_result.get("triggered_guardrails", []),
@@ -340,6 +377,10 @@ class HybridEvaluationClient:
                 "untrusted_effect": parsed.get("untrusted_effect"),
                 # G6 pre-LLM metadata
                 "g6_hint_injected": bool(g6_hint),
+                "g6_candidates_count": g6_meta.get("candidates_count", 0),
+                "g6_candidate_formats": g6_meta.get("candidate_formats", []),
+                "g6_r7_triggered": g6_r7,
+                "_llm_meta": _llm_meta,
             }
 
         # =====================================================================
@@ -367,6 +408,10 @@ class HybridEvaluationClient:
             "final_decision": prediction.get("final_decision"),
             # G6 pre-LLM metadata
             "g6_hint_injected": bool(g6_hint),
+            "g6_candidates_count": g6_meta.get("candidates_count", 0),
+            "g6_candidate_formats": g6_meta.get("candidate_formats", []),
+            "g6_r7_triggered": False,  # baseline/G4-disabled → no R7
+            "_llm_meta": _llm_meta,
         }
 
     def evaluate_sample(self, sample: Dict[str, Any]) -> Dict[str, Any]:
@@ -381,6 +426,11 @@ class HybridEvaluationClient:
         """
         result = {**sample}
         result["model_name"] = self.llm_client.get_model_name()
+        result["provider"] = self.llm_client.get_provider()
+        # Per-call structured_output_mode is stored inside each LLM result's
+        # _llm_meta dict (llm_baseline._llm_meta / llm_guardrail._llm_meta),
+        # NOT as a top-level field — because baseline and guardrail calls use
+        # different schemas (e.g. Anthropic: tool_use_baseline vs tool_use_guardrail).
 
         # Stage 1: Scanner Evaluation
         if self.run_scanners:
@@ -413,7 +463,14 @@ class HybridEvaluationClient:
             )
             if llm_guardrail:
                 result["llm_guardrail"] = llm_guardrail
-                result["llm_guardrail_hit"] = llm_guardrail.get("pred_has_secret", False)
+                # Raw LLM prediction (pred_has_secret only, before guardrail routing)
+                result["llm_guardrail_raw_hit"] = llm_guardrail.get("pred_has_secret", False)
+                # Alert-level: BLOCK or REVIEW counts as positive detection
+                # (includes G4 rule-based escalations such as R7 G6→G4 coupling)
+                fd = llm_guardrail.get("final_decision", "")
+                result["llm_guardrail_alert_hit"] = fd in ("BLOCK", "REVIEW")
+                # Backward-compat alias (matches llm_baseline_hit semantics)
+                result["llm_guardrail_hit"] = result["llm_guardrail_alert_hit"]
 
                 # Apply post-processing guardrail validation
                 guardrail_validation = apply_guardrails(
@@ -423,6 +480,8 @@ class HybridEvaluationClient:
                 result["guardrail_validation"] = guardrail_validation
             else:
                 result["llm_guardrail"] = None
+                result["llm_guardrail_raw_hit"] = False
+                result["llm_guardrail_alert_hit"] = False
                 result["llm_guardrail_hit"] = False
                 result["guardrail_validation"] = None
 
@@ -433,13 +492,13 @@ class HybridEvaluationClient:
         code_diff = sample.get("code_context")
 
         # Helper to extract LLM decision and secret type
-        # G4/G5: Use final_decision if available (after guardrail routing)
+        # Use final_decision if available (after guardrail rule-based routing)
         def get_llm_decision_info(llm_result):
             if not llm_result:
                 return "NOT_INVOKED", False, None
             has_secret = llm_result.get("pred_has_secret", False)
 
-            # G4/G5: Check for guardrail-routed decision
+            # Check for guardrail-routed decision (G4 rules, G5, G2, G1, G3)
             final_decision = llm_result.get("final_decision")
             if final_decision:
                 # Use the guardrail-routed decision (PASS/BLOCK/REVIEW)
@@ -835,7 +894,8 @@ class HybridEvaluationRunner:
 
         # LLM metrics
         baseline_hits = sum(1 for r in results if r.get("llm_baseline_hit"))
-        guardrail_hits = sum(1 for r in results if r.get("llm_guardrail_hit"))
+        guardrail_raw_hits = sum(1 for r in results if r.get("llm_guardrail_raw_hit"))
+        guardrail_alert_hits = sum(1 for r in results if r.get("llm_guardrail_alert_hit"))
 
         # Policy decisions - Baseline
         p1_baseline_blocks = sum(1 for r in results if r.get("policy_p1_baseline") == "BLOCK")
@@ -869,7 +929,8 @@ class HybridEvaluationRunner:
 
         scanner_cm = compute_cm(results, "scanner_hit")
         baseline_cm = compute_cm(results, "llm_baseline_hit")
-        guardrail_cm = compute_cm(results, "llm_guardrail_hit")
+        guardrail_raw_cm = compute_cm(results, "llm_guardrail_raw_hit")
+        guardrail_alert_cm = compute_cm(results, "llm_guardrail_alert_hit")
 
         logger.info("\n=== Hybrid Evaluation Summary ===")
         logger.info(f"Total samples:      {total}")
@@ -883,9 +944,12 @@ class HybridEvaluationRunner:
         logger.info(f"LLM baseline hits:  {rate(baseline_hits, total)}")
         logger.info(f"  Precision: {baseline_cm['precision']:.2%}  Recall: {baseline_cm['recall']:.2%}")
         logger.info(f"  TP={baseline_cm['tp']}  FP={baseline_cm['fp']}  TN={baseline_cm['tn']}  FN={baseline_cm['fn']}")
-        logger.info(f"LLM guardrail hits: {rate(guardrail_hits, total)}")
-        logger.info(f"  Precision: {guardrail_cm['precision']:.2%}  Recall: {guardrail_cm['recall']:.2%}")
-        logger.info(f"  TP={guardrail_cm['tp']}  FP={guardrail_cm['fp']}  TN={guardrail_cm['tn']}  FN={guardrail_cm['fn']}")
+        logger.info(f"LLM guardrail (raw):   {rate(guardrail_raw_hits, total)}  (pred_has_secret only)")
+        logger.info(f"  Precision: {guardrail_raw_cm['precision']:.2%}  Recall: {guardrail_raw_cm['recall']:.2%}")
+        logger.info(f"  TP={guardrail_raw_cm['tp']}  FP={guardrail_raw_cm['fp']}  TN={guardrail_raw_cm['tn']}  FN={guardrail_raw_cm['fn']}")
+        logger.info(f"LLM guardrail (alert): {rate(guardrail_alert_hits, total)}  (BLOCK|REVIEW)")
+        logger.info(f"  Precision: {guardrail_alert_cm['precision']:.2%}  Recall: {guardrail_alert_cm['recall']:.2%}")
+        logger.info(f"  TP={guardrail_alert_cm['tp']}  FP={guardrail_alert_cm['fp']}  TN={guardrail_alert_cm['tn']}  FN={guardrail_alert_cm['fn']}")
         logger.info("")
         logger.info("--- Policy Decisions (Baseline LLM) ---")
         logger.info(f"P1 (Safety-Net) BLOCK:  {rate(p1_baseline_blocks, total)}  REVIEW: {rate(p1_baseline_reviews, total)}")
@@ -921,6 +985,8 @@ class HybridEvaluationRunner:
                               if r.get("llm_guardrail", {}).get("routed_by_guardrail") == "G4")
             routed_by_g5 = sum(1 for r in g4_g5_results
                               if r.get("llm_guardrail", {}).get("routed_by_guardrail") == "G5")
+            g6_r7_count = sum(1 for r in g4_g5_results
+                              if r.get("llm_guardrail", {}).get("g6_r7_triggered"))
 
             logger.info("")
             logger.info("--- G4/G5 Guardrail Metrics ---")
@@ -930,6 +996,7 @@ class HybridEvaluationRunner:
             logger.info(f"Confidence MEDIUM:     {rate(conf_medium, g_total)}")
             logger.info(f"Confidence LOW:        {rate(conf_low, g_total)}")
             logger.info(f"Routed by G4:          {rate(routed_by_g4, g_total)}")
+            logger.info(f"  of which R7 (G6→G4): {rate(g6_r7_count, g_total)}")
             logger.info(f"Routed by G5:          {rate(routed_by_g5, g_total)}")
 
 
@@ -947,6 +1014,12 @@ def main() -> None:
         required=True,
         choices=["openai", "anthropic"],
         help="LLM provider to use",
+    )
+    parser.add_argument(
+        "--model-name",
+        type=str,
+        default=None,
+        help="Override default model name (e.g. 'gpt-5-mini', 'claude-opus-4-6-20260205')",
     )
     parser.add_argument(
         "--input",
@@ -983,7 +1056,7 @@ def main() -> None:
     parser.add_argument(
         "--enable-g4-g5",
         action="store_true",
-        help="Enable G4 (uncertainty routing) and G5 (schema validation) guardrails",
+        help="Enable G4 (rule-based escalation) and G5 (schema validation) guardrails",
     )
     parser.add_argument(
         "--enable-g6",
@@ -1031,9 +1104,9 @@ def main() -> None:
 
     # Build LLM client
     if args.model == "openai":
-        llm_client = OpenAIClient()
+        llm_client = OpenAIClient(model=args.model_name) if args.model_name else OpenAIClient()
     else:
-        llm_client = AnthropicClient()
+        llm_client = AnthropicClient(model=args.model_name) if args.model_name else AnthropicClient()
 
     # Build hybrid client
     hybrid_client = HybridEvaluationClient(

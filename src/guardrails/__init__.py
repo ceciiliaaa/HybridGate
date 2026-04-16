@@ -7,13 +7,18 @@ Implements safety guardrails for LLM-based secret detection:
 - G3: Output Leakage (fail-closed: detect → redact once → REVIEW)
 - G4: Uncertainty / Abstention (rule-based escalation to REVIEW)
 - G5: Schema Validation (validate output structure, route invalid to REVIEW)
-- G6: Format-Familiarity Pre-Scan (pre-LLM hint mechanism, exploratory)
+- G6: Format-Familiarity Pre-Scan (pre-LLM hint + post-hoc G4 coupling)
+      G6 is NOT an autonomous blocker.  It provides two mechanisms:
+      (a) Pre-LLM: forced-reasoning hint injected into the user prompt
+      (b) Post-hoc: G6 metadata (candidate count/formats) passed to G4,
+          which can escalate PASS → REVIEW via rule R7 when G6 found
+          candidates but the LLM still said pred_has_secret=false.
 
 Guardrail Order:
 0. G6 (Format-Familiarity) - PRE-LLM: extracts candidates, injects hint
 1. G5 (Schema Validation) - runs first post-LLM, routes invalid to REVIEW
 2. G2 (Untrusted Input) - runs before G4 so G4 can use G2 issues
-3. G4 (Uncertainty Routing) - rule-based escalation
+3. G4 (Uncertainty Routing) - rule-based escalation (incl. G6→G4 coupling via R7)
 4. G1 (Evidence Check) - validates evidence on unredacted output
 5. G3 (Output Leakage) - final output safety layer (detect → redact → REVIEW)
 """
@@ -129,6 +134,50 @@ def get_g6_hint(
     return g6.get_forced_reasoning_hint(candidates)
 
 
+def get_g6_prescan(
+    diff_text: str,
+    settings: GuardrailSettings = None,
+) -> dict:
+    """
+    Run G6 pre-scan and return both hint string and structured metadata.
+
+    G6 remains a pre-LLM format-familiarity pre-scan — it does NOT make
+    autonomous detection decisions.  The metadata is passed downstream so
+    that G4 can treat "G6 candidates found + LLM says PASS" as a
+    deterministic ambiguity signal.
+
+    Args:
+        diff_text: Raw diff text (before line numbering)
+        settings: Guardrail settings
+
+    Returns:
+        Dict with:
+        - hint: str (prompt text to append, or "")
+        - g6_active: bool (G6 was enabled)
+        - candidates_count: int (number of format-familiar candidates found)
+        - candidate_formats: list[str] (format names of candidates)
+    """
+    if settings is None:
+        settings = DEFAULT_SETTINGS
+
+    if not settings.is_enabled("G6"):
+        return {
+            "hint": "",
+            "g6_active": False,
+            "candidates_count": 0,
+            "candidate_formats": [],
+        }
+
+    g6 = G6FormatFamiliarity()
+    candidates = g6.extract_candidates(diff_text)
+    return {
+        "hint": g6.get_forced_reasoning_hint(candidates),
+        "g6_active": True,
+        "candidates_count": len(candidates),
+        "candidate_formats": [c.format_name for c in candidates],
+    }
+
+
 def apply_guardrails(llm_output: dict, ground_truth: dict = None) -> dict:
     """
     Apply post-processing guardrail validations to LLM output.
@@ -177,6 +226,7 @@ def apply_guardrails_with_routing(
     pr_body: str = "",
     scanner_hit: bool = None,
     file_path: str = "",
+    g6_prescan: dict = None,
 ) -> dict:
     """
     Apply guardrails with decision routing (G5 -> G2 -> G4 -> G1 -> G3 order).
@@ -204,6 +254,11 @@ def apply_guardrails_with_routing(
         pr_body: Original PR body (for G2 cross-check, optional)
         scanner_hit: Optional scanner result for G4 disagreement detection
         file_path: Optional source file path (for G4 context inference)
+        g6_prescan: Optional G6 pre-scan metadata from get_g6_prescan().
+            Passed through to G4 guardrail_context so that G4 can use
+            "G6 candidates found + LLM PASS" as a deterministic ambiguity
+            signal.  G6 itself remains a pre-LLM mechanism — this parameter
+            only carries metadata, not a decision.
 
     Returns:
         Dictionary with:
@@ -320,12 +375,22 @@ def apply_guardrails_with_routing(
                 validation.repair_attempted and validation.repair_succeeded
             ),
             "g2_issues": g2_issues,
+            # G6 pre-scan metadata — allows G4 to infer
+            # g6_format_candidate_pass when G6 found candidates but
+            # LLM decided pred_has_secret=false.
+            "g6_prescan": g6_prescan or {},
         }
 
         g4_details = g4.validate_with_details(llm_output, guardrail_context)
         result["g4_details"] = g4_details
 
-        if g4_details["should_review"] and result["routed_by_guardrail"] is None:
+        # G4 only escalates PASS → REVIEW.  If the LLM already decided
+        # BLOCK, that is a stronger security signal than REVIEW and must
+        # not be downgraded.  (BLOCK and REVIEW both count as alert-level
+        # detections, so this preserves recall while reducing reviewer load.)
+        if (g4_details["should_review"]
+                and result["routed_by_guardrail"] is None
+                and original_decision == "PASS"):
             result["routed_by_guardrail"] = "G4"
             result["final_decision"] = "REVIEW"
 

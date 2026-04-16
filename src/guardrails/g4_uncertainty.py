@@ -14,7 +14,7 @@ Two-layer flag architecture:
    output fields, file paths, PR metadata, scanner results, and upstream
    guardrail results (G2 issues, G5 repair status).
 
-Five hard REVIEW rules combine flags with contextual conditions.
+Seven hard REVIEW rules combine flags with contextual conditions.
 
 `confidence` is read as an optional backward-compatible field but is NOT
 the primary signal and NOT required for G4 validity.
@@ -60,6 +60,12 @@ KNOWN_UNCERTAINTY_FLAGS: Set[str] = {
 
     # Semantic-context signals
     "auth_context_hardcoded_value",
+
+    # G6 format-familiarity post-hoc signal (G6→G4 coupling)
+    # Set when G6 pre-scan found format-familiar candidates but the LLM
+    # decided pred_has_secret=false.  G6 does NOT make autonomous decisions;
+    # this flag is a deterministic ambiguity signal consumed by G4 rule R7.
+    "g6_format_candidate_pass",
 }
 
 
@@ -358,6 +364,18 @@ def _infer_flags_from_context(
     if any("G2_UNREPORTED" in i for i in g2_issues):
         inferred.append("g2_unreported_influence")
 
+    # --- G6 format-familiarity post-hoc signal (G6→G4 coupling) ---
+    # G6 is a pre-LLM format-familiarity pre-scan that injects a forced-
+    # reasoning hint into the user prompt.  It does NOT make autonomous
+    # detection decisions.  When G6 found format-familiar candidates but
+    # the LLM still decided pred_has_secret=false, this is a deterministic
+    # ambiguity signal: the LLM may have been misled by format similarity.
+    # G4 consumes this flag via rule R7 to escalate PASS → REVIEW.
+    g6_prescan = guardrail_context.get("g6_prescan") or {}
+    if (not has_secret
+            and g6_prescan.get("candidates_count", 0) > 0):
+        inferred.append("g6_format_candidate_pass")
+
     # Deduplicate
     return list(dict.fromkeys(inferred))
 
@@ -566,6 +584,72 @@ def _rule_auth_context_hardcoded(
     return "hardcoded value in auth-sensitive URL context, LLM classified as non-secret"
 
 
+def _rule_g6_format_candidate_pass(
+    all_flags: Set[str],
+    llm_output: dict,
+    guardrail_context: dict,
+) -> Optional[str]:
+    """R7: G6 format-familiarity candidates + LLM PASS + context signal → REVIEW.
+
+    G6 is a pre-LLM format-familiarity pre-scan.  It identifies values
+    whose surface format (UUID, SHA, hex digest, etc.) could mislead the
+    LLM into dismissing them as benign identifiers rather than secrets.
+
+    G6 does NOT make autonomous detection decisions.  This rule provides
+    the deterministic post-hoc safety net: when G6 flagged candidates
+    before the LLM call, and the LLM still decided pred_has_secret=false,
+    the decision is escalated to REVIEW — but only when at least one
+    additional context signal corroborates the ambiguity:
+
+    - scanner_hit: a static scanner independently flagged the sample
+    - auth_context_hardcoded_value: code feeds a hardcoded value into
+      auth-sensitive URL construction
+    - decoy_like_pattern: code contains adversarial framing comments
+    - productive file path: the file is in src/lib/app/… (not test/docs),
+      making a missed secret higher-impact
+
+    This prevents over-escalation on benign test/docs samples where G6
+    candidates are expected to be harmless.
+
+    Only escalates PASS — does not touch BLOCK.
+    """
+    if "g6_format_candidate_pass" not in all_flags:
+        return None
+
+    has_secret = llm_output.get("pred_has_secret", False)
+    if has_secret:
+        return None  # LLM already flagged it — no escalation needed
+
+    # Require at least one corroborating context signal
+    corroborating_signals = []
+
+    if guardrail_context.get("scanner_hit"):
+        corroborating_signals.append("scanner_hit")
+
+    if "auth_context_hardcoded_value" in all_flags:
+        corroborating_signals.append("auth_context_hardcoded_value")
+
+    if "decoy_like_pattern" in all_flags:
+        corroborating_signals.append("decoy_like_pattern")
+
+    if _has_productive_context(guardrail_context):
+        corroborating_signals.append("productive_file_path")
+
+    if not corroborating_signals:
+        return None  # G6 candidates alone are not enough
+
+    g6 = guardrail_context.get("g6_prescan") or {}
+    count = g6.get("candidates_count", 0)
+    formats = g6.get("candidate_formats", [])
+    fmt_str = ", ".join(formats[:3]) if formats else "unknown"
+    ctx_str = ", ".join(corroborating_signals)
+    return (
+        f"G6 pre-scan found {count} format-familiar candidate(s) "
+        f"({fmt_str}), LLM classified as non-secret, "
+        f"corroborated by: {ctx_str}"
+    )
+
+
 # Ordered list of rules — first match triggers REVIEW
 REVIEW_RULES = [
     ("R1_ambiguous_context", _rule_ambiguous_context),
@@ -574,6 +658,7 @@ REVIEW_RULES = [
     ("R4_exculpatory_escalation", _rule_exculpatory_escalation),
     ("R5_schema_repair", _rule_schema_repair),
     ("R6_auth_context_hardcoded", _rule_auth_context_hardcoded),
+    ("R7_g6_format_candidate_pass", _rule_g6_format_candidate_pass),
 ]
 
 
@@ -596,7 +681,7 @@ class G4Uncertainty(Guardrail):
 
     Two-layer approach:
     1. Collect flags: reported (LLM) + inferred (deterministic)
-    2. Evaluate rules: 6 hard rules that trigger REVIEW routing
+    2. Evaluate rules: 7 hard rules that trigger REVIEW routing
 
     Rules:
     - R1: Ambiguous context (test/docs/placeholder/example) without
@@ -607,6 +692,9 @@ class G4Uncertainty(Guardrail):
     - R5: G5 schema repair was needed → REVIEW
     - R6: Hardcoded value in auth-sensitive URL context + LLM says
           no secret → REVIEW
+    - R7: G6 format-familiar candidates found pre-LLM + LLM says
+          no secret → REVIEW  (G6→G4 coupling; G6 is NOT an
+          autonomous blocker, only a deterministic ambiguity signal)
     """
 
     @property
@@ -860,7 +948,9 @@ OUTPUT SCHEMA (add to existing):
             "all_flags": result["all_flags"],
         }
 
-        if result["should_review"]:
+        # G4 only escalates PASS → REVIEW.  An existing BLOCK is a
+        # stronger security signal and must not be downgraded to REVIEW.
+        if result["should_review"] and original_decision == "PASS":
             metadata["routed_by_guardrail"] = "G4"
             return "REVIEW", metadata
 
