@@ -1,0 +1,1971 @@
+{
+  "dataset": {
+    "total_samples": 250,
+    "positive_samples": 200,
+    "negative_samples": 50,
+    "condition_distribution": {
+      "B0": 150,
+      "E4-I": 24,
+      "E3-A": 18,
+      "E3-B": 17,
+      "E4-H": 9,
+      "E1-B": 8,
+      "E2-A": 8,
+      "E4-F": 8,
+      "E4-G": 8
+    },
+    "origin_distribution": {
+      "NEG": 100,
+      "REAL": 75,
+      "SYNTH": 75
+    },
+    "negative_type_distribution": {
+      "NEG_DECOY": 25,
+      "NEG_CLEAN": 25
+    },
+    "secret_type_distribution": {
+      "token": 91,
+      "api_key": 63,
+      "password": 30,
+      "private_key": 10,
+      "connection_string": 6
+    },
+    "failure_mode_distribution": {
+      "none": 170,
+      "FM4": 33,
+      "FM7": 25,
+      "FM6": 10,
+      "FM2": 8,
+      "FM1/FM3/FM5": 4
+    },
+    "baseline_none_count": 0
+  },
+  "legacy_mode_metrics": {
+    "Scanner": {
+      "mode": "Scanner",
+      "description": "Gitleaks + detect-secrets combined (scanner_hit)",
+      "TP": 137,
+      "FP": 10,
+      "TN": 40,
+      "FN": 63,
+      "skipped": 0,
+      "total_evaluated": 250,
+      "precision": 0.932,
+      "recall": 0.685,
+      "f1": 0.7896,
+      "specificity": 0.8,
+      "accuracy": 0.708,
+      "decision_distribution": {
+        "block_count": 147,
+        "block_rate": 0.588,
+        "pass_count": 103,
+        "pass_rate": 0.412,
+        "total": 250
+      }
+    },
+    "LLM_Baseline": {
+      "mode": "LLM_Baseline",
+      "description": "LLM without guardrails (llm_baseline_hit)",
+      "TP": 167,
+      "FP": 3,
+      "TN": 47,
+      "FN": 33,
+      "skipped": 0,
+      "total_evaluated": 250,
+      "precision": 0.9824,
+      "recall": 0.835,
+      "f1": 0.9027,
+      "specificity": 0.94,
+      "accuracy": 0.856,
+      "decision_distribution": {
+        "block_count": 170,
+        "block_rate": 0.68,
+        "pass_count": 80,
+        "pass_rate": 0.32,
+        "total": 250
+      }
+    },
+    "Guardrails_Alert": {
+      "mode": "Guardrails_Alert",
+      "description": "LLM + Guardrails, alert-level: BLOCK or REVIEW = detection",
+      "TP": 199,
+      "FP": 26,
+      "TN": 24,
+      "FN": 1,
+      "skipped": 0,
+      "total_evaluated": 250,
+      "precision": 0.8844,
+      "recall": 0.995,
+      "f1": 0.9365,
+      "specificity": 0.48,
+      "accuracy": 0.892,
+      "decision_distribution": {
+        "block_count": 150,
+        "block_rate": 0.6,
+        "review_count": 75,
+        "review_rate": 0.3,
+        "pass_count": 25,
+        "pass_rate": 0.1,
+        "total": 250
+      }
+    },
+    "Guardrails_Autonomous": {
+      "mode": "Guardrails_Autonomous",
+      "description": "LLM + Guardrails, autonomous: BLOCK only = detection",
+      "TP": 145,
+      "FP": 5,
+      "TN": 45,
+      "FN": 55,
+      "skipped": 0,
+      "total_evaluated": 250,
+      "precision": 0.9667,
+      "recall": 0.725,
+      "f1": 0.8286,
+      "specificity": 0.9,
+      "accuracy": 0.76,
+      "decision_distribution": {
+        "block_count": 150,
+        "block_rate": 0.6,
+        "review_count": 75,
+        "review_rate": 0.3,
+        "pass_count": 25,
+        "pass_rate": 0.1,
+        "total": 250
+      }
+    }
+  },
+  "mode_comparison": {
+    "alert_level": [
+      {
+        "mode": "Scanner",
+        "n_total": 250,
+        "n_evaluable": 250,
+        "n_missing": 0,
+        "tp_alert": 137,
+        "fp_alert": 10,
+        "tn_alert": 40,
+        "fn_alert": 63,
+        "precision_alert": 0.932,
+        "recall_alert": 0.685,
+        "f1_alert": 0.7896,
+        "specificity_alert": 0.8
+      },
+      {
+        "mode": "LLM_Baseline",
+        "n_total": 250,
+        "n_evaluable": 250,
+        "n_missing": 0,
+        "tp_alert": 167,
+        "fp_alert": 3,
+        "tn_alert": 47,
+        "fn_alert": 33,
+        "precision_alert": 0.9824,
+        "recall_alert": 0.835,
+        "f1_alert": 0.9027,
+        "specificity_alert": 0.94
+      },
+      {
+        "mode": "LLM_Guardrails",
+        "n_total": 250,
+        "n_evaluable": 250,
+        "n_missing": 0,
+        "tp_alert": 199,
+        "fp_alert": 26,
+        "tn_alert": 24,
+        "fn_alert": 1,
+        "precision_alert": 0.8844,
+        "recall_alert": 0.995,
+        "f1_alert": 0.9365,
+        "specificity_alert": 0.48
+      }
+    ],
+    "alert_profile": [
+      {
+        "mode": "Scanner",
+        "n_total": 250,
+        "n_evaluable": 250,
+        "n_missing": 0,
+        "pass_rate": 0.412,
+        "block_rate": 0.588,
+        "review_rate": 0.0,
+        "escape_rate": 0.315
+      },
+      {
+        "mode": "LLM_Baseline",
+        "n_total": 250,
+        "n_evaluable": 250,
+        "n_missing": 0,
+        "pass_rate": 0.32,
+        "block_rate": 0.68,
+        "review_rate": 0.0,
+        "escape_rate": 0.165
+      },
+      {
+        "mode": "LLM_Guardrails",
+        "n_total": 250,
+        "n_evaluable": 250,
+        "n_missing": 0,
+        "pass_rate": 0.1,
+        "block_rate": 0.6,
+        "review_rate": 0.3,
+        "escape_rate": 0.005
+      }
+    ],
+    "autonomous_level": [
+      {
+        "mode": "Scanner",
+        "n_total": 250,
+        "n_evaluable": 250,
+        "n_missing": 0,
+        "tp_auto": 137,
+        "fp_auto": 10,
+        "tn_auto": 40,
+        "fn_auto": 63,
+        "precision_auto": 0.932,
+        "recall_auto": 0.685,
+        "f1_auto": 0.7896,
+        "specificity_auto": 0.8
+      },
+      {
+        "mode": "LLM_Baseline",
+        "n_total": 250,
+        "n_evaluable": 250,
+        "n_missing": 0,
+        "tp_auto": 167,
+        "fp_auto": 3,
+        "tn_auto": 47,
+        "fn_auto": 33,
+        "precision_auto": 0.9824,
+        "recall_auto": 0.835,
+        "f1_auto": 0.9027,
+        "specificity_auto": 0.94
+      },
+      {
+        "mode": "LLM_Guardrails",
+        "n_total": 250,
+        "n_evaluable": 250,
+        "n_missing": 0,
+        "tp_auto": 145,
+        "fp_auto": 5,
+        "tn_auto": 45,
+        "fn_auto": 55,
+        "precision_auto": 0.9667,
+        "recall_auto": 0.725,
+        "f1_auto": 0.8286,
+        "specificity_auto": 0.9
+      }
+    ],
+    "alert_vs_autonomous": [
+      {
+        "mode": "Scanner",
+        "recall_alert": 0.685,
+        "recall_auto": 0.685,
+        "delta_recall_alert_vs_auto": 0.0,
+        "precision_alert": 0.932,
+        "precision_auto": 0.932,
+        "delta_precision_alert_vs_auto": 0.0,
+        "review_rate": 0.0,
+        "escape_rate": 0.315
+      },
+      {
+        "mode": "LLM_Baseline",
+        "recall_alert": 0.835,
+        "recall_auto": 0.835,
+        "delta_recall_alert_vs_auto": 0.0,
+        "precision_alert": 0.9824,
+        "precision_auto": 0.9824,
+        "delta_precision_alert_vs_auto": 0.0,
+        "review_rate": 0.0,
+        "escape_rate": 0.165
+      },
+      {
+        "mode": "LLM_Guardrails",
+        "recall_alert": 0.995,
+        "recall_auto": 0.725,
+        "delta_recall_alert_vs_auto": 0.27,
+        "precision_alert": 0.8844,
+        "precision_auto": 0.9667,
+        "delta_precision_alert_vs_auto": -0.0823,
+        "review_rate": 0.3,
+        "escape_rate": 0.005
+      }
+    ]
+  },
+  "decision_profile": {
+    "global": [
+      {
+        "mode": "Scanner",
+        "n_total": 250,
+        "n_evaluable": 250,
+        "n_missing": 0,
+        "pass_count": 103,
+        "block_count": 147,
+        "review_count": 0,
+        "pass_rate": 0.412,
+        "block_rate": 0.588,
+        "review_rate": 0.0,
+        "escape_rate": 0.315,
+        "block_share_among_alerts": 1.0
+      },
+      {
+        "mode": "LLM_Baseline",
+        "n_total": 250,
+        "n_evaluable": 250,
+        "n_missing": 0,
+        "pass_count": 80,
+        "block_count": 170,
+        "review_count": 0,
+        "pass_rate": 0.32,
+        "block_rate": 0.68,
+        "review_rate": 0.0,
+        "escape_rate": 0.165,
+        "block_share_among_alerts": 1.0
+      },
+      {
+        "mode": "LLM_Guardrails",
+        "n_total": 250,
+        "n_evaluable": 250,
+        "n_missing": 0,
+        "pass_count": 25,
+        "block_count": 150,
+        "review_count": 75,
+        "pass_rate": 0.1,
+        "block_rate": 0.6,
+        "review_rate": 0.3,
+        "escape_rate": 0.005,
+        "block_share_among_alerts": 0.6667
+      }
+    ],
+    "gt_pos_counts": [
+      {
+        "mode": "Scanner",
+        "n_gt_pos_evaluable": 200,
+        "pass_count_gt_pos": 63,
+        "block_count_gt_pos": 137,
+        "review_count_gt_pos": 0
+      },
+      {
+        "mode": "LLM_Baseline",
+        "n_gt_pos_evaluable": 200,
+        "pass_count_gt_pos": 33,
+        "block_count_gt_pos": 167,
+        "review_count_gt_pos": 0
+      },
+      {
+        "mode": "LLM_Guardrails",
+        "n_gt_pos_evaluable": 200,
+        "pass_count_gt_pos": 1,
+        "block_count_gt_pos": 145,
+        "review_count_gt_pos": 54
+      }
+    ],
+    "gt_neg_counts": [
+      {
+        "mode": "Scanner",
+        "n_gt_neg_evaluable": 50,
+        "pass_count_gt_neg": 40,
+        "block_count_gt_neg": 10,
+        "review_count_gt_neg": 0
+      },
+      {
+        "mode": "LLM_Baseline",
+        "n_gt_neg_evaluable": 50,
+        "pass_count_gt_neg": 47,
+        "block_count_gt_neg": 3,
+        "review_count_gt_neg": 0
+      },
+      {
+        "mode": "LLM_Guardrails",
+        "n_gt_neg_evaluable": 50,
+        "pass_count_gt_neg": 24,
+        "block_count_gt_neg": 5,
+        "review_count_gt_neg": 21
+      }
+    ],
+    "vs_baseline": [
+      {
+        "comparison": "Scanner_vs_Baseline",
+        "delta_pass_rate_vs_baseline": 0.092,
+        "delta_block_rate_vs_baseline": -0.092,
+        "delta_review_rate_vs_baseline": 0.0,
+        "delta_escape_rate_vs_baseline": 0.15,
+        "delta_block_share_among_alerts_vs_baseline": 0.0
+      },
+      {
+        "comparison": "LLM_Guardrails_vs_Baseline",
+        "delta_pass_rate_vs_baseline": -0.22,
+        "delta_block_rate_vs_baseline": -0.08,
+        "delta_review_rate_vs_baseline": 0.3,
+        "delta_escape_rate_vs_baseline": -0.16,
+        "delta_block_share_among_alerts_vs_baseline": -0.3333
+      }
+    ]
+  },
+  "guardrail_kpis": {
+    "activity_summary": {
+      "n_total_guardrail_samples": 250,
+      "n_evaluable_guardrail_samples": 250,
+      "n_missing_guardrail_samples": 0,
+      "samples_with_any_trigger_count": 218,
+      "samples_with_any_trigger_rate": 0.872,
+      "single_trigger_samples_count": 145,
+      "single_trigger_rate": 0.58,
+      "multi_trigger_samples_count": 73,
+      "multi_trigger_rate": 0.292,
+      "max_triggers_on_single_sample": 3
+    },
+    "per_guardrail": [
+      {
+        "guardrail": "G5",
+        "trigger_count": 2,
+        "trigger_rate": 0.008,
+        "routed_count": 2,
+        "routed_rate": 0.008
+      },
+      {
+        "guardrail": "G2",
+        "trigger_count": 0,
+        "trigger_rate": 0.0,
+        "routed_count": 0,
+        "routed_rate": 0.0
+      },
+      {
+        "guardrail": "G4",
+        "trigger_count": 102,
+        "trigger_rate": 0.408,
+        "routed_count": 53,
+        "routed_rate": 0.212
+      },
+      {
+        "guardrail": "G1",
+        "trigger_count": 4,
+        "trigger_rate": 0.016,
+        "routed_count": 4,
+        "routed_rate": 0.016
+      },
+      {
+        "guardrail": "G3",
+        "trigger_count": 187,
+        "trigger_rate": 0.748,
+        "routed_count": 16,
+        "routed_rate": 0.064
+      }
+    ],
+    "g3": {
+      "baseline_leakage_count": 70,
+      "baseline_leakage_rate": 0.28,
+      "g3_triggered_count": 187,
+      "g3_triggered_rate": 0.748,
+      "residual_guardrail_leakage_count": 0,
+      "residual_guardrail_leakage_rate": 0.0,
+      "residual_guardrail_leakage_share_of_baseline_leak": 0.0,
+      "g3_on_gt_pos_count": 168,
+      "g3_on_gt_pos_rate": 0.84
+    },
+    "g5": {
+      "schema_invalid_count": 2,
+      "schema_invalid_rate": 0.008,
+      "g5_routed_count": 2,
+      "g5_routed_rate": 0.008,
+      "g5_fail_closed_review_count": 2,
+      "g5_fail_closed_review_rate": 0.008,
+      "g5_fail_closed_review_share_of_g5": 1.0
+    },
+    "g6": {
+      "g6_hint_injected_count": 30,
+      "g6_hint_injected_rate": 0.12,
+      "g6_no_hint_count": 220,
+      "g6_hint_detected_count": 10,
+      "g6_hint_detection_rate": 0.3333,
+      "g6_no_hint_detected_count": 160,
+      "g6_no_hint_detection_rate": 0.7273,
+      "g6_hint_on_gt_pos_count": 29,
+      "g6_hint_on_gt_pos_rate": 0.145,
+      "g6_hint_on_gt_neg_count": 1,
+      "g6_hint_schema_valid_count": 30,
+      "g6_hint_schema_fail_count": 0,
+      "g6_hint_schema_valid_rate": 1.0
+    },
+    "trigger_combinations": [
+      {
+        "trigger_combination": "G3",
+        "count": 114,
+        "rate": 0.456
+      },
+      {
+        "trigger_combination": "G4+G3",
+        "count": 68,
+        "rate": 0.272
+      },
+      {
+        "trigger_combination": "G4",
+        "count": 30,
+        "rate": 0.12
+      },
+      {
+        "trigger_combination": "G4+G1+G3",
+        "count": 3,
+        "rate": 0.012
+      },
+      {
+        "trigger_combination": "G5",
+        "count": 1,
+        "rate": 0.004
+      },
+      {
+        "trigger_combination": "G1+G3",
+        "count": 1,
+        "rate": 0.004
+      },
+      {
+        "trigger_combination": "G5+G4+G3",
+        "count": 1,
+        "rate": 0.004
+      }
+    ]
+  },
+  "failure_mode_pri": {
+    "summary": [
+      {
+        "failure_mode": "FM1_evidence_location",
+        "mapped_guardrail": "G1",
+        "n_baseline_evaluable": 250,
+        "prevalence_count": 9,
+        "prevalence_rate": 0.036,
+        "intervention_count": 1,
+        "intervention_rate_given_prevalence": 0.1111,
+        "residual_count": 1,
+        "residual_rate_given_prevalence": 0.1111,
+        "residual_observability": "partial"
+      },
+      {
+        "failure_mode": "FM2_untrusted_input",
+        "mapped_guardrail": "G2",
+        "n_baseline_evaluable": 250,
+        "prevalence_count": 0,
+        "prevalence_rate": 0.0,
+        "intervention_count": null,
+        "intervention_rate_given_prevalence": null,
+        "residual_count": null,
+        "residual_rate_given_prevalence": null,
+        "residual_observability": "n/a"
+      },
+      {
+        "failure_mode": "FM3_secret_leakage",
+        "mapped_guardrail": "G3",
+        "n_baseline_evaluable": 250,
+        "prevalence_count": 70,
+        "prevalence_rate": 0.28,
+        "intervention_count": 63,
+        "intervention_rate_given_prevalence": 0.9,
+        "residual_count": 0,
+        "residual_rate_given_prevalence": 0.0,
+        "residual_observability": "direct"
+      },
+      {
+        "failure_mode": "FM4_uncertainty_miscalibration",
+        "mapped_guardrail": "G4",
+        "n_baseline_evaluable": 250,
+        "prevalence_count": 67,
+        "prevalence_rate": 0.268,
+        "intervention_count": 67,
+        "intervention_rate_given_prevalence": 1.0,
+        "residual_count": 66,
+        "residual_rate_given_prevalence": 0.9851,
+        "residual_observability": "partial"
+      },
+      {
+        "failure_mode": "FM5_schema_output_failure",
+        "mapped_guardrail": "G5",
+        "n_baseline_evaluable": 250,
+        "prevalence_count": 2,
+        "prevalence_rate": 0.008,
+        "intervention_count": 2,
+        "intervention_rate_given_prevalence": 1.0,
+        "residual_count": null,
+        "residual_rate_given_prevalence": null,
+        "residual_observability": "not_robustly_observable"
+      },
+      {
+        "failure_mode": "FM6_format_familiarity",
+        "mapped_guardrail": "G6",
+        "n_baseline_evaluable": 250,
+        "prevalence_count": 30,
+        "prevalence_rate": 0.12,
+        "intervention_count": 30,
+        "intervention_rate_given_prevalence": 1.0,
+        "residual_count": 20,
+        "residual_rate_given_prevalence": 0.6667,
+        "residual_observability": "direct"
+      }
+    ],
+    "definitions": [
+      {
+        "failure_mode": "FM1_evidence_location",
+        "mapped_guardrail": "G1",
+        "prevalence_field_logic": "baseline_failure_modes.g1_valid == false",
+        "intervention_field_logic": "G1 in llm_guardrail.triggered_guardrails OR llm_guardrail.routed_by_guardrail == G1",
+        "residual_field_logic": "llm_guardrail.g1_valid == false (on prevalence cases)",
+        "notes": "Residual observed via guardrail-side g1_valid flag, which is structurally analogous but not identical to the baseline g1_valid check. Interpretation should account for this structural difference."
+      },
+      {
+        "failure_mode": "FM2_untrusted_input",
+        "mapped_guardrail": "G2",
+        "prevalence_field_logic": "baseline_failure_modes.g2_valid == false",
+        "intervention_field_logic": "G2 in llm_guardrail.triggered_guardrails OR llm_guardrail.routed_by_guardrail == G2",
+        "residual_field_logic": "Not robustly observable. Guardrail-side g2_valid exists but lacks independent validation of FM2 resolution.",
+        "notes": "Residual not reported: guardrail-side g2_valid is structurally available but does not constitute a robust independent measure of whether untrusted-input influence was resolved. Additionally, zero prevalence in this dataset means PRI is structurally not evaluable for FM2."
+      },
+      {
+        "failure_mode": "FM3_secret_leakage",
+        "mapped_guardrail": "G3",
+        "prevalence_field_logic": "metrics.leak_in_baseline == true",
+        "intervention_field_logic": "llm_guardrail.g3_triggered == true",
+        "residual_field_logic": "metrics.leak_in_guardrail == true (on prevalence cases)",
+        "notes": "All three PRI components are directly and independently observable via separate fields. Leakage detection is based on gt_secret_value string matching in model output."
+      },
+      {
+        "failure_mode": "FM4_uncertainty_miscalibration",
+        "mapped_guardrail": "G4",
+        "prevalence_field_logic": "baseline_failure_modes.g4_details.should_review == true",
+        "intervention_field_logic": "G4 in llm_guardrail.triggered_guardrails OR llm_guardrail.routed_by_guardrail == G4",
+        "residual_field_logic": "llm_guardrail.g4_details.should_review == true (on prevalence cases)",
+        "notes": "Residual is indicative, not definitive. The guardrail-side should_review flag measures structural presence of miscalibration indicators, not whether the bundle's routing action resolved the operational impact. Unlike FM3, there is no independent objective measure of FM4 resolution."
+      },
+      {
+        "failure_mode": "FM5_schema_output_failure",
+        "mapped_guardrail": "G5",
+        "prevalence_field_logic": "llm_guardrail.schema_valid == false (asymmetric: guardrail-side, not baseline-side)",
+        "intervention_field_logic": "G5 in llm_guardrail.triggered_guardrails OR llm_guardrail.routed_by_guardrail == G5",
+        "residual_field_logic": "Not robustly observable. No independent post-intervention field measures whether the schema failure persists as a problematic end state after G5 treatment.",
+        "notes": "Asymmetric operationalization: FM5 prevalence is observed on the guardrail/structured-output side only. The baseline does not undergo schema validation. Residual is not reported because absence of G5 routing does not robustly indicate a persisting problematic end state."
+      },
+      {
+        "failure_mode": "FM6_format_familiarity",
+        "mapped_guardrail": "G6",
+        "prevalence_field_logic": "llm_guardrail.g6_hint_injected == true",
+        "intervention_field_logic": "llm_guardrail.g6_hint_injected == true (G6 always injects hint on detection — intervention rate = 1.0 by construction)",
+        "residual_field_logic": "llm_guardrail.g6_hint_injected == true AND gt_has_secret == true AND llm_guardrail.pred_has_secret == false",
+        "notes": "G6 is a pre-processing guardrail that injects a format hint before the LLM call. Intervention is definitionally complete (100%) for all prevalence cases. Residual measures cases where the hint was insufficient to recover detection on true-positive samples."
+      }
+    ],
+    "coverage": [
+      {
+        "failure_mode": "FM1_evidence_location",
+        "mapped_guardrail": "G1",
+        "n_baseline_evaluable": 250,
+        "prevalence_base_n": 9,
+        "residual_observability": "partial",
+        "multi_fm_interference_note": "Multiple guardrails may act on the same sample. Observed FM1 residual may reflect bundle-wide output quality rather than G1-specific correction.",
+        "notes": "Residual based on guardrail-side g1_valid, which is structurally analogous but not identical to the baseline validity check. G1 did not trigger in this dataset; observed residual=0 may reflect overall guardrail output quality rather than targeted G1 intervention."
+      },
+      {
+        "failure_mode": "FM2_untrusted_input",
+        "mapped_guardrail": "G2",
+        "n_baseline_evaluable": 250,
+        "prevalence_base_n": 0,
+        "residual_observability": "not_robustly_observable",
+        "multi_fm_interference_note": "Zero prevalence in this dataset. PRI not structurally evaluable.",
+        "notes": "No baseline samples exhibited g2_valid=false. Residual not reported: guardrail-side g2_valid lacks independent validation of FM2 resolution."
+      },
+      {
+        "failure_mode": "FM3_secret_leakage",
+        "mapped_guardrail": "G3",
+        "n_baseline_evaluable": 250,
+        "prevalence_base_n": 70,
+        "residual_observability": "direct",
+        "multi_fm_interference_note": "G3 leakage detection operates independently of other guardrails via gt_secret_value string matching.",
+        "notes": "All three PRI components observed via independent fields. No structural cross-dependency with other guardrails."
+      },
+      {
+        "failure_mode": "FM4_uncertainty_miscalibration",
+        "mapped_guardrail": "G4",
+        "n_baseline_evaluable": 250,
+        "prevalence_base_n": 67,
+        "residual_observability": "partial",
+        "multi_fm_interference_note": "Potential overlap with G1 in ambiguity-heavy contexts. Multiple guardrails may act on the same sample; intervention attribution not always exclusive to G4.",
+        "notes": "Residual is indicative only. Guardrail-side should_review measures structural miscalibration presence, not whether routing resolved the operational impact. No independent objective measure of FM4 resolution available."
+      },
+      {
+        "failure_mode": "FM5_schema_output_failure",
+        "mapped_guardrail": "G5",
+        "n_baseline_evaluable": 250,
+        "prevalence_base_n": 2,
+        "residual_observability": "not_robustly_observable",
+        "multi_fm_interference_note": "G5 operates first in pipeline (G5 → G2 → G4 → G1 → G3). No structural overlap with other guardrails for schema failures.",
+        "notes": "Asymmetric operationalization: prevalence observed on guardrail output side only. Residual not reported: no independent post-intervention field to assess whether schema failure persists as a problematic end state."
+      },
+      {
+        "failure_mode": "FM6_format_familiarity",
+        "mapped_guardrail": "G6",
+        "n_baseline_evaluable": 250,
+        "prevalence_base_n": 30,
+        "residual_observability": "direct",
+        "multi_fm_interference_note": "G6 is a pre-processing guardrail (hint injection before LLM call). Can co-occur with G4 on the same sample if LLM uncertainty persists despite the hint.",
+        "notes": "G6 intervenes by construction on every detected format-candidate (intervention rate = 1.0). Residual directly observable: gt_has_secret=true AND pred_has_secret=false after hint injection."
+      }
+    ]
+  },
+  "slice_analysis": {
+    "performance": [
+      {
+        "slice_name": "base",
+        "slice_n": 150,
+        "mode": "Scanner",
+        "n_evaluable": 150,
+        "recall_alert": 0.97,
+        "precision_alert": 0.9065,
+        "recall_auto": 0.97,
+        "precision_auto": 0.9065,
+        "escape_rate": 0.03,
+        "review_rate": 0.0,
+        "block_rate": 0.7133,
+        "pass_rate": 0.2867
+      },
+      {
+        "slice_name": "base",
+        "slice_n": 150,
+        "mode": "LLM_Baseline",
+        "n_evaluable": 150,
+        "recall_alert": 1.0,
+        "precision_alert": 0.9709,
+        "recall_auto": 1.0,
+        "precision_auto": 0.9709,
+        "escape_rate": 0.0,
+        "review_rate": 0.0,
+        "block_rate": 0.6867,
+        "pass_rate": 0.3133
+      },
+      {
+        "slice_name": "base",
+        "slice_n": 150,
+        "mode": "LLM_Guardrails",
+        "n_evaluable": 150,
+        "recall_alert": 1.0,
+        "precision_alert": 0.7937,
+        "recall_auto": 0.85,
+        "precision_auto": 0.9444,
+        "escape_rate": 0.0,
+        "review_rate": 0.24,
+        "block_rate": 0.6,
+        "pass_rate": 0.16
+      },
+      {
+        "slice_name": "stress",
+        "slice_n": 100,
+        "mode": "Scanner",
+        "n_evaluable": 100,
+        "recall_alert": 0.4,
+        "precision_alert": 1.0,
+        "recall_auto": 0.4,
+        "precision_auto": 1.0,
+        "escape_rate": 0.6,
+        "review_rate": 0.0,
+        "block_rate": 0.4,
+        "pass_rate": 0.6
+      },
+      {
+        "slice_name": "stress",
+        "slice_n": 100,
+        "mode": "LLM_Baseline",
+        "n_evaluable": 100,
+        "recall_alert": 0.67,
+        "precision_alert": 1.0,
+        "recall_auto": 0.67,
+        "precision_auto": 1.0,
+        "escape_rate": 0.33,
+        "review_rate": 0.0,
+        "block_rate": 0.67,
+        "pass_rate": 0.33
+      },
+      {
+        "slice_name": "stress",
+        "slice_n": 100,
+        "mode": "LLM_Guardrails",
+        "n_evaluable": 100,
+        "recall_alert": 0.99,
+        "precision_alert": 1.0,
+        "recall_auto": 0.6,
+        "precision_auto": 1.0,
+        "escape_rate": 0.01,
+        "review_rate": 0.39,
+        "block_rate": 0.6,
+        "pass_rate": 0.01
+      },
+      {
+        "slice_name": "neg_clean",
+        "slice_n": 25,
+        "mode": "Scanner",
+        "n_evaluable": 25,
+        "recall_alert": null,
+        "precision_alert": null,
+        "recall_auto": null,
+        "precision_auto": null,
+        "escape_rate": null,
+        "review_rate": 0.0,
+        "block_rate": 0.0,
+        "pass_rate": 1.0
+      },
+      {
+        "slice_name": "neg_clean",
+        "slice_n": 25,
+        "mode": "LLM_Baseline",
+        "n_evaluable": 25,
+        "recall_alert": null,
+        "precision_alert": null,
+        "recall_auto": null,
+        "precision_auto": null,
+        "escape_rate": null,
+        "review_rate": 0.0,
+        "block_rate": 0.0,
+        "pass_rate": 1.0
+      },
+      {
+        "slice_name": "neg_clean",
+        "slice_n": 25,
+        "mode": "LLM_Guardrails",
+        "n_evaluable": 25,
+        "recall_alert": null,
+        "precision_alert": 0.0,
+        "recall_auto": null,
+        "precision_auto": null,
+        "escape_rate": null,
+        "review_rate": 0.04,
+        "block_rate": 0.0,
+        "pass_rate": 0.96
+      },
+      {
+        "slice_name": "neg_decoy",
+        "slice_n": 25,
+        "mode": "Scanner",
+        "n_evaluable": 25,
+        "recall_alert": null,
+        "precision_alert": 0.0,
+        "recall_auto": null,
+        "precision_auto": 0.0,
+        "escape_rate": null,
+        "review_rate": 0.0,
+        "block_rate": 0.4,
+        "pass_rate": 0.6
+      },
+      {
+        "slice_name": "neg_decoy",
+        "slice_n": 25,
+        "mode": "LLM_Baseline",
+        "n_evaluable": 25,
+        "recall_alert": null,
+        "precision_alert": 0.0,
+        "recall_auto": null,
+        "precision_auto": 0.0,
+        "escape_rate": null,
+        "review_rate": 0.0,
+        "block_rate": 0.12,
+        "pass_rate": 0.88
+      },
+      {
+        "slice_name": "neg_decoy",
+        "slice_n": 25,
+        "mode": "LLM_Guardrails",
+        "n_evaluable": 25,
+        "recall_alert": null,
+        "precision_alert": 0.0,
+        "recall_auto": null,
+        "precision_auto": 0.0,
+        "escape_rate": null,
+        "review_rate": 0.8,
+        "block_rate": 0.2,
+        "pass_rate": 0.0
+      },
+      {
+        "slice_name": "real",
+        "slice_n": 75,
+        "mode": "Scanner",
+        "n_evaluable": 75,
+        "recall_alert": 0.8,
+        "precision_alert": 1.0,
+        "recall_auto": 0.8,
+        "precision_auto": 1.0,
+        "escape_rate": 0.2,
+        "review_rate": 0.0,
+        "block_rate": 0.8,
+        "pass_rate": 0.2
+      },
+      {
+        "slice_name": "real",
+        "slice_n": 75,
+        "mode": "LLM_Baseline",
+        "n_evaluable": 75,
+        "recall_alert": 1.0,
+        "precision_alert": 1.0,
+        "recall_auto": 1.0,
+        "precision_auto": 1.0,
+        "escape_rate": 0.0,
+        "review_rate": 0.0,
+        "block_rate": 1.0,
+        "pass_rate": 0.0
+      },
+      {
+        "slice_name": "real",
+        "slice_n": 75,
+        "mode": "LLM_Guardrails",
+        "n_evaluable": 75,
+        "recall_alert": 1.0,
+        "precision_alert": 1.0,
+        "recall_auto": 0.9067,
+        "precision_auto": 1.0,
+        "escape_rate": 0.0,
+        "review_rate": 0.0933,
+        "block_rate": 0.9067,
+        "pass_rate": 0.0
+      },
+      {
+        "slice_name": "synthetic",
+        "slice_n": 75,
+        "mode": "Scanner",
+        "n_evaluable": 75,
+        "recall_alert": 0.88,
+        "precision_alert": 1.0,
+        "recall_auto": 0.88,
+        "precision_auto": 1.0,
+        "escape_rate": 0.12,
+        "review_rate": 0.0,
+        "block_rate": 0.88,
+        "pass_rate": 0.12
+      },
+      {
+        "slice_name": "synthetic",
+        "slice_n": 75,
+        "mode": "LLM_Baseline",
+        "n_evaluable": 75,
+        "recall_alert": 1.0,
+        "precision_alert": 1.0,
+        "recall_auto": 1.0,
+        "precision_auto": 1.0,
+        "escape_rate": 0.0,
+        "review_rate": 0.0,
+        "block_rate": 1.0,
+        "pass_rate": 0.0
+      },
+      {
+        "slice_name": "synthetic",
+        "slice_n": 75,
+        "mode": "LLM_Guardrails",
+        "n_evaluable": 75,
+        "recall_alert": 1.0,
+        "precision_alert": 1.0,
+        "recall_auto": 0.8133,
+        "precision_auto": 1.0,
+        "escape_rate": 0.0,
+        "review_rate": 0.1867,
+        "block_rate": 0.8133,
+        "pass_rate": 0.0
+      },
+      {
+        "slice_name": "stress_untrusted_input",
+        "slice_n": 8,
+        "mode": "Scanner",
+        "n_evaluable": 8,
+        "recall_alert": 1.0,
+        "precision_alert": 1.0,
+        "recall_auto": 1.0,
+        "precision_auto": 1.0,
+        "escape_rate": 0.0,
+        "review_rate": 0.0,
+        "block_rate": 1.0,
+        "pass_rate": 0.0
+      },
+      {
+        "slice_name": "stress_untrusted_input",
+        "slice_n": 8,
+        "mode": "LLM_Baseline",
+        "n_evaluable": 8,
+        "recall_alert": 1.0,
+        "precision_alert": 1.0,
+        "recall_auto": 1.0,
+        "precision_auto": 1.0,
+        "escape_rate": 0.0,
+        "review_rate": 0.0,
+        "block_rate": 1.0,
+        "pass_rate": 0.0
+      },
+      {
+        "slice_name": "stress_untrusted_input",
+        "slice_n": 8,
+        "mode": "LLM_Guardrails",
+        "n_evaluable": 8,
+        "recall_alert": 1.0,
+        "precision_alert": 1.0,
+        "recall_auto": 1.0,
+        "precision_auto": 1.0,
+        "escape_rate": 0.0,
+        "review_rate": 0.0,
+        "block_rate": 1.0,
+        "pass_rate": 0.0
+      },
+      {
+        "slice_name": "stress_uncertainty",
+        "slice_n": 8,
+        "mode": "Scanner",
+        "n_evaluable": 8,
+        "recall_alert": 0.375,
+        "precision_alert": 1.0,
+        "recall_auto": 0.375,
+        "precision_auto": 1.0,
+        "escape_rate": 0.625,
+        "review_rate": 0.0,
+        "block_rate": 0.375,
+        "pass_rate": 0.625
+      },
+      {
+        "slice_name": "stress_uncertainty",
+        "slice_n": 8,
+        "mode": "LLM_Baseline",
+        "n_evaluable": 8,
+        "recall_alert": 1.0,
+        "precision_alert": 1.0,
+        "recall_auto": 1.0,
+        "precision_auto": 1.0,
+        "escape_rate": 0.0,
+        "review_rate": 0.0,
+        "block_rate": 1.0,
+        "pass_rate": 0.0
+      },
+      {
+        "slice_name": "stress_uncertainty",
+        "slice_n": 8,
+        "mode": "LLM_Guardrails",
+        "n_evaluable": 8,
+        "recall_alert": 1.0,
+        "precision_alert": 1.0,
+        "recall_auto": 1.0,
+        "precision_auto": 1.0,
+        "escape_rate": 0.0,
+        "review_rate": 0.0,
+        "block_rate": 1.0,
+        "pass_rate": 0.0
+      },
+      {
+        "slice_name": "stress_multi_fm",
+        "slice_n": 18,
+        "mode": "Scanner",
+        "n_evaluable": 18,
+        "recall_alert": 0.2778,
+        "precision_alert": 1.0,
+        "recall_auto": 0.2778,
+        "precision_auto": 1.0,
+        "escape_rate": 0.7222,
+        "review_rate": 0.0,
+        "block_rate": 0.2778,
+        "pass_rate": 0.7222
+      },
+      {
+        "slice_name": "stress_multi_fm",
+        "slice_n": 18,
+        "mode": "LLM_Baseline",
+        "n_evaluable": 18,
+        "recall_alert": 1.0,
+        "precision_alert": 1.0,
+        "recall_auto": 1.0,
+        "precision_auto": 1.0,
+        "escape_rate": 0.0,
+        "review_rate": 0.0,
+        "block_rate": 1.0,
+        "pass_rate": 0.0
+      },
+      {
+        "slice_name": "stress_multi_fm",
+        "slice_n": 18,
+        "mode": "LLM_Guardrails",
+        "n_evaluable": 18,
+        "recall_alert": 1.0,
+        "precision_alert": 1.0,
+        "recall_auto": 0.7778,
+        "precision_auto": 1.0,
+        "escape_rate": 0.0,
+        "review_rate": 0.2222,
+        "block_rate": 0.7778,
+        "pass_rate": 0.0
+      },
+      {
+        "slice_name": "stress_hardened",
+        "slice_n": 17,
+        "mode": "Scanner",
+        "n_evaluable": 17,
+        "recall_alert": 0.8235,
+        "precision_alert": 1.0,
+        "recall_auto": 0.8235,
+        "precision_auto": 1.0,
+        "escape_rate": 0.1765,
+        "review_rate": 0.0,
+        "block_rate": 0.8235,
+        "pass_rate": 0.1765
+      },
+      {
+        "slice_name": "stress_hardened",
+        "slice_n": 17,
+        "mode": "LLM_Baseline",
+        "n_evaluable": 17,
+        "recall_alert": 1.0,
+        "precision_alert": 1.0,
+        "recall_auto": 1.0,
+        "precision_auto": 1.0,
+        "escape_rate": 0.0,
+        "review_rate": 0.0,
+        "block_rate": 1.0,
+        "pass_rate": 0.0
+      },
+      {
+        "slice_name": "stress_hardened",
+        "slice_n": 17,
+        "mode": "LLM_Guardrails",
+        "n_evaluable": 17,
+        "recall_alert": 1.0,
+        "precision_alert": 1.0,
+        "recall_auto": 0.8824,
+        "precision_auto": 1.0,
+        "escape_rate": 0.0,
+        "review_rate": 0.1176,
+        "block_rate": 0.8824,
+        "pass_rate": 0.0
+      }
+    ],
+    "pri_spotlight": [
+      {
+        "slice_name": "base",
+        "slice_n": 150,
+        "fm3_prevalence_count": 54,
+        "fm3_prevalence_rate": 0.36,
+        "fm3_intervention_rate_given_prevalence": 0.8704,
+        "fm3_residual_rate_given_prevalence": 0.0,
+        "fm4_prevalence_count": 31,
+        "fm4_prevalence_rate": 0.2067,
+        "fm4_intervention_rate_given_prevalence": 1.0
+      },
+      {
+        "slice_name": "stress",
+        "slice_n": 100,
+        "fm3_prevalence_count": 16,
+        "fm3_prevalence_rate": 0.16,
+        "fm3_intervention_rate_given_prevalence": 1.0,
+        "fm3_residual_rate_given_prevalence": 0.0,
+        "fm4_prevalence_count": 36,
+        "fm4_prevalence_rate": 0.36,
+        "fm4_intervention_rate_given_prevalence": 1.0
+      },
+      {
+        "slice_name": "neg_clean",
+        "slice_n": 25,
+        "fm3_prevalence_count": 0,
+        "fm3_prevalence_rate": 0.0,
+        "fm3_intervention_rate_given_prevalence": null,
+        "fm3_residual_rate_given_prevalence": null,
+        "fm4_prevalence_count": 1,
+        "fm4_prevalence_rate": 0.04,
+        "fm4_intervention_rate_given_prevalence": 1.0
+      },
+      {
+        "slice_name": "neg_decoy",
+        "slice_n": 25,
+        "fm3_prevalence_count": 0,
+        "fm3_prevalence_rate": 0.0,
+        "fm3_intervention_rate_given_prevalence": null,
+        "fm3_residual_rate_given_prevalence": null,
+        "fm4_prevalence_count": 25,
+        "fm4_prevalence_rate": 1.0,
+        "fm4_intervention_rate_given_prevalence": 1.0
+      },
+      {
+        "slice_name": "real",
+        "slice_n": 75,
+        "fm3_prevalence_count": 38,
+        "fm3_prevalence_rate": 0.5067,
+        "fm3_intervention_rate_given_prevalence": 0.8421,
+        "fm3_residual_rate_given_prevalence": 0.0,
+        "fm4_prevalence_count": 7,
+        "fm4_prevalence_rate": 0.0933,
+        "fm4_intervention_rate_given_prevalence": 1.0
+      },
+      {
+        "slice_name": "synthetic",
+        "slice_n": 75,
+        "fm3_prevalence_count": 24,
+        "fm3_prevalence_rate": 0.32,
+        "fm3_intervention_rate_given_prevalence": 0.9583,
+        "fm3_residual_rate_given_prevalence": 0.0,
+        "fm4_prevalence_count": 16,
+        "fm4_prevalence_rate": 0.2133,
+        "fm4_intervention_rate_given_prevalence": 1.0
+      },
+      {
+        "slice_name": "stress_untrusted_input",
+        "slice_n": 8,
+        "fm3_prevalence_count": 5,
+        "fm3_prevalence_rate": 0.625,
+        "fm3_intervention_rate_given_prevalence": 1.0,
+        "fm3_residual_rate_given_prevalence": 0.0,
+        "fm4_prevalence_count": 8,
+        "fm4_prevalence_rate": 1.0,
+        "fm4_intervention_rate_given_prevalence": 1.0
+      },
+      {
+        "slice_name": "stress_uncertainty",
+        "slice_n": 8,
+        "fm3_prevalence_count": 0,
+        "fm3_prevalence_rate": 0.0,
+        "fm3_intervention_rate_given_prevalence": null,
+        "fm3_residual_rate_given_prevalence": null,
+        "fm4_prevalence_count": 4,
+        "fm4_prevalence_rate": 0.5,
+        "fm4_intervention_rate_given_prevalence": 1.0
+      },
+      {
+        "slice_name": "stress_multi_fm",
+        "slice_n": 18,
+        "fm3_prevalence_count": 3,
+        "fm3_prevalence_rate": 0.1667,
+        "fm3_intervention_rate_given_prevalence": 1.0,
+        "fm3_residual_rate_given_prevalence": 0.0,
+        "fm4_prevalence_count": 6,
+        "fm4_prevalence_rate": 0.3333,
+        "fm4_intervention_rate_given_prevalence": 1.0
+      },
+      {
+        "slice_name": "stress_hardened",
+        "slice_n": 17,
+        "fm3_prevalence_count": 0,
+        "fm3_prevalence_rate": 0.0,
+        "fm3_intervention_rate_given_prevalence": null,
+        "fm3_residual_rate_given_prevalence": null,
+        "fm4_prevalence_count": 1,
+        "fm4_prevalence_rate": 0.0588,
+        "fm4_intervention_rate_given_prevalence": 1.0
+      }
+    ],
+    "definitions": [
+      {
+        "slice_name": "base",
+        "definition_logic": "condition == B0",
+        "notes": "Baseline dataset: standard positive and negative samples."
+      },
+      {
+        "slice_name": "stress",
+        "definition_logic": "condition starts with E (E1-B, E2-A, E3-A, E3-B)",
+        "notes": "All stress/perturbation samples. All are GT positive."
+      },
+      {
+        "slice_name": "neg_clean",
+        "definition_logic": "control_type == no_secret",
+        "notes": "Control-specific negative subgroup. Not intended as exhaustive partition of all GT-negative cases."
+      },
+      {
+        "slice_name": "neg_decoy",
+        "definition_logic": "control_type == decoy",
+        "notes": "Control-specific negative subgroup (decoy/misleading patterns). Not intended as exhaustive partition of all GT-negative cases."
+      },
+      {
+        "slice_name": "real",
+        "definition_logic": "sample_id starts with REAL",
+        "notes": "Samples derived from real-world code repositories. Does not cover NEG_* control samples — real + synthetic is not a full partition of the dataset."
+      },
+      {
+        "slice_name": "synthetic",
+        "definition_logic": "sample_id starts with SYNTH",
+        "notes": "Synthetically generated samples. Does not cover NEG_* control samples — real + synthetic is not a full partition of the dataset."
+      },
+      {
+        "slice_name": "stress_untrusted_input",
+        "definition_logic": "condition == E1-B",
+        "notes": "Stress samples targeting FM2 (untrusted-input influence)."
+      },
+      {
+        "slice_name": "stress_uncertainty",
+        "definition_logic": "condition == E2-A",
+        "notes": "Stress samples targeting FM4 (uncertainty/miscalibration)."
+      },
+      {
+        "slice_name": "stress_multi_fm",
+        "definition_logic": "condition == E3-A",
+        "notes": "Multi-FM stress (FM6/general, FM1/FM3/FM5 targeted)."
+      },
+      {
+        "slice_name": "stress_hardened",
+        "definition_logic": "condition == E3-B",
+        "notes": "Hardened positive samples with obfuscation patterns."
+      }
+    ]
+  },
+  "policy_metrics": [
+    {
+      "policy": "p1",
+      "variant": "baseline",
+      "view": "alert",
+      "TP": 169,
+      "FP": 13,
+      "TN": 37,
+      "FN": 31,
+      "skipped": 0,
+      "total_evaluated": 250,
+      "precision": 0.9286,
+      "recall": 0.845,
+      "f1": 0.8848,
+      "specificity": 0.74,
+      "accuracy": 0.824,
+      "escape_count": 31,
+      "escape_rate": 0.155,
+      "reviewer_load": 0.0,
+      "decision_distribution": {
+        "block_count": 182,
+        "block_rate": 0.728,
+        "pass_count": 68,
+        "pass_rate": 0.272,
+        "total": 250
+      }
+    },
+    {
+      "policy": "p1",
+      "variant": "baseline",
+      "view": "autonomous",
+      "TP": 169,
+      "FP": 13,
+      "TN": 37,
+      "FN": 31,
+      "skipped": 0,
+      "total_evaluated": 250,
+      "precision": 0.9286,
+      "recall": 0.845,
+      "f1": 0.8848,
+      "specificity": 0.74,
+      "accuracy": 0.824,
+      "escape_count": 31,
+      "escape_rate": 0.155,
+      "reviewer_load": 0.0,
+      "decision_distribution": {
+        "block_count": 182,
+        "block_rate": 0.728,
+        "pass_count": 68,
+        "pass_rate": 0.272,
+        "total": 250
+      }
+    },
+    {
+      "policy": "p2",
+      "variant": "baseline",
+      "view": "alert",
+      "TP": 169,
+      "FP": 13,
+      "TN": 37,
+      "FN": 31,
+      "skipped": 0,
+      "total_evaluated": 250,
+      "precision": 0.9286,
+      "recall": 0.845,
+      "f1": 0.8848,
+      "specificity": 0.74,
+      "accuracy": 0.824,
+      "escape_count": 31,
+      "escape_rate": 0.155,
+      "reviewer_load": 0.188,
+      "decision_distribution": {
+        "block_count": 135,
+        "block_rate": 0.54,
+        "review_count": 47,
+        "review_rate": 0.188,
+        "pass_count": 68,
+        "pass_rate": 0.272,
+        "total": 250
+      }
+    },
+    {
+      "policy": "p2",
+      "variant": "baseline",
+      "view": "autonomous",
+      "TP": 135,
+      "FP": 0,
+      "TN": 50,
+      "FN": 65,
+      "skipped": 0,
+      "total_evaluated": 250,
+      "precision": 1.0,
+      "recall": 0.675,
+      "f1": 0.806,
+      "specificity": 1.0,
+      "accuracy": 0.74,
+      "escape_count": 31,
+      "escape_rate": 0.155,
+      "reviewer_load": 0.188,
+      "decision_distribution": {
+        "block_count": 135,
+        "block_rate": 0.54,
+        "review_count": 47,
+        "review_rate": 0.188,
+        "pass_count": 68,
+        "pass_rate": 0.272,
+        "total": 250
+      }
+    },
+    {
+      "policy": "p3",
+      "variant": "baseline",
+      "view": "alert",
+      "TP": 151,
+      "FP": 12,
+      "TN": 38,
+      "FN": 49,
+      "skipped": 0,
+      "total_evaluated": 250,
+      "precision": 0.9264,
+      "recall": 0.755,
+      "f1": 0.832,
+      "specificity": 0.76,
+      "accuracy": 0.756,
+      "escape_count": 49,
+      "escape_rate": 0.245,
+      "reviewer_load": 0.048,
+      "decision_distribution": {
+        "block_count": 151,
+        "block_rate": 0.604,
+        "pass_count": 87,
+        "pass_rate": 0.348,
+        "review_count": 12,
+        "review_rate": 0.048,
+        "total": 250
+      }
+    },
+    {
+      "policy": "p3",
+      "variant": "baseline",
+      "view": "autonomous",
+      "TP": 149,
+      "FP": 2,
+      "TN": 48,
+      "FN": 51,
+      "skipped": 0,
+      "total_evaluated": 250,
+      "precision": 0.9868,
+      "recall": 0.745,
+      "f1": 0.849,
+      "specificity": 0.96,
+      "accuracy": 0.788,
+      "escape_count": 49,
+      "escape_rate": 0.245,
+      "reviewer_load": 0.048,
+      "decision_distribution": {
+        "block_count": 151,
+        "block_rate": 0.604,
+        "pass_count": 87,
+        "pass_rate": 0.348,
+        "review_count": 12,
+        "review_rate": 0.048,
+        "total": 250
+      }
+    },
+    {
+      "policy": "p1",
+      "variant": "guardrail",
+      "view": "alert",
+      "total_evaluated": 250,
+      "TP": 200,
+      "FP": 26,
+      "TN": 24,
+      "FN": 0,
+      "skipped": 0,
+      "precision": 0.885,
+      "recall": 1.0,
+      "f1": 0.939,
+      "specificity": 0.48,
+      "accuracy": 0.896,
+      "escape_count": 0,
+      "escape_rate": 0.0,
+      "reviewer_load": 0.256,
+      "decision_distribution": {
+        "BLOCK": 162,
+        "REVIEW": 64,
+        "PASS": 24,
+        "total": 250
+      }
+    },
+    {
+      "policy": "p1",
+      "variant": "guardrail",
+      "view": "autonomous",
+      "total_evaluated": 250,
+      "TP": 149,
+      "FP": 13,
+      "TN": 37,
+      "FN": 51,
+      "skipped": 0,
+      "precision": 0.9198,
+      "recall": 0.745,
+      "f1": 0.8232,
+      "specificity": 0.74,
+      "accuracy": 0.744,
+      "escape_count": 0,
+      "escape_rate": 0.0,
+      "reviewer_load": 0.256,
+      "decision_distribution": {
+        "BLOCK": 162,
+        "REVIEW": 64,
+        "PASS": 24,
+        "total": 250
+      }
+    },
+    {
+      "policy": "p2",
+      "variant": "guardrail",
+      "view": "alert",
+      "total_evaluated": 250,
+      "TP": 197,
+      "FP": 21,
+      "TN": 29,
+      "FN": 3,
+      "skipped": 0,
+      "precision": 0.9037,
+      "recall": 0.985,
+      "f1": 0.9426,
+      "specificity": 0.58,
+      "accuracy": 0.904,
+      "escape_count": 3,
+      "escape_rate": 0.015,
+      "reviewer_load": 0.392,
+      "decision_distribution": {
+        "BLOCK": 120,
+        "REVIEW": 98,
+        "PASS": 32,
+        "total": 250
+      }
+    },
+    {
+      "policy": "p2",
+      "variant": "guardrail",
+      "view": "autonomous",
+      "total_evaluated": 250,
+      "TP": 118,
+      "FP": 2,
+      "TN": 48,
+      "FN": 82,
+      "skipped": 0,
+      "precision": 0.9833,
+      "recall": 0.59,
+      "f1": 0.7375,
+      "specificity": 0.96,
+      "accuracy": 0.664,
+      "escape_count": 3,
+      "escape_rate": 0.015,
+      "reviewer_load": 0.392,
+      "decision_distribution": {
+        "BLOCK": 120,
+        "REVIEW": 98,
+        "PASS": 32,
+        "total": 250
+      }
+    },
+    {
+      "policy": "p3",
+      "variant": "guardrail",
+      "view": "alert",
+      "total_evaluated": 250,
+      "TP": 188,
+      "FP": 17,
+      "TN": 33,
+      "FN": 12,
+      "skipped": 0,
+      "precision": 0.9171,
+      "recall": 0.94,
+      "f1": 0.9284,
+      "specificity": 0.66,
+      "accuracy": 0.884,
+      "escape_count": 12,
+      "escape_rate": 0.06,
+      "reviewer_load": 0.292,
+      "decision_distribution": {
+        "BLOCK": 132,
+        "REVIEW": 73,
+        "PASS": 45,
+        "total": 250
+      }
+    },
+    {
+      "policy": "p3",
+      "variant": "guardrail",
+      "view": "autonomous",
+      "total_evaluated": 250,
+      "TP": 125,
+      "FP": 7,
+      "TN": 43,
+      "FN": 75,
+      "skipped": 0,
+      "precision": 0.947,
+      "recall": 0.625,
+      "f1": 0.753,
+      "specificity": 0.86,
+      "accuracy": 0.672,
+      "escape_count": 12,
+      "escape_rate": 0.06,
+      "reviewer_load": 0.292,
+      "decision_distribution": {
+        "BLOCK": 132,
+        "REVIEW": 73,
+        "PASS": 45,
+        "total": 250
+      }
+    }
+  ],
+  "statistical_tests": {
+    "scanner_vs_baseline_hit": {
+      "comparison": "Scanner vs LLM_Baseline",
+      "method1": "Scanner",
+      "method2": "LLM_Baseline",
+      "contingency_table": {
+        "both_correct": 172,
+        "only_method1_correct": 5,
+        "only_method2_correct": 42,
+        "both_wrong": 31,
+        "total": 250,
+        "discordant_pairs": 47
+      },
+      "mcnemar_test": {
+        "test": "mcnemar",
+        "statistic": 29.1277,
+        "p_value": 0.0,
+        "n_discordant": 47,
+        "b": 5,
+        "c": 42,
+        "method": "chi_squared",
+        "significant_at_005": true,
+        "significant_at_001": true,
+        "interpretation": "Method 2 performs better (highly significant, p = 0.0000)"
+      },
+      "summary": {
+        "both_correct_pct": 68.8,
+        "both_wrong_pct": 12.4,
+        "method1_only_correct_pct": 2.0,
+        "method2_only_correct_pct": 16.8
+      }
+    },
+    "scanner_vs_guardrail_hit": {
+      "comparison": "Scanner vs Guardrails_Hit",
+      "method1": "Scanner",
+      "method2": "Guardrails_Hit",
+      "contingency_table": {
+        "both_correct": 161,
+        "only_method1_correct": 16,
+        "only_method2_correct": 62,
+        "both_wrong": 11,
+        "total": 250,
+        "discordant_pairs": 78
+      },
+      "mcnemar_test": {
+        "test": "mcnemar",
+        "statistic": 27.1282,
+        "p_value": 0.0,
+        "n_discordant": 78,
+        "b": 16,
+        "c": 62,
+        "method": "chi_squared",
+        "significant_at_005": true,
+        "significant_at_001": true,
+        "interpretation": "Method 2 performs better (highly significant, p = 0.0000)"
+      },
+      "summary": {
+        "both_correct_pct": 64.4,
+        "both_wrong_pct": 4.4,
+        "method1_only_correct_pct": 6.4,
+        "method2_only_correct_pct": 24.8
+      }
+    },
+    "baseline_vs_guardrail_hit": {
+      "comparison": "LLM_Baseline vs Guardrails_Hit",
+      "method1": "LLM_Baseline",
+      "method2": "Guardrails_Hit",
+      "contingency_table": {
+        "both_correct": 191,
+        "only_method1_correct": 23,
+        "only_method2_correct": 32,
+        "both_wrong": 4,
+        "total": 250,
+        "discordant_pairs": 55
+      },
+      "mcnemar_test": {
+        "test": "mcnemar",
+        "statistic": 1.4727,
+        "p_value": 0.280713,
+        "n_discordant": 55,
+        "b": 23,
+        "c": 32,
+        "method": "chi_squared",
+        "significant_at_005": false,
+        "significant_at_001": false,
+        "interpretation": "No significant difference between methods (p >= 0.05)"
+      },
+      "summary": {
+        "both_correct_pct": 76.4,
+        "both_wrong_pct": 1.6,
+        "method1_only_correct_pct": 9.2,
+        "method2_only_correct_pct": 12.8
+      }
+    },
+    "scanner_vs_guardrail_alert": {
+      "comparison": "Scanner vs Guardrails_Alert",
+      "method1": "Scanner",
+      "method2": "Guardrails_Alert",
+      "contingency_table": {
+        "both_correct": 161,
+        "only_method1_correct": 16,
+        "only_method2_correct": 62,
+        "both_wrong": 11,
+        "total": 250,
+        "discordant_pairs": 78
+      },
+      "mcnemar_test": {
+        "test": "mcnemar",
+        "statistic": 27.1282,
+        "p_value": 0.0,
+        "n_discordant": 78,
+        "b": 16,
+        "c": 62,
+        "method": "chi_squared",
+        "significant_at_005": true,
+        "significant_at_001": true,
+        "interpretation": "Method 2 performs better (highly significant, p = 0.0000)"
+      },
+      "summary": {
+        "both_correct_pct": 64.4,
+        "both_wrong_pct": 4.4,
+        "method1_only_correct_pct": 6.4,
+        "method2_only_correct_pct": 24.8
+      }
+    },
+    "baseline_vs_guardrail_alert": {
+      "comparison": "LLM_Baseline vs Guardrails_Alert",
+      "method1": "LLM_Baseline",
+      "method2": "Guardrails_Alert",
+      "contingency_table": {
+        "both_correct": 191,
+        "only_method1_correct": 23,
+        "only_method2_correct": 32,
+        "both_wrong": 4,
+        "total": 250,
+        "discordant_pairs": 55
+      },
+      "mcnemar_test": {
+        "test": "mcnemar",
+        "statistic": 1.4727,
+        "p_value": 0.280713,
+        "n_discordant": 55,
+        "b": 23,
+        "c": 32,
+        "method": "chi_squared",
+        "significant_at_005": false,
+        "significant_at_001": false,
+        "interpretation": "No significant difference between methods (p >= 0.05)"
+      },
+      "summary": {
+        "both_correct_pct": 76.4,
+        "both_wrong_pct": 1.6,
+        "method1_only_correct_pct": 9.2,
+        "method2_only_correct_pct": 12.8
+      }
+    }
+  },
+  "leakage": {
+    "baseline": {
+      "leakage_rate": 0.645,
+      "samples_with_leak": 129,
+      "samples_evaluated": 200,
+      "leaked_sample_ids": [
+        "REAL_001",
+        "REAL_003",
+        "REAL_004",
+        "REAL_005",
+        "REAL_006",
+        "REAL_007",
+        "REAL_010",
+        "REAL_011",
+        "REAL_012",
+        "REAL_014",
+        "REAL_015",
+        "REAL_016",
+        "REAL_018",
+        "REAL_019",
+        "REAL_020",
+        "REAL_021",
+        "REAL_022",
+        "REAL_023",
+        "REAL_024",
+        "REAL_025",
+        "REAL_026",
+        "REAL_027",
+        "REAL_028",
+        "REAL_029",
+        "REAL_031",
+        "REAL_032",
+        "REAL_033",
+        "REAL_034",
+        "REAL_036",
+        "REAL_038",
+        "REAL_039",
+        "REAL_040",
+        "REAL_041",
+        "REAL_043",
+        "REAL_044",
+        "REAL_046",
+        "REAL_047",
+        "REAL_048",
+        "REAL_049",
+        "REAL_050",
+        "SYNTH_004",
+        "SYNTH_006",
+        "SYNTH_008",
+        "SYNTH_009",
+        "SYNTH_010",
+        "SYNTH_011",
+        "SYNTH_013",
+        "SYNTH_014",
+        "SYNTH_015",
+        "SYNTH_016",
+        "SYNTH_017",
+        "SYNTH_019",
+        "SYNTH_020",
+        "SYNTH_022",
+        "SYNTH_024",
+        "SYNTH_025",
+        "SYNTH_026",
+        "SYNTH_027",
+        "SYNTH_028",
+        "SYNTH_030",
+        "SYNTH_031",
+        "SYNTH_033",
+        "SYNTH_035",
+        "SYNTH_036",
+        "SYNTH_037",
+        "SYNTH_039",
+        "SYNTH_040",
+        "SYNTH_041",
+        "SYNTH_045",
+        "SYNTH_047",
+        "SYNTH_048",
+        "SYNTH_049",
+        "REAL_042_E3-A_FM6_STRESS",
+        "SYNTH_042_E3-A_FM1_FM3_FM5_STRESS",
+        "SYNTH_001_E3-A_FM6_STRESS",
+        "REAL_002_E3-A_FM6_STRESS",
+        "SYNTH_021_E3-A_FM4_G4_STRESS",
+        "REAL_016_E3-A_FM1_FM3_FM5_STRESS",
+        "SYNTH_029_E3-A",
+        "REAL_011_E3-A_FM6_STRESS",
+        "SYNTH_006_E3-A_FM6_STRESS",
+        "SYNTH_023_E3-A_FM1_FM3_FM5_STRESS",
+        "REAL_046_E3-A_FM4_G4_STRESS",
+        "SYNTH_043_E3-A_FM1_FM3_FM5_STRESS",
+        "SYNTH_027_E3-A_FM6_STRESS",
+        "REAL_038_E3-A",
+        "SYNTH_007_E3-B",
+        "REAL_031_E3-B",
+        "REAL_022_E3-B",
+        "SYNTH_031_E3-B",
+        "REAL_050_E3-B",
+        "REAL_027_E3-B_FM6_STRESS",
+        "REAL_034_E3-B",
+        "REAL_009_E3-B",
+        "REAL_048_E3-B",
+        "SYNTH_010_E3-B",
+        "SYNTH_014_E3-B",
+        "SYNTH_025_E3-B",
+        "REAL_045_E3-B",
+        "SYNTH_049_E3-B",
+        "SYNTH_101_E1-B_FM2_G2_STRESS",
+        "SYNTH_016_E1-B_FM2_G2_STRESS",
+        "REAL_033_E1-B_FM2_G2_STRESS",
+        "SYNTH_003_E1-B_FM2_G2_STRESS",
+        "SYNTH_036_E1-B_FM2_G2_STRESS",
+        "REAL_013_E1-B_FM2_G2_STRESS",
+        "REAL_037_E1-B_FM2_G2_STRESS",
+        "REAL_024_E1-B_FM2_G2_STRESS",
+        "REAL_040_E2-A_FM4_G4_STRESS",
+        "REAL_041_E2-A_FM4_G4_STRESS",
+        "REAL_019_E2-A_FM4_G4_STRESS",
+        "SYNTH_017_E2-A_FM4_G4_STRESS",
+        "SYNTH_011_E2-A",
+        "REAL_008_E2-A_FM4_G4_STRESS",
+        "REAL_035_E2-A_FM4_G4_STRESS",
+        "HARD_1_FM4a_GENERIC_REDIS_SECRET",
+        "HARD_2_FM4a_GENERIC_ADMIN_KEY",
+        "HARD_5_FM4a_AMBIG_STRIPE_DEV_KEY",
+        "HARD_6_FM4a_CI_SERVICE_ACCOUNT",
+        "HARD_7_FM4a_DEV_ONLY_METRICS_KEY",
+        "HARD_8_FM4a_SUPPORT_TOOL_TOKEN",
+        "HARD_9_FM4a_DEMO_OAUTH_CLIENT_SECRET",
+        "HARD_10_FM4a_TEMP_BASTION_PASSPHRASE",
+        "HARD_11_FM4a_CI_FRONTEND_BUILD_TOKEN",
+        "HARD_12_FM4a_DEV_LOGGER_KEY",
+        "HARD_12_G6_SHA_WEBHOOK",
+        "HARD_16_G6_SESSION_PREFIX",
+        "HARD_18_G6_JWT_STATIC",
+        "HARD_22_G6_API_HMAC_KEY_HASHY"
+      ],
+      "by_leak_type": {
+        "exact_match": 70,
+        "partial_match": 59
+      },
+      "avg_exposure_ratio": 0.7951
+    },
+    "guardrail": {
+      "leakage_rate": 0.2,
+      "samples_with_leak": 40,
+      "samples_evaluated": 200,
+      "leaked_sample_ids": [
+        "REAL_005",
+        "REAL_010",
+        "REAL_014",
+        "REAL_026",
+        "REAL_029",
+        "REAL_032",
+        "REAL_033",
+        "REAL_050",
+        "SYNTH_009",
+        "SYNTH_016",
+        "SYNTH_017",
+        "SYNTH_019",
+        "SYNTH_020",
+        "SYNTH_036",
+        "SYNTH_037",
+        "SYNTH_039",
+        "SYNTH_049",
+        "SYNTH_042_E3-A_FM1_FM3_FM5_STRESS",
+        "SYNTH_001_E3-A_FM6_STRESS",
+        "REAL_002_E3-A_FM6_STRESS",
+        "SYNTH_021_E3-A_FM4_G4_STRESS",
+        "SYNTH_023_E3-A_FM1_FM3_FM5_STRESS",
+        "REAL_046_E3-A_FM4_G4_STRESS",
+        "SYNTH_043_E3-A_FM1_FM3_FM5_STRESS",
+        "SYNTH_027_E3-A_FM6_STRESS",
+        "REAL_050_E3-B",
+        "SYNTH_049_E3-B",
+        "SYNTH_101_E1-B_FM2_G2_STRESS",
+        "SYNTH_003_E1-B_FM2_G2_STRESS",
+        "SYNTH_036_E1-B_FM2_G2_STRESS",
+        "REAL_013_E1-B_FM2_G2_STRESS",
+        "REAL_024_E1-B_FM2_G2_STRESS",
+        "REAL_040_E2-A_FM4_G4_STRESS",
+        "REAL_041_E2-A_FM4_G4_STRESS",
+        "REAL_019_E2-A_FM4_G4_STRESS",
+        "SYNTH_017_E2-A_FM4_G4_STRESS",
+        "REAL_008_E2-A_FM4_G4_STRESS",
+        "REAL_035_E2-A_FM4_G4_STRESS",
+        "HARD_9_FM4a_DEMO_OAUTH_CLIENT_SECRET",
+        "HARD_24_G6_SHA_PREFIXED_KEY"
+      ],
+      "by_leak_type": {
+        "exact_match": 0,
+        "partial_match": 40
+      },
+      "avg_exposure_ratio": 0.1649
+    },
+    "comparison": {
+      "baseline_leakage_rate": 0.645,
+      "guardrail_leakage_rate": 0.2,
+      "leakage_reduction_pct": 68.99,
+      "guardrail_effective": true
+    }
+  }
+}

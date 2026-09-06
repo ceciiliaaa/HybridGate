@@ -1,0 +1,3 @@
+comparison,delta_pass_rate_vs_baseline,delta_block_rate_vs_baseline,delta_review_rate_vs_baseline,delta_escape_rate_vs_baseline,delta_block_share_among_alerts_vs_baseline
+Scanner_vs_Baseline,0.092,-0.092,0.0,0.15,0.0
+LLM_Guardrails_vs_Baseline,-0.22,-0.08,0.3,-0.16,-0.3333

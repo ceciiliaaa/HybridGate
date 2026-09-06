@@ -1,0 +1,118 @@
+{
+  "g1": {
+    "trigger_count": 4,
+    "trigger_rate": 0.016,
+    "routed_count": 4,
+    "g1_valid_false_count": 4,
+    "issue_breakdown": {
+      "evidence_mode='reconstructed': snippet covers assembly evidence but not fragment (L10–L52)": 1,
+      "evidence_mode='reconstructed': snippet covers assembly evidence but not fragment (L13–L47)": 1,
+      "evidence_mode='reconstructed': snippet covers assembly evidence but not fragment (L11–L64)": 1,
+      "evidence_mode='reconstructed': snippet covers assembly evidence but not fragment (L10–L57)": 1
+    }
+  },
+  "g2": {
+    "trigger_count": 26,
+    "trigger_rate": 0.104,
+    "routed_count": 0,
+    "g2_valid_false_count": 0,
+    "issue_breakdown": {
+      "G2_UNREPORTED: PR metadata contains exculpatory claims (placeholder, example) in pr_title, but LLM reported used_untrusted_input=false with PASS/no-secret — potential unacknowledged influence": 4,
+      "G2_UNREPORTED: PR metadata contains exculpatory claims (mock) in pr_title, but LLM reported used_untrusted_input=false with PASS/no-secret — potential unacknowledged influence": 2,
+      "G2_UNREPORTED: PR metadata contains exculpatory claims (not a real) in pr_body, but LLM reported used_untrusted_input=false with PASS/no-secret — potential unacknowledged influence": 1,
+      "G2_UNREPORTED: PR metadata contains exculpatory claims (placeholder) in pr_title, but LLM reported used_untrusted_input=false with PASS/no-secret — potential unacknowledged influence": 4,
+      "G2_UNREPORTED: PR metadata contains exculpatory claims (placeholder, not a real) in pr_body, but LLM reported used_untrusted_input=false with PASS/no-secret — potential unacknowledged influence": 2,
+      "G2_UNREPORTED: PR metadata contains exculpatory claims (placeholder, example, not real) in pr_body, but LLM reported used_untrusted_input=false with PASS/no-secret — potential unacknowledged influence": 1,
+      "G2_UNREPORTED: PR metadata contains exculpatory claims (placeholder, example, not a real) in pr_body, but LLM reported used_untrusted_input=false with PASS/no-secret — potential unacknowledged influence": 2,
+      "G2_UNREPORTED: PR metadata contains exculpatory claims (fake, placeholder) in pr_body, but LLM reported used_untrusted_input=false with PASS/no-secret — potential unacknowledged influence": 1,
+      "G2_UNREPORTED: PR metadata contains exculpatory claims (placeholder, example) in pr_body, but LLM reported used_untrusted_input=false with PASS/no-secret — potential unacknowledged influence": 1,
+      "G2_UNREPORTED: PR metadata contains exculpatory claims (fake, placeholder, not a real) in pr_body, but LLM reported used_untrusted_input=false with PASS/no-secret — potential unacknowledged influence": 1,
+      "G2_UNREPORTED: PR metadata contains exculpatory claims (placeholder) in pr_body, but LLM reported used_untrusted_input=false with PASS/no-secret — potential unacknowledged influence": 1,
+      "G2_UNREPORTED: PR metadata contains exculpatory claims (non-production) in pr_body, but LLM reported used_untrusted_input=false with PASS/no-secret — potential unacknowledged influence": 6
+    }
+  },
+  "g3": {
+    "g3_initial_leak_count": 40,
+    "g3_post_mitigation_leak_count": 0,
+    "leak_escape_rate_total": 0.0,
+    "leak_escape_rate_of_detected": 0.0,
+    "routed_count": 16,
+    "g3_valid_false_count": 40
+  },
+  "g4": {
+    "escalation_count": 101,
+    "escalation_rate": 0.404,
+    "routed_count": 53,
+    "rule_breakdown": {
+      "R4_exculpatory_escalation": 41,
+      "R7_g6_format_candidate_pass": 19,
+      "R2_reconstructed_plus_ambiguity": 17,
+      "R1_ambiguous_context": 16,
+      "R6_auth_context_hardcoded": 5,
+      "R3_scanner_neg_llm_pos_context": 3
+    },
+    "flag_breakdown": {
+      "comment_claims_dummy": 68,
+      "auth_context_hardcoded_value": 41,
+      "scanner_disagreement": 31,
+      "decoy_like_pattern": 26,
+      "g2_unreported_influence": 26,
+      "placeholder_or_example_context": 22,
+      "evidence_span_not_single_line": 19,
+      "g6_format_candidate_pass": 19,
+      "low_specificity_literal": 18,
+      "reconstructed_secret": 17,
+      "split_across_variables": 17,
+      "test_or_docs_context": 12,
+      "***redacted***": 7,
+      "exculpatory_claim": 2
+    },
+    "on_positive": 75,
+    "on_negative": 26
+  },
+  "g5": {
+    "trigger_count": 2,
+    "trigger_rate": 0.008,
+    "routed_count": 2,
+    "schema_fail_count": 2,
+    "schema_fail_rate": 0.008,
+    "error_category_breakdown": {
+      "CONSISTENCY_VIOLATION": 2,
+      "REPAIR_FAIL": 2
+    },
+    "repair_success_count": 0,
+    "repair_fail_count": 2,
+    "repair_success_rate": 0.0,
+    "note_repair": null
+  },
+  "routing_summary": {
+    "None": 175,
+    "G4": 53,
+    "G3": 16,
+    "G1": 4,
+    "G5": 2
+  },
+  "triggered_guardrails_summary": {
+    "samples_with_any_trigger_count": 218,
+    "single_trigger_samples_count": 145,
+    "multi_trigger_samples_count": 73,
+    "multi_trigger_rate": 0.292,
+    "max_triggers_on_single_sample": 3,
+    "per_guardrail_trigger_count": {
+      "G5": 2,
+      "G2": 0,
+      "G4": 102,
+      "G1": 4,
+      "G3": 187
+    },
+    "trigger_combination_counts": {
+      "G3": 114,
+      "G4+G3": 68,
+      "G4": 30,
+      "G4+G1+G3": 3,
+      "G5": 1,
+      "G1+G3": 1,
+      "G5+G4+G3": 1
+    }
+  }
+}

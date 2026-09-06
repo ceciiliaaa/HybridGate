@@ -1,0 +1,4 @@
+mode,escape_rate,recall_alert,recall_auto,delta_recall_alert_vs_auto,precision_alert,precision_auto,delta_precision_alert_vs_auto,review_rate
+Scanner,0.315,0.685,0.685,0.0,0.932,0.932,0.0,0.0
+LLM_Baseline,0.165,0.835,0.835,0.0,0.9824,0.9824,0.0,0.0
+LLM_Guardrails,0.005,0.995,0.725,0.27,0.8844,0.9667,-0.0823,0.3
