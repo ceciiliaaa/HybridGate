@@ -1,0 +1,4 @@
+mode,n_total,n_evaluable,n_missing,tp_auto,fp_auto,tn_auto,fn_auto,precision_auto,recall_auto,f1_auto,specificity_auto
+Scanner,250,250,0,137,10,40,63,0.932,0.685,0.7896,0.8
+LLM_Baseline,250,250,0,167,3,47,33,0.9824,0.835,0.9027,0.94
+LLM_Guardrails,250,250,0,145,5,45,55,0.9667,0.725,0.8286,0.9

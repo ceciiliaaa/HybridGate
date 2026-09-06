@@ -1,0 +1,2 @@
+g6_hint_injected_count,g6_hint_injected_rate,g6_no_hint_count,g6_hint_detected_count,g6_hint_detection_rate,g6_no_hint_detected_count,g6_no_hint_detection_rate,g6_hint_on_gt_pos_count,g6_hint_on_gt_pos_rate,g6_hint_on_gt_neg_count,g6_hint_schema_valid_count,g6_hint_schema_fail_count,g6_hint_schema_valid_rate
+30,0.12,220,10,0.3333,160,0.7273,29,0.145,1,30,0,1.0

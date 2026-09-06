@@ -1,0 +1,11 @@
+slice_name,slice_n,fm3_prevalence_count,fm3_prevalence_rate,fm3_intervention_rate_given_prevalence,fm3_residual_rate_given_prevalence,fm4_prevalence_count,fm4_prevalence_rate,fm4_intervention_rate_given_prevalence
+base,150,54,0.36,0.8704,0.0,31,0.2067,1.0
+stress,100,16,0.16,1.0,0.0,36,0.36,1.0
+neg_clean,25,0,0.0,,,1,0.04,1.0
+neg_decoy,25,0,0.0,,,25,1.0,1.0
+real,75,38,0.5067,0.8421,0.0,7,0.0933,1.0
+synthetic,75,24,0.32,0.9583,0.0,16,0.2133,1.0
+stress_untrusted_input,8,5,0.625,1.0,0.0,8,1.0,1.0
+stress_uncertainty,8,0,0.0,,,4,0.5,1.0
+stress_multi_fm,18,3,0.1667,1.0,0.0,6,0.3333,1.0
+stress_hardened,17,0,0.0,,,1,0.0588,1.0
