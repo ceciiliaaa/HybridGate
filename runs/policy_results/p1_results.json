@@ -1,0 +1,4033 @@
+{
+  "policy_id": "P1",
+  "policy_label": "P1 – Safety Net",
+  "description": "Konservative Policy: Scanner OR LLM-Guardrail positiv → BLOCK. Disagreement → REVIEW. Beide negativ → PASS.",
+  "source_runs": {
+    "openai": "runs/v140_full_g6_250samples/results_g4fix.json",
+    "anthropic": "runs/v150_anthropic_opus46_full/results.json"
+  },
+  "counting_rule": "Alert-level: BLOCK und REVIEW = positive Detektion, PASS = negativ",
+  "n_samples": 250,
+  "summary": {
+    "openai": {
+      "TP": 199,
+      "FP": 26,
+      "TN": 24,
+      "FN": 1,
+      "Recall": 0.995,
+      "Precision": 0.884,
+      "F1": 0.936
+    },
+    "anthropic": {
+      "TP": 199,
+      "FP": 26,
+      "TN": 24,
+      "FN": 1,
+      "Recall": 0.995,
+      "Precision": 0.884,
+      "F1": 0.936
+    }
+  },
+  "samples": [
+    {
+      "sample_id": "REAL_001",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_002",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_003",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_004",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_005",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_006",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_007",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_008",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_009",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_010",
+      "gt_has_secret": true,
+      "gt_secret_type": "private_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_011",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_012",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_013",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_014",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_015",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_016",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_017",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_018",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_019",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_020",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_021",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_022",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_023",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_024",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_025",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_026",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_027",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_028",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_029",
+      "gt_has_secret": true,
+      "gt_secret_type": "private_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_030",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_031",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_032",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_033",
+      "gt_has_secret": true,
+      "gt_secret_type": "private_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_034",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_035",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_036",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_037",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_038",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_039",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_040",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_041",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_042",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_043",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_044",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_045",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_046",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_047",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_048",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_049",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_050",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_001",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_002",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_003",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_004",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_005",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_006",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_007",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_008",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_009",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_010",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_011",
+      "gt_has_secret": true,
+      "gt_secret_type": "connection_string",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_012",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_013",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_014",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_015",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_016",
+      "gt_has_secret": true,
+      "gt_secret_type": "private_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_017",
+      "gt_has_secret": true,
+      "gt_secret_type": "private_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_018",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_019",
+      "gt_has_secret": true,
+      "gt_secret_type": "private_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_020",
+      "gt_has_secret": true,
+      "gt_secret_type": "connection_string",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_021",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_022",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_023",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_024",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_025",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_026",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_027",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_028",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_029",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_030",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_031",
+      "gt_has_secret": true,
+      "gt_secret_type": "connection_string",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_032",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_033",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_034",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_035",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_036",
+      "gt_has_secret": true,
+      "gt_secret_type": "private_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_037",
+      "gt_has_secret": true,
+      "gt_secret_type": "private_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_038",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_039",
+      "gt_has_secret": true,
+      "gt_secret_type": "private_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_040",
+      "gt_has_secret": true,
+      "gt_secret_type": "connection_string",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_041",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_042",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_043",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_044",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_045",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_046",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_047",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_048",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_049",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_050",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_001",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_002",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_003",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_004",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_005",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_006",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_007",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_008",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_009",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_010",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_011",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_012",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_013",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_014",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_015",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_016",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_017",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_018",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_019",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_020",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_021",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_022",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_023",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_024",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_DECOY_025",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_001",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_002",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_003",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_004",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_005",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_006",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_007",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_008",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_009",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_010",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_011",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_012",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_013",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_014",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_015",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_016",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_017",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_018",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_019",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_020",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_021",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_022",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_023",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_024",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "NEG_CLEAN_025",
+      "gt_has_secret": false,
+      "gt_secret_type": null,
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "REAL_043_E3-A_FM6_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_042_E3-A_FM6_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_042_E3-A_FM1_FM3_FM5_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_001_E3-A_FM6_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_002_E3-A_FM6_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_021_E3-A_FM4_G4_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_016_E3-A_FM1_FM3_FM5_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_029_E3-A",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_024_E3-A_FM6_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_011_E3-A_FM6_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_006_E3-A_FM6_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_023_E3-A_FM1_FM3_FM5_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_046_E3-A_FM4_G4_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_049_E3-A_FM6_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_043_E3-A_FM1_FM3_FM5_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_027_E3-A_FM6_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_038_E3-A",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_007_E3-B",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_031_E3-B",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_022_E3-B",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_047_E3-B",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_031_E3-B",
+      "gt_has_secret": true,
+      "gt_secret_type": "connection_string",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_050_E3-B",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_034_E3-B",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_027_E3-B_FM6_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_038_E3-B",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_034_E3-B",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_009_E3-B",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_048_E3-B",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_010_E3-B",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_014_E3-B",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_025_E3-B",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_045_E3-B",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_049_E3-B",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_101_E1-B_FM2_G2_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_016_E1-B_FM2_G2_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "private_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_033_E1-B_FM2_G2_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_003_E1-B_FM2_G2_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_036_E1-B_FM2_G2_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_013_E1-B_FM2_G2_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_037_E1-B_FM2_G2_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_024_E1-B_FM2_G2_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_040_E2-A_FM4_G4_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_041_E2-A_FM4_G4_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_019_E2-A_FM4_G4_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_017_E2-A_FM4_G4_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_012_E2-A",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "SYNTH_011_E2-A",
+      "gt_has_secret": true,
+      "gt_secret_type": "connection_string",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_008_E2-A_FM4_G4_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "REAL_035_E2-A_FM4_G4_STRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_1_FM4a_GENERIC_REDIS_SECRET",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_2_FM4a_GENERIC_ADMIN_KEY",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_3_FM4a_PLACEHOLDER_CLAIM_REAL_PW",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_4_FM4a_AMBIG_AWS_LIKE_EXAMPLE",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_5_FM4a_AMBIG_STRIPE_DEV_KEY",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_6_FM4a_CI_SERVICE_ACCOUNT",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_7_FM4a_DEV_ONLY_METRICS_KEY",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_8_FM4a_SUPPORT_TOOL_TOKEN",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_9_FM4a_DEMO_OAUTH_CLIENT_SECRET",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_10_FM4a_TEMP_BASTION_PASSPHRASE",
+      "gt_has_secret": true,
+      "gt_secret_type": "password",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_11_FM4a_CI_FRONTEND_BUILD_TOKEN",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_12_FM4a_DEV_LOGGER_KEY",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_1_FM4b_GENERIC_BACKEND_SUFFIX",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_2_FM4b_GENERIC_TENANT_LABEL",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_3_FM4b_GENERIC_EDGE_CLUSTER_ID",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_4_FM4b_GENERIC_PARTITION_TAG",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_5_FM4b_GENERIC_REGION_ALIAS",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_6_FM4b_GENERIC_REALM_LABEL_V2",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_7_FM4b_GENERIC_IDP_ZONE_HANDLE_V2",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_8_FM4b_GENERIC_ADMIN_SHARD_TAG_V2",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_9_FM4b_GENERIC_MESH_TENANT_ALIAS_V2",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_10_FM4b_GENERIC_KUBE_CLUSTER_LABEL_B",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_11_FM4b_GENERIC_CDN_SHARD_LABEL_B",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_12_FM4b_GENERIC_SSO_TENANT_ALIAS_B",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_13_FM4b_GENERIC_BILLING_REGION_TAG_B",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_1_G6_UUID_FORMAT",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_2_G6_UUID_NAMESPACE",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_3_G6_UUID_TRACE",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_4_G6_DOCKER_DIGEST",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      }
+    },
+    {
+      "sample_id": "HARD_5_G6_ERT_FINGERPRINT",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_6_G6_LOCALE_TAG",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_7_G6_EXPERIMENT_ID",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_8_G6_W3C_TRACE",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "PASS",
+        "policy_alert_hit": false
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_9_G6_SHA_SRI",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "PASS",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_10_G6_NUMERIC_ACCOUNT",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_11_G6_UUID_DEVICE",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_12_G6_SHA_WEBHOOK",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_13_G6_RUN_ID",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_14_G6_MAC_ADDRESS",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_15_G6_UUID_MIGRATION",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_16_G6_SESSION_PREFIX",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_17_G6_BSON_OBJECTID",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_18_G6_JWT_STATIC",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_19_G6_X509_SERIAL",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_20_G6_CUID_REF",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_21_G6_ETL_RUN_UUID",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_22_G6_API_HMAC_KEY_HASHY",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": true,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_23_G6_SCHEDULER_JOB_ID",
+      "gt_has_secret": true,
+      "gt_secret_type": "api_key",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_24_G6_SHA_PREFIXED_KEY",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "BLOCK",
+        "policy_alert_hit": true
+      }
+    },
+    {
+      "sample_id": "HARD_25_G6_TRACE_CORRELATION_REF",
+      "gt_has_secret": true,
+      "gt_secret_type": "token",
+      "scanner_hit": false,
+      "openai": {
+        "llm_final_decision": "BLOCK",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      },
+      "anthropic": {
+        "llm_final_decision": "REVIEW",
+        "policy_decision": "REVIEW",
+        "policy_alert_hit": true
+      }
+    }
+  ]
+}

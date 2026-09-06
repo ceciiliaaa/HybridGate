@@ -1,0 +1,303 @@
+{
+  "timestamp": "2026-04-25T16:58:52.375490+00:00",
+  "note": "Policies applied exclusively to LLM guardrail results.",
+  "policies": {
+    "P1_SafetyNet": {
+      "openai": {
+        "n_evaluated": 250,
+        "autonomous_view": {
+          "TP": 175,
+          "FP": 23,
+          "TN": 27,
+          "FN": 25,
+          "precision": 0.8838,
+          "recall": 0.875,
+          "f1": 0.8794
+        },
+        "alert_view": {
+          "TP": 200,
+          "FP": 26,
+          "TN": 24,
+          "FN": 0,
+          "precision": 0.885,
+          "recall": 1.0,
+          "f1": 0.939
+        },
+        "distribution": {
+          "n": 250,
+          "BLOCK": 198,
+          "REVIEW": 28,
+          "PASS": 24,
+          "block_rate": 0.792,
+          "review_rate": 0.112,
+          "pass_rate": 0.096
+        },
+        "leak_escape": {
+          "leak_escape_rate": 0.0,
+          "escaped": 0,
+          "total_secrets": 200
+        },
+        "false_block": {
+          "false_block_rate": 0.46,
+          "false_blocks": 23,
+          "total_clean": 50
+        }
+      },
+      "anthropic": {
+        "n_evaluated": 250,
+        "autonomous_view": {
+          "TP": 149,
+          "FP": 13,
+          "TN": 37,
+          "FN": 51,
+          "precision": 0.9198,
+          "recall": 0.745,
+          "f1": 0.8232
+        },
+        "alert_view": {
+          "TP": 200,
+          "FP": 26,
+          "TN": 24,
+          "FN": 0,
+          "precision": 0.885,
+          "recall": 1.0,
+          "f1": 0.939
+        },
+        "distribution": {
+          "n": 250,
+          "BLOCK": 162,
+          "REVIEW": 64,
+          "PASS": 24,
+          "block_rate": 0.648,
+          "review_rate": 0.256,
+          "pass_rate": 0.096
+        },
+        "leak_escape": {
+          "leak_escape_rate": 0.0,
+          "escaped": 0,
+          "total_secrets": 200
+        },
+        "false_block": {
+          "false_block_rate": 0.26,
+          "false_blocks": 13,
+          "total_clean": 50
+        }
+      }
+    },
+    "P2_ContextualVeto": {
+      "openai": {
+        "n_evaluated": 250,
+        "autonomous_view": {
+          "TP": 117,
+          "FP": 7,
+          "TN": 43,
+          "FN": 83,
+          "precision": 0.9435,
+          "recall": 0.585,
+          "f1": 0.7222
+        },
+        "alert_view": {
+          "TP": 199,
+          "FP": 26,
+          "TN": 24,
+          "FN": 1,
+          "precision": 0.8844,
+          "recall": 0.995,
+          "f1": 0.9365
+        },
+        "distribution": {
+          "n": 250,
+          "BLOCK": 124,
+          "REVIEW": 101,
+          "PASS": 25,
+          "block_rate": 0.496,
+          "review_rate": 0.404,
+          "pass_rate": 0.1
+        },
+        "leak_escape": {
+          "leak_escape_rate": 0.005,
+          "escaped": 1,
+          "total_secrets": 200
+        },
+        "false_block": {
+          "false_block_rate": 0.14,
+          "false_blocks": 7,
+          "total_clean": 50
+        },
+        "llm_override_count": 1
+      },
+      "anthropic": {
+        "n_evaluated": 250,
+        "autonomous_view": {
+          "TP": 118,
+          "FP": 2,
+          "TN": 48,
+          "FN": 82,
+          "precision": 0.9833,
+          "recall": 0.59,
+          "f1": 0.7375
+        },
+        "alert_view": {
+          "TP": 197,
+          "FP": 21,
+          "TN": 29,
+          "FN": 3,
+          "precision": 0.9037,
+          "recall": 0.985,
+          "f1": 0.9426
+        },
+        "distribution": {
+          "n": 250,
+          "BLOCK": 120,
+          "REVIEW": 98,
+          "PASS": 32,
+          "block_rate": 0.48,
+          "review_rate": 0.392,
+          "pass_rate": 0.128
+        },
+        "leak_escape": {
+          "leak_escape_rate": 0.015,
+          "escaped": 3,
+          "total_secrets": 200
+        },
+        "false_block": {
+          "false_block_rate": 0.04,
+          "false_blocks": 2,
+          "total_clean": 50
+        },
+        "llm_override_count": 8
+      }
+    },
+    "P3_RiskWeighted": {
+      "openai": {
+        "n_evaluated": 250,
+        "autonomous_view": {
+          "TP": 148,
+          "FP": 14,
+          "TN": 36,
+          "FN": 52,
+          "precision": 0.9136,
+          "recall": 0.74,
+          "f1": 0.8177
+        },
+        "alert_view": {
+          "TP": 193,
+          "FP": 24,
+          "TN": 26,
+          "FN": 7,
+          "precision": 0.8894,
+          "recall": 0.965,
+          "f1": 0.9257
+        },
+        "distribution": {
+          "n": 250,
+          "BLOCK": 162,
+          "REVIEW": 55,
+          "PASS": 33,
+          "block_rate": 0.648,
+          "review_rate": 0.22,
+          "pass_rate": 0.132
+        },
+        "leak_escape": {
+          "leak_escape_rate": 0.035,
+          "escaped": 7,
+          "total_secrets": 200
+        },
+        "false_block": {
+          "false_block_rate": 0.28,
+          "false_blocks": 14,
+          "total_clean": 50
+        },
+        "llm_override_count": 0,
+        "score_histogram": {
+          "0": 24,
+          "1": 11,
+          "2": 10,
+          "3": 37,
+          "4": 94,
+          "5": 57,
+          "6": 17
+        }
+      },
+      "anthropic": {
+        "n_evaluated": 250,
+        "autonomous_view": {
+          "TP": 125,
+          "FP": 7,
+          "TN": 43,
+          "FN": 75,
+          "precision": 0.947,
+          "recall": 0.625,
+          "f1": 0.753
+        },
+        "alert_view": {
+          "TP": 188,
+          "FP": 17,
+          "TN": 33,
+          "FN": 12,
+          "precision": 0.9171,
+          "recall": 0.94,
+          "f1": 0.9284
+        },
+        "distribution": {
+          "n": 250,
+          "BLOCK": 132,
+          "REVIEW": 73,
+          "PASS": 45,
+          "block_rate": 0.528,
+          "review_rate": 0.292,
+          "pass_rate": 0.18
+        },
+        "leak_escape": {
+          "leak_escape_rate": 0.06,
+          "escaped": 12,
+          "total_secrets": 200
+        },
+        "false_block": {
+          "false_block_rate": 0.14,
+          "false_blocks": 7,
+          "total_clean": 50
+        },
+        "llm_override_count": 0,
+        "score_histogram": {
+          "0": 24,
+          "1": 22,
+          "2": 29,
+          "3": 33,
+          "4": 81,
+          "5": 46,
+          "6": 15
+        }
+      }
+    }
+  },
+  "comparison": {
+    "p1_vs_p2_pass": {
+      "openai": {
+        "p1_pass_count": 24,
+        "p2_pass_count": 25,
+        "identical": false,
+        "p2_only_pass": [
+          "HARD_9_G6_SHA_SRI"
+        ],
+        "p1_only_pass": []
+      },
+      "anthropic": {
+        "p1_pass_count": 24,
+        "p2_pass_count": 32,
+        "identical": false,
+        "p2_only_pass": [
+          "HARD_2_FM4a_GENERIC_ADMIN_KEY",
+          "HARD_9_G6_SHA_SRI",
+          "NEG_DECOY_001",
+          "NEG_DECOY_002",
+          "NEG_DECOY_010",
+          "NEG_DECOY_012",
+          "NEG_DECOY_023",
+          "SYNTH_030"
+        ],
+        "p1_only_pass": []
+      }
+    }
+  }
+}
