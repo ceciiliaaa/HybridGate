@@ -205,28 +205,26 @@ Signal variables, in the notation of the thesis:
 | C | critical secret type (`private_key`, `connection_string`) |
 | H | hard fail: G5 schema still invalid, or a G3 leak persisting after mitigation |
 
-All three policies share a fail-closed pre-policy rule. Output that could not be
-validated or sanitised is not eligible for an automatic decision, and separating
-technical hard fails from epistemic review signals keeps G4's uncertainty output
-from dominating the detection logic.
+All three policies share a fail-closed pre-policy rule, which the figure below
+does not show: `H ⇒ REVIEW`. Output that could not be validated or sanitised is
+not eligible for an automatic decision, and separating technical hard fails from
+epistemic review signals keeps G4's uncertainty output from dominating the
+detection logic.
+
+![The three gate policies as decision functions over the signal variables](docs/figures/gate-policies.png)
+
+P1 is implemented exactly as printed above. P2 and P3 are not. The implementation
+evaluates:
 
 ```
-pre-policy   H  ⇒  REVIEW
-
-P1   BLOCK   if  S ∨ L_B
-     REVIEW  if  L_R ∨ R
-     PASS    otherwise
-
-P2   BLOCK   if  S ∧ L_B
-     PASS    if  S ∧ ¬pred ∧ ¬F ∧ ¬C          (LLM veto)
-     REVIEW  if  S ∨ L_B ∨ L_R ∨ R
-     PASS    otherwise
-
-P3   σ = 2S + 2L_B + 𝟙(L_R ∨ R) + Q + F + C
-     BLOCK   if  σ ≥ 4  ∧  (S ∨ L_B)
-     REVIEW  if  σ ≥ 2
-     PASS    otherwise
+P2   PASS   if  S ∧ ¬P̂ ∧ ¬F ∧ ¬C                  (¬R dropped, ¬C added)
+P3   σ  =  2S + 2L_B + 𝟙(L_R ∨ R) + Q + F + C      (Q and C added)
 ```
+
+Both deviations are set out in
+[Where implementation and thesis diverge](#where-implementation-and-thesis-diverge).
+Every number reported below comes from the implementation, never from the printed
+formulas.
 
 In P3 a BLOCK always requires a detection signal, so context alone can never block.
 
