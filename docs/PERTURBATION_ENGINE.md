@@ -6,14 +6,8 @@ The Perturbation Engine v2 generates **modified positive samples** from baseline
 
 **Key change:** The engine no longer acts as a complete adversarial robustness engine. Instead it selectively generates a target number of perturbed positive samples with configurable strategy distribution.
 
-**Legacy version:** The v1 engine and its documentation lived in an `Archiv/`
-directory until commit `9f118d6`, where they were removed from the working tree
-because git history already preserves them. To read them:
-
-```bash
-git show 9f118d6:Archiv/src/manipulation/perturbation_engine_v1_full_legacy.py
-git show 9f118d6:Archiv/docs/PERTURBATION_ENGINE_v1_full_legacy.md
-```
+**Legacy version:** The v1 engine is not part of the artifact. It was removed from
+the working tree and remains in git history.
 
 ## Architecture
 
