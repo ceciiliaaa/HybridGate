@@ -1,0 +1,49 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  unit-tests:
+    name: Unit tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      # The guardrail and policy modules import nothing outside the standard
+      # library, so the suite needs pytest and nothing else.
+      - run: pip install pytest
+      - run: pytest tests/ -q
+
+  reproduce-metrics:
+    name: Metrics reproduce byte for byte
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # No pip install on purpose. The whole chain from frozen model output to
+      # published tables is standard library only. If that ever stops being
+      # true, this job fails and tells us.
+      - name: Regenerate the Anthropic evaluation tables
+        run: |
+          python -m src.metrics.compute_all \
+            --results runs/v150_anthropic_opus46_full/results.json \
+            --outdir  /tmp/regenerated
+
+      - name: Compare against the committed tables
+        run: |
+          diff -r /tmp/regenerated \
+                  runs/v150_anthropic_opus46_full/evaluation_outputs \
+            && echo "All 26 output files match the committed versions."

@@ -1,0 +1,16 @@
+# Test and tooling dependencies.
+#
+# The test suite covers the guardrail and policy modules, which import nothing
+# outside the standard library, so pytest alone is enough to run it:
+#
+#     pip install pytest && pytest tests/ -q
+
+-r requirements.txt
+
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Formatting and static checks, not enforced in CI
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.4.0

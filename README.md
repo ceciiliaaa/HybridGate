@@ -334,30 +334,40 @@ generalise to other weakness classes.
 
 ## Reproducing
 
+Everything downstream of the API calls is pure standard library. The guardrails,
+the policies and the whole metrics chain import nothing outside it, so the
+published tables regenerate on a bare Python 3.10 or newer with no installation
+at all:
+
+```bash
+# Regenerate every evaluation table from the frozen model output
+python -m src.metrics.compute_all \
+    --results runs/v150_anthropic_opus46_full/results.json \
+    --outdir  /tmp/regenerated
+diff -r /tmp/regenerated runs/v150_anthropic_opus46_full/evaluation_outputs
+
+# Re-simulate all three policies on the frozen guardrail outputs
+python -m src.scripts.run_policy_comparison_v2
+
+# Guardrail and policy tests
+pip install pytest && pytest tests/ -q
+```
+
+All 26 output files come back **byte for byte** identical. CI checks exactly
+this on every push, in `.github/workflows/tests.yml`, and deliberately runs the
+reproduction job without a `pip install` so that a new dependency creeping into
+the metrics chain breaks the build.
+
+Running a fresh evaluation against the provider APIs does need dependencies and
+keys:
+
 ```bash
 python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env          # add OPENAI_API_KEY / ANTHROPIC_API_KEY
 ```
 
-The benchmark and the frozen model outputs are both committed, so everything
-downstream of the API calls runs without a key and without cost. Both commands
-below regenerate the committed tables **byte for byte**:
-
-```bash
-# Metrics and all evaluation tables from a frozen run
-python -m src.metrics.compute_all \
-    --results runs/v150_anthropic_opus46_full/results.json \
-    --outdir  runs/v150_anthropic_opus46_full/evaluation_outputs
-
-# Re-simulate all three policies on the frozen guardrail outputs
-python -m src.scripts.run_policy_comparison_v2
-
-# Guardrail unit tests
-pytest tests/ -q
-```
-
-A full evaluation run requires API access:
+A full evaluation run then looks like this:
 
 ```bash
 python -m src.llm_evaluation.run_evaluation \
@@ -377,7 +387,9 @@ src/
   scanners/           gitleaks and detect-secrets wrappers
   llm_evaluation/     provider clients, baseline and guardrail runs
   guardrails/         G1 to G6
-  policies/           P1 to P3, plus the superseded P2 and P3 kept for reference
+  policies/           P1 to P3, plus the superseded p2_consensus and
+                      p3_escalation. The latter is not dead: its
+                      compute_policy_tags is still called during evaluation
   metrics/            model, gate, failure-mode (PRI) and statistical metrics
   scripts/            policy re-simulation
 runs/
