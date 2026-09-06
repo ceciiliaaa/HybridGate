@@ -64,7 +64,7 @@ Scanner has no REVIEW concept; both views are identical for Scanner.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Scanner | 250 | 250 | 0 | 0.4120 | 0.5880 | 0.0000 | 0.3150 |
 | LLM_Baseline | 250 | 250 | 0 | 0.2080 | 0.7600 | 0.0320 | 0.1300 |
-| LLM_Guardrails | 250 | 250 | 0 | 0.1040 | 0.3840 | 0.5120 | 0.0100 |
+| LLM_Guardrails | 250 | 250 | 0 | 0.1040 | 0.7480 | 0.1480 | 0.0100 |
 
 ### Table 2C — Autonomous-Level Confusion Metrics
 
@@ -72,7 +72,7 @@ Scanner has no REVIEW concept; both views are identical for Scanner.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Scanner | 250 | 250 | 0 | 137 | 10 | 40 | 63 | 0.9320 | 0.6850 | 0.7896 | 0.8000 |
 | LLM_Baseline | 250 | 250 | 0 | 167 | 23 | 27 | 33 | 0.8789 | 0.8350 | 0.8564 | 0.5400 |
-| LLM_Guardrails | 250 | 250 | 0 | 96 | 0 | 50 | 104 | 1.0000 | 0.4800 | 0.6486 | 1.0000 |
+| LLM_Guardrails | 250 | 250 | 0 | 167 | 20 | 30 | 33 | 0.8930 | 0.8350 | 0.8630 | 0.6000 |
 
 ### Table 2D — Alert vs Autonomous Comparison
 
@@ -80,7 +80,7 @@ Scanner has no REVIEW concept; both views are identical for Scanner.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Scanner | 0.6850 | 0.6850 | 0.0000 | 0.9320 | 0.9320 | 0.0000 | 0.0000 | 0.3150 |
 | LLM_Baseline | 0.8700 | 0.8350 | 0.0350 | 0.8788 | 0.8789 | -0.0001 | 0.0320 | 0.1300 |
-| LLM_Guardrails | 0.9900 | 0.4800 | 0.5100 | 0.8839 | 1.0000 | -0.1161 | 0.5120 | 0.0100 |
+| LLM_Guardrails | 0.9900 | 0.8350 | 0.1550 | 0.8839 | 0.8930 | -0.0091 | 0.1480 | 0.0100 |
 
 ## Step 3 — Decision Profile
 
@@ -92,7 +92,7 @@ Step 3 shows the **operative decision behavior** of each system — how often it
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Scanner | 250 | 250 | 0 | 103 | 147 | 0 | 0.4120 | 0.5880 | 0.0000 | 0.3150 | 1.0000 |
 | LLM_Baseline | 250 | 250 | 0 | 52 | 190 | 8 | 0.2080 | 0.7600 | 0.0320 | 0.1300 | 0.9596 |
-| LLM_Guardrails | 250 | 250 | 0 | 26 | 96 | 128 | 0.1040 | 0.3840 | 0.5120 | 0.0100 | 0.4286 |
+| LLM_Guardrails | 250 | 250 | 0 | 26 | 187 | 37 | 0.1040 | 0.7480 | 0.1480 | 0.0100 | 0.8348 |
 
 ### 3B. Decision Counts on GT_POS
 
@@ -100,7 +100,7 @@ Step 3 shows the **operative decision behavior** of each system — how often it
 | --- | --- | --- | --- | --- |
 | Scanner | 200 | 63 | 137 | 0 |
 | LLM_Baseline | 200 | 26 | 167 | 7 |
-| LLM_Guardrails | 200 | 2 | 96 | 102 |
+| LLM_Guardrails | 200 | 2 | 167 | 31 |
 
 ### 3C. Decision Counts on GT_NEG
 
@@ -108,14 +108,14 @@ Step 3 shows the **operative decision behavior** of each system — how often it
 | --- | --- | --- | --- | --- |
 | Scanner | 50 | 40 | 10 | 0 |
 | LLM_Baseline | 50 | 26 | 23 | 1 |
-| LLM_Guardrails | 50 | 24 | 0 | 26 |
+| LLM_Guardrails | 50 | 24 | 20 | 6 |
 
 ### 3D. Behavioral Shift vs Baseline
 
 | Comparison | Δ Pass Rate | Δ Block Rate | Δ Review Rate | Δ Escape Rate | Δ Block Share |
 | --- | --- | --- | --- | --- | --- |
 | Scanner_vs_Baseline | 0.2040 | -0.1720 | -0.0320 | 0.1850 | 0.0404 |
-| LLM_Guardrails_vs_Baseline | -0.1040 | -0.3760 | 0.4800 | -0.1200 | -0.5310 |
+| LLM_Guardrails_vs_Baseline | -0.1040 | -0.0120 | 0.1160 | -0.1200 | -0.1248 |
 
 ## Step 4 — Guardrail KPIs
 
@@ -137,41 +137,43 @@ Operational activity of the guardrail bundle. Measures intervention frequency, p
 
 | Guardrail | Trigger Count | Trigger Rate | Routed Count | Routed Rate |
 | --- | --- | --- | --- | --- |
-| G5 | 0 | 0.0000 | 0 | 0.0000 |
-| G2 | 10 | 0.0400 | 10 | 0.0400 |
-| G4 | 104 | 0.4160 | 101 | 0.4040 |
-| G1 | 6 | 0.0240 | 2 | 0.0080 |
-| G3 | 226 | 0.9040 | 15 | 0.0600 |
+| G5 | 3 | 0.0120 | 3 | 0.0120 |
+| G2 | 9 | 0.0360 | 9 | 0.0360 |
+| G4 | 105 | 0.4200 | 3 | 0.0120 |
+| G1 | 6 | 0.0240 | 6 | 0.0240 |
+| G3 | 223 | 0.8920 | 16 | 0.0640 |
 
 ### 4C. G3 Leakage KPIs
 
 | Metric | Value |
 | --- | --- |
 | baseline_leakage | 131 (0.5240) |
-| g3_triggered | 226 (0.9040) |
+| g3_triggered | 223 (0.8920) |
 | residual_guardrail_leakage | 0 (0.0000) |
 | residual_share_of_baseline_leak | 0.0000 |
-| g3_on_gt_pos | 199 (0.9950) |
+| g3_on_gt_pos | 197 (0.9850) |
 
 ### 4D. G5 Schema / Fail-Closed KPIs
 
 | Metric | Value |
 | --- | --- |
-| schema_invalid | 0 (0.0000) |
-| g5_routed | 0 (0.0000) |
-| g5_fail_closed_review | 0 (0.0000) |
-| g5_fail_closed_share_of_g5 | n/a |
+| schema_invalid | 3 (0.0120) |
+| g5_routed | 3 (0.0120) |
+| g5_fail_closed_review | 3 (0.0120) |
+| g5_fail_closed_share_of_g5 | 1.0000 |
 
 ### 4E. Trigger Combination Summary
 
 | Combination | Count | Rate |
 | --- | --- | --- |
-| G3 | 113 | 0.4520 |
+| G3 | 111 | 0.4440 |
 | G4+G3 | 97 | 0.3880 |
-| G2+G3 | 7 | 0.0280 |
+| G2+G3 | 6 | 0.0240 |
 | G4+G1+G3 | 4 | 0.0160 |
 | G2+G4+G3 | 3 | 0.0120 |
+| G5 | 2 | 0.0080 |
 | G1+G3 | 2 | 0.0080 |
+| G5+G4 | 1 | 0.0040 |
 
 ### 4F. G6 Pre-LLM Hint KPIs
 
@@ -180,7 +182,7 @@ Operational activity of the guardrail bundle. Measures intervention frequency, p
 | g6_hint_injected | 30 (0.1200) |
 | g6_no_hint | 220 |
 | g6_hint_detection_rate | 0.9333 |
-| g6_no_hint_detection_rate | 0.8773 |
+| g6_no_hint_detection_rate | 0.8636 |
 | g6_hint_on_gt_pos | 29 (0.1450) |
 | g6_hint_on_gt_neg | 1 |
 | g6_hint_schema_valid | 30 (1.0000) |
@@ -194,11 +196,12 @@ Evaluates the guardrail bundle as a control layer via Prevalence (P), Interventi
 
 | FM | Guardrail | n_eval | Prev | Prev Rate | Interv | Interv Rate|Prev | Resid | Resid Rate|Prev | Observability |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| FM1_evidence_location | G1 | 250 | 26 | 0.1040 | 2 | 0.0769 | 2 | 0.0769 | partial |
+| FM1_evidence_location | G1 | 250 | 25 | 0.1000 | 2 | 0.0800 | 2 | 0.0800 | partial |
 | FM2_untrusted_input | G2 | 250 | 0 | 0.0000 | — | n/a | — | n/a | n/a |
-| FM3_secret_leakage | G3 | 250 | 131 | 0.5240 | 131 | 1.0000 | 0 | 0.0000 | direct |
-| FM4_uncertainty_miscalibration | G4 | 250 | 73 | 0.2920 | 65 | 0.8904 | 65 | 0.8904 | partial |
-| FM5_schema_output_failure | G5 | 250 | 0 | 0.0000 | — | n/a | — | n/a | n/a |
+| FM3_secret_leakage | G3 | 250 | 131 | 0.5240 | 130 | 0.9924 | 0 | 0.0000 | direct |
+| FM4_uncertainty_miscalibration | G4 | 250 | 73 | 0.2920 | 66 | 0.9041 | 65 | 0.8904 | partial |
+| FM5_schema_output_failure | G5 | 250 | 3 | 0.0120 | 3 | 1.0000 | — | n/a | not_robustly_observable |
+| FM6_format_familiarity | G6 | 250 | 30 | 0.1200 | 30 | 1.0000 | 2 | 0.0667 | direct |
 
 ### 5B. PRI Definitions
 
@@ -209,16 +212,18 @@ Evaluates the guardrail bundle as a control layer via Prevalence (P), Interventi
 | FM3_secret_leakage | G3 | metrics.leak_in_baseline == true | llm_guardrail.g3_triggered == true | metrics.leak_in_guardrail == true (on prevalence cases) | All three PRI components are directly and independently observable via separate fields. Leakage detection is based on gt_secret_value string matching in model output. |
 | FM4_uncertainty_miscalibration | G4 | baseline_failure_modes.g4_details.should_review == true | G4 in llm_guardrail.triggered_guardrails OR llm_guardrail.routed_by_guardrail == G4 | llm_guardrail.g4_details.should_review == true (on prevalence cases) | Residual is indicative, not definitive. The guardrail-side should_review flag measures structural presence of miscalibration indicators, not whether the bundle's routing action resolved the operational impact. Unlike FM3, there is no independent objective measure of FM4 resolution. |
 | FM5_schema_output_failure | G5 | llm_guardrail.schema_valid == false (asymmetric: guardrail-side, not baseline-side) | G5 in llm_guardrail.triggered_guardrails OR llm_guardrail.routed_by_guardrail == G5 | Not robustly observable. No independent post-intervention field measures whether the schema failure persists as a problematic end state after G5 treatment. | Asymmetric operationalization: FM5 prevalence is observed on the guardrail/structured-output side only. The baseline does not undergo schema validation. Residual is not reported because absence of G5 routing does not robustly indicate a persisting problematic end state. |
+| FM6_format_familiarity | G6 | llm_guardrail.g6_hint_injected == true | llm_guardrail.g6_hint_injected == true (G6 always injects hint on detection — intervention rate = 1.0 by construction) | llm_guardrail.g6_hint_injected == true AND gt_has_secret == true AND llm_guardrail.pred_has_secret == false | G6 is a pre-processing guardrail that injects a format hint before the LLM call. Intervention is definitionally complete (100%) for all prevalence cases. Residual measures cases where the hint was insufficient to recover detection on true-positive samples. |
 
 ### 5C. PRI Coverage / Observability
 
 | FM | Guardrail | n_eval | Prev n | Resid Observability | Multi-FM Note | Notes |
 | --- | --- | --- | --- | --- | --- | --- |
-| FM1_evidence_location | G1 | 250 | 26 | partial | Multiple guardrails may act on the same sample. Observed FM1 residual may reflect bundle-wide output quality rather than G1-specific correction. | Residual based on guardrail-side g1_valid, which is structurally analogous but not identical to the baseline validity check. G1 did not trigger in this dataset; observed residual=0 may reflect overall guardrail output quality rather than targeted G1 intervention. |
+| FM1_evidence_location | G1 | 250 | 25 | partial | Multiple guardrails may act on the same sample. Observed FM1 residual may reflect bundle-wide output quality rather than G1-specific correction. | Residual based on guardrail-side g1_valid, which is structurally analogous but not identical to the baseline validity check. G1 did not trigger in this dataset; observed residual=0 may reflect overall guardrail output quality rather than targeted G1 intervention. |
 | FM2_untrusted_input | G2 | 250 | 0 | not_robustly_observable | Zero prevalence in this dataset. PRI not structurally evaluable. | No baseline samples exhibited g2_valid=false. Residual not reported: guardrail-side g2_valid lacks independent validation of FM2 resolution. |
 | FM3_secret_leakage | G3 | 250 | 131 | direct | G3 leakage detection operates independently of other guardrails via gt_secret_value string matching. | All three PRI components observed via independent fields. No structural cross-dependency with other guardrails. |
 | FM4_uncertainty_miscalibration | G4 | 250 | 73 | partial | Potential overlap with G1 in ambiguity-heavy contexts. Multiple guardrails may act on the same sample; intervention attribution not always exclusive to G4. | Residual is indicative only. Guardrail-side should_review measures structural miscalibration presence, not whether routing resolved the operational impact. No independent objective measure of FM4 resolution available. |
-| FM5_schema_output_failure | G5 | 250 | 0 | not_robustly_observable | G5 operates first in pipeline (G5 → G2 → G4 → G1 → G3). No structural overlap with other guardrails for schema failures. | Asymmetric operationalization: prevalence observed on guardrail output side only. Residual not reported: no independent post-intervention field to assess whether schema failure persists as a problematic end state. |
+| FM5_schema_output_failure | G5 | 250 | 3 | not_robustly_observable | G5 operates first in pipeline (G5 → G2 → G4 → G1 → G3). No structural overlap with other guardrails for schema failures. | Asymmetric operationalization: prevalence observed on guardrail output side only. Residual not reported: no independent post-intervention field to assess whether schema failure persists as a problematic end state. |
+| FM6_format_familiarity | G6 | 250 | 30 | direct | G6 is a pre-processing guardrail (hint injection before LLM call). Can co-occur with G4 on the same sample if LLM uncertainty persists despite the hint. | G6 intervenes by construction on every detected format-candidate (intervention rate = 1.0). Residual directly observable: gt_has_secret=true AND pred_has_secret=false after hint injection. |
 
 ## Step 6 — Slice Analysis (Supplementary)
 
@@ -230,22 +235,22 @@ Segments the main findings from Steps 2, 3, and 5 by dataset slices. This is a *
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | base | 150 | Scanner | 150 | 0.9700 | 0.9065 | 0.9700 | 0.9065 | 0.0300 | 0.0000 | 0.7133 | 0.2867 |
 | base | 150 | LLM_Baseline | 150 | 1.0000 | 0.8065 | 1.0000 | 0.8130 | 0.0000 | 0.0067 | 0.8200 | 0.1733 |
-| base | 150 | LLM_Guardrails | 150 | 1.0000 | 0.7937 | 0.7600 | 1.0000 | 0.0000 | 0.3333 | 0.5067 | 0.1600 |
+| base | 150 | LLM_Guardrails | 150 | 1.0000 | 0.7937 | 0.8800 | 0.8148 | 0.0000 | 0.1200 | 0.7200 | 0.1600 |
 | stress | 100 | Scanner | 100 | 0.4000 | 1.0000 | 0.4000 | 1.0000 | 0.6000 | 0.0000 | 0.4000 | 0.6000 |
 | stress | 100 | LLM_Baseline | 100 | 0.7400 | 1.0000 | 0.6700 | 1.0000 | 0.2600 | 0.0700 | 0.6700 | 0.2600 |
-| stress | 100 | LLM_Guardrails | 100 | 0.9800 | 1.0000 | 0.2000 | 1.0000 | 0.0200 | 0.7800 | 0.2000 | 0.0200 |
+| stress | 100 | LLM_Guardrails | 100 | 0.9800 | 1.0000 | 0.7900 | 1.0000 | 0.0200 | 0.1900 | 0.7900 | 0.0200 |
 | neg_clean | 25 | Scanner | 25 | n/a | n/a | n/a | n/a | n/a | 0.0000 | 0.0000 | 1.0000 |
 | neg_clean | 25 | LLM_Baseline | 25 | n/a | n/a | n/a | n/a | n/a | 0.0000 | 0.0000 | 1.0000 |
 | neg_clean | 25 | LLM_Guardrails | 25 | n/a | 0.0000 | n/a | n/a | n/a | 0.0400 | 0.0000 | 0.9600 |
 | neg_decoy | 25 | Scanner | 25 | n/a | 0.0000 | n/a | 0.0000 | n/a | 0.0000 | 0.4000 | 0.6000 |
 | neg_decoy | 25 | LLM_Baseline | 25 | n/a | 0.0000 | n/a | 0.0000 | n/a | 0.0400 | 0.9200 | 0.0400 |
-| neg_decoy | 25 | LLM_Guardrails | 25 | n/a | 0.0000 | n/a | n/a | n/a | 1.0000 | 0.0000 | 0.0000 |
+| neg_decoy | 25 | LLM_Guardrails | 25 | n/a | 0.0000 | n/a | 0.0000 | n/a | 0.2000 | 0.8000 | 0.0000 |
 | real | 75 | Scanner | 75 | 0.8000 | 1.0000 | 0.8000 | 1.0000 | 0.2000 | 0.0000 | 0.8000 | 0.2000 |
 | real | 75 | LLM_Baseline | 75 | 1.0000 | 1.0000 | 0.9467 | 1.0000 | 0.0000 | 0.0533 | 0.9467 | 0.0000 |
-| real | 75 | LLM_Guardrails | 75 | 1.0000 | 1.0000 | 0.7200 | 1.0000 | 0.0000 | 0.2800 | 0.7200 | 0.0000 |
+| real | 75 | LLM_Guardrails | 75 | 1.0000 | 1.0000 | 0.8267 | 1.0000 | 0.0000 | 0.1733 | 0.8267 | 0.0000 |
 | synthetic | 75 | Scanner | 75 | 0.8800 | 1.0000 | 0.8800 | 1.0000 | 0.1200 | 0.0000 | 0.8800 | 0.1200 |
 | synthetic | 75 | LLM_Baseline | 75 | 1.0000 | 1.0000 | 0.9600 | 1.0000 | 0.0000 | 0.0400 | 0.9600 | 0.0000 |
-| synthetic | 75 | LLM_Guardrails | 75 | 1.0000 | 1.0000 | 0.5200 | 1.0000 | 0.0000 | 0.4800 | 0.5200 | 0.0000 |
+| synthetic | 75 | LLM_Guardrails | 75 | 1.0000 | 1.0000 | 0.8533 | 1.0000 | 0.0000 | 0.1467 | 0.8533 | 0.0000 |
 
 *Coverage notes: `real` + `synthetic` covers positive samples only (NEG\_ controls excluded). `neg_clean` + `neg_decoy` are control-specific subgroups, not an exhaustive partition of all GT-negative cases.*
 
@@ -258,16 +263,16 @@ Segments the main findings from Steps 2, 3, and 5 by dataset slices. This is a *
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | stress_untrusted_input | 8 | Scanner | 8 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 | 1.0000 | 0.0000 |
 | stress_untrusted_input | 8 | LLM_Baseline | 8 | 1.0000 | 1.0000 | 0.8750 | 1.0000 | 0.0000 | 0.1250 | 0.8750 | 0.0000 |
-| stress_untrusted_input | 8 | LLM_Guardrails | 8 | 1.0000 | 1.0000 | 0.0000 | n/a | 0.0000 | 1.0000 | 0.0000 | 0.0000 |
+| stress_untrusted_input | 8 | LLM_Guardrails | 8 | 1.0000 | 1.0000 | 0.6250 | 1.0000 | 0.0000 | 0.3750 | 0.6250 | 0.0000 |
 | stress_uncertainty | 8 | Scanner | 8 | 0.3750 | 1.0000 | 0.3750 | 1.0000 | 0.6250 | 0.0000 | 0.3750 | 0.6250 |
 | stress_uncertainty | 8 | LLM_Baseline | 8 | 1.0000 | 1.0000 | 0.3750 | 1.0000 | 0.0000 | 0.6250 | 0.3750 | 0.0000 |
-| stress_uncertainty | 8 | LLM_Guardrails | 8 | 1.0000 | 1.0000 | 0.0000 | n/a | 0.0000 | 1.0000 | 0.0000 | 0.0000 |
+| stress_uncertainty | 8 | LLM_Guardrails | 8 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 | 1.0000 | 0.0000 |
 | stress_multi_fm | 18 | Scanner | 18 | 0.2778 | 1.0000 | 0.2778 | 1.0000 | 0.7222 | 0.0000 | 0.2778 | 0.7222 |
 | stress_multi_fm | 18 | LLM_Baseline | 18 | 1.0000 | 1.0000 | 0.9444 | 1.0000 | 0.0000 | 0.0556 | 0.9444 | 0.0000 |
-| stress_multi_fm | 18 | LLM_Guardrails | 18 | 1.0000 | 1.0000 | 0.2222 | 1.0000 | 0.0000 | 0.7778 | 0.2222 | 0.0000 |
+| stress_multi_fm | 18 | LLM_Guardrails | 18 | 1.0000 | 1.0000 | 0.6111 | 1.0000 | 0.0000 | 0.3889 | 0.6111 | 0.0000 |
 | stress_hardened | 17 | Scanner | 17 | 0.8235 | 1.0000 | 0.8235 | 1.0000 | 0.1765 | 0.0000 | 0.8235 | 0.1765 |
 | stress_hardened | 17 | LLM_Baseline | 17 | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 0.0000 | 0.0000 | 1.0000 | 0.0000 |
-| stress_hardened | 17 | LLM_Guardrails | 17 | 1.0000 | 1.0000 | 0.7647 | 1.0000 | 0.0000 | 0.2353 | 0.7647 | 0.0000 |
+| stress_hardened | 17 | LLM_Guardrails | 17 | 1.0000 | 1.0000 | 0.8824 | 1.0000 | 0.0000 | 0.1176 | 0.8824 | 0.0000 |
 
 </details>
 
@@ -280,12 +285,12 @@ FM3 (secret leakage) and FM4 (uncertainty miscalibration) PRI rates per slice. R
 
 | Slice | n | FM3 Prev | FM3 Prev Rate | FM3 Interv|Prev | FM3 Resid|Prev | FM4 Prev | FM4 Prev Rate | FM4 Interv|Prev |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| base | 150 | 90 | 0.6000 | 1.0000 | 0.0000 | 34 | 0.2267 | 0.9412 |
+| base | 150 | 90 | 0.6000 | 0.9889 | 0.0000 | 34 | 0.2267 | 0.9706 |
 | stress | 100 | 41 | 0.4100 | 1.0000 | 0.0000 | 39 | 0.3900 | 0.8462 |
 | neg_clean | 25 | 0 | 0.0000 | n/a | n/a | 1 | 0.0400 | 1.0000 |
-| neg_decoy | 25 | 0 | 0.0000 | n/a | n/a | 25 | 1.0000 | 0.9200 |
+| neg_decoy | 25 | 0 | 0.0000 | n/a | n/a | 25 | 1.0000 | 0.9600 |
 | real | 75 | 52 | 0.6933 | 1.0000 | 0.0000 | 7 | 0.0933 | 0.5714 |
-| synthetic | 75 | 52 | 0.6933 | 1.0000 | 0.0000 | 21 | 0.2800 | 0.9048 |
+| synthetic | 75 | 52 | 0.6933 | 0.9808 | 0.0000 | 21 | 0.2800 | 0.9048 |
 | stress_untrusted_input | 8 | 8 | 1.0000 | 1.0000 | 0.0000 | 8 | 1.0000 | 0.6250 |
 | stress_uncertainty | 8 | 2 | 0.2500 | 1.0000 | 0.0000 | 4 | 0.5000 | 1.0000 |
 | stress_multi_fm | 18 | 4 | 0.2222 | 1.0000 | 0.0000 | 8 | 0.4444 | 0.7500 |
@@ -312,16 +317,16 @@ FM3 (secret leakage) and FM4 (uncertainty miscalibration) PRI rates per slice. R
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | p1 | baseline | alert | 175 | 24 | 26 | 25 | 0.8794 | 0.8750 | 0.8772 | 0.1250 | 0.0320 |
 | p1 | baseline | autonomous | 168 | 23 | 27 | 32 | 0.8796 | 0.8400 | 0.8593 | 0.1250 | 0.0320 |
-| p1 | guardrail | alert | 199 | 26 | 24 | 1 | 0.8844 | 0.9950 | 0.9365 | 0.0050 | 0.5120 |
-| p1 | guardrail | autonomous | 97 | 0 | 50 | 103 | 1.0000 | 0.4850 | 0.6532 | 0.0050 | 0.5120 |
 | p2 | baseline | alert | 175 | 24 | 26 | 25 | 0.8794 | 0.8750 | 0.8772 | 0.1250 | 0.2160 |
 | p2 | baseline | autonomous | 135 | 10 | 40 | 65 | 0.9310 | 0.6750 | 0.7826 | 0.1250 | 0.2160 |
-| p2 | guardrail | alert | 199 | 26 | 24 | 1 | 0.8844 | 0.9950 | 0.9365 | 0.0050 | 0.5440 |
-| p2 | guardrail | autonomous | 89 | 0 | 50 | 111 | 1.0000 | 0.4450 | 0.6159 | 0.0050 | 0.5440 |
 | p3 | baseline | alert | 153 | 16 | 34 | 47 | 0.9053 | 0.7650 | 0.8293 | 0.2350 | 0.0280 |
 | p3 | baseline | autonomous | 146 | 16 | 34 | 54 | 0.9012 | 0.7300 | 0.8066 | 0.2350 | 0.0280 |
-| p3 | guardrail | alert | 160 | 16 | 34 | 40 | 0.9091 | 0.8000 | 0.8511 | 0.2000 | 0.3240 |
-| p3 | guardrail | autonomous | 95 | 0 | 50 | 105 | 1.0000 | 0.4750 | 0.6441 | 0.2000 | 0.3240 |
+| p1 | guardrail | alert | 200 | 26 | 24 | 0 | 0.8850 | 1.0000 | 0.9390 | 0.0000 | 0.1120 |
+| p1 | guardrail | autonomous | 175 | 23 | 27 | 25 | 0.8838 | 0.8750 | 0.8794 | 0.0000 | 0.1120 |
+| p2 | guardrail | alert | 199 | 26 | 24 | 1 | 0.8844 | 0.9950 | 0.9365 | 0.0050 | 0.4040 |
+| p2 | guardrail | autonomous | 117 | 7 | 43 | 83 | 0.9435 | 0.5850 | 0.7222 | 0.0050 | 0.4040 |
+| p3 | guardrail | alert | 193 | 24 | 26 | 7 | 0.8894 | 0.9650 | 0.9257 | 0.0350 | 0.2200 |
+| p3 | guardrail | autonomous | 148 | 14 | 36 | 52 | 0.9136 | 0.7400 | 0.8177 | 0.0350 | 0.2200 |
 
 ## Supplementary — Slice Metrics
 
@@ -350,7 +355,7 @@ Segmented analysis across dataset dimensions. Complements the system-level resul
 | NEG_CLEAN | LLM_Baseline | 25 | 0 | 25 | 1.0000 |
 | NEG_CLEAN | Scanner | 25 | 0 | 25 | 1.0000 |
 | NEG_DECOY | Guardrails_Alert | 25 | 25 | 0 | 0.0000 |
-| NEG_DECOY | Guardrails_Autonomous | 25 | 0 | 25 | 1.0000 |
+| NEG_DECOY | Guardrails_Autonomous | 25 | 20 | 5 | 0.2000 |
 | NEG_DECOY | LLM_Baseline | 25 | 24 | 1 | 0.0400 |
 | NEG_DECOY | Scanner | 25 | 10 | 15 | 0.6000 |
 
@@ -375,14 +380,14 @@ Segmented analysis across dataset dimensions. Complements the system-level resul
 | Scanner | 137 | 10 | 40 | 63 | 0.9320 | 0.6850 | 0.7896 | 0.8000 | 0 |
 | LLM_Baseline | 174 | 24 | 26 | 26 | 0.8788 | 0.8700 | 0.8744 | 0.5200 | 0 |
 | Guardrails_Alert | 198 | 26 | 24 | 2 | 0.8839 | 0.9900 | 0.9340 | 0.4800 | 0 |
-| Guardrails_Autonomous | 96 | 0 | 50 | 104 | 1.0000 | 0.4800 | 0.6486 | 1.0000 | 0 |
+| Guardrails_Autonomous | 167 | 20 | 30 | 33 | 0.8930 | 0.8350 | 0.8630 | 0.6000 | 0 |
 
 ### Decision Distributions
 
 **Scanner:** BLOCK=147, REVIEW=0, PASS=103, None=0
 **LLM_Baseline:** BLOCK=190, REVIEW=8, PASS=52, None=0
-**Guardrails_Alert:** BLOCK=96, REVIEW=128, PASS=26, None=0
-**Guardrails_Autonomous:** BLOCK=96, REVIEW=128, PASS=26, None=0
+**Guardrails_Alert:** BLOCK=187, REVIEW=37, PASS=26, None=0
+**Guardrails_Autonomous:** BLOCK=187, REVIEW=37, PASS=26, None=0
 
 ## Appendix — Legacy Guardrail KPI Details
 
@@ -390,17 +395,18 @@ Segmented analysis across dataset dimensions. Complements the system-level resul
 
 | Routed By | Count |
 | --- | --- |
-| None | 122 |
-| G4 | 101 |
-| G3 | 15 |
-| G2 | 10 |
-| G1 | 2 |
+| None | 213 |
+| G3 | 16 |
+| G2 | 9 |
+| G1 | 6 |
+| G5 | 3 |
+| G4 | 3 |
 
 ### G1
 
 - **trigger_count:** 6
 - **trigger_rate:** 0.024
-- **routed_count:** 2
+- **routed_count:** 6
 - **g1_valid_false_count:** 6
 - **issue_breakdown:**
   - evidence_mode='reconstructed': snippet covers assembly evidence but not fragment (L19–L29): 1
@@ -414,28 +420,28 @@ Segmented analysis across dataset dimensions. Complements the system-level resul
 
 ### G2
 
-- **trigger_count:** 11
-- **trigger_rate:** 0.044
-- **routed_count:** 10
-- **g2_valid_false_count:** 10
+- **trigger_count:** 10
+- **trigger_rate:** 0.04
+- **routed_count:** 9
+- **g2_valid_false_count:** 9
 - **issue_breakdown:**
-  - G2_EXCULPATORY: untrusted_effect='exculpatory_claim' (role=pr_body) — untrusted input must not exculpate findings: 10
+  - G2_EXCULPATORY: untrusted_effect='exculpatory_claim' (role=pr_body) — untrusted input must not exculpate findings: 9
   - G2_UNREPORTED: PR metadata contains exculpatory claims (non-production) in pr_body, but LLM reported used_untrusted_input=false with PASS/no-secret — potential unacknowledged influence: 1
 
 ### G3
 
-- **g3_initial_leak_count:** 30
+- **g3_initial_leak_count:** 29
 - **g3_post_mitigation_leak_count:** 0
 - **leak_escape_rate_total:** 0.0
 - **leak_escape_rate_of_detected:** 0.0
-- **routed_count:** 15
-- **g3_valid_false_count:** 30
+- **routed_count:** 16
+- **g3_valid_false_count:** 29
 
 ### G4
 
 - **escalation_count:** 104
 - **escalation_rate:** 0.416
-- **routed_count:** 101
+- **routed_count:** 3
 - **rule_breakdown:**
   - R3_scanner_neg_llm_pos_context: 39
   - R1_ambiguous_context: 32
@@ -459,12 +465,13 @@ Segmented analysis across dataset dimensions. Complements the system-level resul
 
 ### G5
 
-- **trigger_count:** 0
-- **trigger_rate:** 0.0
-- **routed_count:** 0
-- **schema_fail_count:** 0
-- **schema_fail_rate:** 0.0
+- **trigger_count:** 3
+- **trigger_rate:** 0.012
+- **routed_count:** 3
+- **schema_fail_count:** 3
+- **schema_fail_rate:** 0.012
 - **error_category_breakdown:**
+  - PARSE_ERROR: 3
 - **repair_success_count:** 0
 - **repair_fail_count:** 0
 - **note_repair:** repair_success_rate is None when no REPAIR_SUCCESS/REPAIR_FAIL categories are present in results
@@ -481,22 +488,24 @@ Segmented analysis across dataset dimensions. Complements the system-level resul
 
 | Guardrail | Trigger Count |
 | --- | --- |
-| G5 | 0 |
-| G2 | 10 |
-| G4 | 104 |
+| G5 | 3 |
+| G2 | 9 |
+| G4 | 105 |
 | G1 | 6 |
-| G3 | 226 |
+| G3 | 223 |
 
 **Trigger Combination Breakdown:**
 
 | Combination | Count |
 | --- | --- |
-| G3 | 113 |
+| G3 | 111 |
 | G4+G3 | 97 |
-| G2+G3 | 7 |
+| G2+G3 | 6 |
 | G4+G1+G3 | 4 |
 | G2+G4+G3 | 3 |
+| G5 | 2 |
 | G1+G3 | 2 |
+| G5+G4 | 1 |
 
 ## Data Availability Notes
 

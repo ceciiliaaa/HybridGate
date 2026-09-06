@@ -102,10 +102,10 @@
       "specificity": 0.48,
       "accuracy": 0.888,
       "decision_distribution": {
-        "block_count": 96,
-        "block_rate": 0.384,
-        "review_count": 128,
-        "review_rate": 0.512,
+        "block_count": 187,
+        "block_rate": 0.748,
+        "review_count": 37,
+        "review_rate": 0.148,
         "pass_count": 26,
         "pass_rate": 0.104,
         "total": 250
@@ -114,22 +114,22 @@
     "Guardrails_Autonomous": {
       "mode": "Guardrails_Autonomous",
       "description": "LLM + Guardrails, autonomous: BLOCK only = detection",
-      "TP": 96,
-      "FP": 0,
-      "TN": 50,
-      "FN": 104,
+      "TP": 167,
+      "FP": 20,
+      "TN": 30,
+      "FN": 33,
       "skipped": 0,
       "total_evaluated": 250,
-      "precision": 1.0,
-      "recall": 0.48,
-      "f1": 0.6486,
-      "specificity": 1.0,
-      "accuracy": 0.584,
+      "precision": 0.893,
+      "recall": 0.835,
+      "f1": 0.863,
+      "specificity": 0.6,
+      "accuracy": 0.788,
       "decision_distribution": {
-        "block_count": 96,
-        "block_rate": 0.384,
-        "review_count": 128,
-        "review_rate": 0.512,
+        "block_count": 187,
+        "block_rate": 0.748,
+        "review_count": 37,
+        "review_rate": 0.148,
         "pass_count": 26,
         "pass_rate": 0.104,
         "total": 250
@@ -208,8 +208,8 @@
         "n_evaluable": 250,
         "n_missing": 0,
         "pass_rate": 0.104,
-        "block_rate": 0.384,
-        "review_rate": 0.512,
+        "block_rate": 0.748,
+        "review_rate": 0.148,
         "escape_rate": 0.01
       }
     ],
@@ -247,14 +247,14 @@
         "n_total": 250,
         "n_evaluable": 250,
         "n_missing": 0,
-        "tp_auto": 96,
-        "fp_auto": 0,
-        "tn_auto": 50,
-        "fn_auto": 104,
-        "precision_auto": 1.0,
-        "recall_auto": 0.48,
-        "f1_auto": 0.6486,
-        "specificity_auto": 1.0
+        "tp_auto": 167,
+        "fp_auto": 20,
+        "tn_auto": 30,
+        "fn_auto": 33,
+        "precision_auto": 0.893,
+        "recall_auto": 0.835,
+        "f1_auto": 0.863,
+        "specificity_auto": 0.6
       }
     ],
     "alert_vs_autonomous": [
@@ -283,12 +283,12 @@
       {
         "mode": "LLM_Guardrails",
         "recall_alert": 0.99,
-        "recall_auto": 0.48,
-        "delta_recall_alert_vs_auto": 0.51,
+        "recall_auto": 0.835,
+        "delta_recall_alert_vs_auto": 0.155,
         "precision_alert": 0.8839,
-        "precision_auto": 1.0,
-        "delta_precision_alert_vs_auto": -0.1161,
-        "review_rate": 0.512,
+        "precision_auto": 0.893,
+        "delta_precision_alert_vs_auto": -0.0091,
+        "review_rate": 0.148,
         "escape_rate": 0.01
       }
     ]
@@ -329,13 +329,13 @@
         "n_evaluable": 250,
         "n_missing": 0,
         "pass_count": 26,
-        "block_count": 96,
-        "review_count": 128,
+        "block_count": 187,
+        "review_count": 37,
         "pass_rate": 0.104,
-        "block_rate": 0.384,
-        "review_rate": 0.512,
+        "block_rate": 0.748,
+        "review_rate": 0.148,
         "escape_rate": 0.01,
-        "block_share_among_alerts": 0.4286
+        "block_share_among_alerts": 0.8348
       }
     ],
     "gt_pos_counts": [
@@ -357,8 +357,8 @@
         "mode": "LLM_Guardrails",
         "n_gt_pos_evaluable": 200,
         "pass_count_gt_pos": 2,
-        "block_count_gt_pos": 96,
-        "review_count_gt_pos": 102
+        "block_count_gt_pos": 167,
+        "review_count_gt_pos": 31
       }
     ],
     "gt_neg_counts": [
@@ -380,8 +380,8 @@
         "mode": "LLM_Guardrails",
         "n_gt_neg_evaluable": 50,
         "pass_count_gt_neg": 24,
-        "block_count_gt_neg": 0,
-        "review_count_gt_neg": 26
+        "block_count_gt_neg": 20,
+        "review_count_gt_neg": 6
       }
     ],
     "vs_baseline": [
@@ -396,10 +396,10 @@
       {
         "comparison": "LLM_Guardrails_vs_Baseline",
         "delta_pass_rate_vs_baseline": -0.104,
-        "delta_block_rate_vs_baseline": -0.376,
-        "delta_review_rate_vs_baseline": 0.48,
+        "delta_block_rate_vs_baseline": -0.012,
+        "delta_review_rate_vs_baseline": 0.116,
         "delta_escape_rate_vs_baseline": -0.12,
-        "delta_block_share_among_alerts_vs_baseline": -0.531
+        "delta_block_share_among_alerts_vs_baseline": -0.1248
       }
     ]
   },
@@ -419,59 +419,59 @@
     "per_guardrail": [
       {
         "guardrail": "G5",
-        "trigger_count": 0,
-        "trigger_rate": 0.0,
-        "routed_count": 0,
-        "routed_rate": 0.0
+        "trigger_count": 3,
+        "trigger_rate": 0.012,
+        "routed_count": 3,
+        "routed_rate": 0.012
       },
       {
         "guardrail": "G2",
-        "trigger_count": 10,
-        "trigger_rate": 0.04,
-        "routed_count": 10,
-        "routed_rate": 0.04
+        "trigger_count": 9,
+        "trigger_rate": 0.036,
+        "routed_count": 9,
+        "routed_rate": 0.036
       },
       {
         "guardrail": "G4",
-        "trigger_count": 104,
-        "trigger_rate": 0.416,
-        "routed_count": 101,
-        "routed_rate": 0.404
+        "trigger_count": 105,
+        "trigger_rate": 0.42,
+        "routed_count": 3,
+        "routed_rate": 0.012
       },
       {
         "guardrail": "G1",
         "trigger_count": 6,
         "trigger_rate": 0.024,
-        "routed_count": 2,
-        "routed_rate": 0.008
+        "routed_count": 6,
+        "routed_rate": 0.024
       },
       {
         "guardrail": "G3",
-        "trigger_count": 226,
-        "trigger_rate": 0.904,
-        "routed_count": 15,
-        "routed_rate": 0.06
+        "trigger_count": 223,
+        "trigger_rate": 0.892,
+        "routed_count": 16,
+        "routed_rate": 0.064
       }
     ],
     "g3": {
       "baseline_leakage_count": 131,
       "baseline_leakage_rate": 0.524,
-      "g3_triggered_count": 226,
-      "g3_triggered_rate": 0.904,
+      "g3_triggered_count": 223,
+      "g3_triggered_rate": 0.892,
       "residual_guardrail_leakage_count": 0,
       "residual_guardrail_leakage_rate": 0.0,
       "residual_guardrail_leakage_share_of_baseline_leak": 0.0,
-      "g3_on_gt_pos_count": 199,
-      "g3_on_gt_pos_rate": 0.995
+      "g3_on_gt_pos_count": 197,
+      "g3_on_gt_pos_rate": 0.985
     },
     "g5": {
-      "schema_invalid_count": 0,
-      "schema_invalid_rate": 0.0,
-      "g5_routed_count": 0,
-      "g5_routed_rate": 0.0,
-      "g5_fail_closed_review_count": 0,
-      "g5_fail_closed_review_rate": 0.0,
-      "g5_fail_closed_review_share_of_g5": null
+      "schema_invalid_count": 3,
+      "schema_invalid_rate": 0.012,
+      "g5_routed_count": 3,
+      "g5_routed_rate": 0.012,
+      "g5_fail_closed_review_count": 3,
+      "g5_fail_closed_review_rate": 0.012,
+      "g5_fail_closed_review_share_of_g5": 1.0
     },
     "g6": {
       "g6_hint_injected_count": 30,
@@ -479,8 +479,8 @@
       "g6_no_hint_count": 220,
       "g6_hint_detected_count": 28,
       "g6_hint_detection_rate": 0.9333,
-      "g6_no_hint_detected_count": 193,
-      "g6_no_hint_detection_rate": 0.8773,
+      "g6_no_hint_detected_count": 190,
+      "g6_no_hint_detection_rate": 0.8636,
       "g6_hint_on_gt_pos_count": 29,
       "g6_hint_on_gt_pos_rate": 0.145,
       "g6_hint_on_gt_neg_count": 1,
@@ -491,8 +491,8 @@
     "trigger_combinations": [
       {
         "trigger_combination": "G3",
-        "count": 113,
-        "rate": 0.452
+        "count": 111,
+        "rate": 0.444
       },
       {
         "trigger_combination": "G4+G3",
@@ -501,8 +501,8 @@
       },
       {
         "trigger_combination": "G2+G3",
-        "count": 7,
-        "rate": 0.028
+        "count": 6,
+        "rate": 0.024
       },
       {
         "trigger_combination": "G4+G1+G3",
@@ -515,9 +515,19 @@
         "rate": 0.012
       },
       {
+        "trigger_combination": "G5",
+        "count": 2,
+        "rate": 0.008
+      },
+      {
         "trigger_combination": "G1+G3",
         "count": 2,
         "rate": 0.008
+      },
+      {
+        "trigger_combination": "G5+G4",
+        "count": 1,
+        "rate": 0.004
       }
     ]
   },
@@ -527,12 +537,12 @@
         "failure_mode": "FM1_evidence_location",
         "mapped_guardrail": "G1",
         "n_baseline_evaluable": 250,
-        "prevalence_count": 26,
-        "prevalence_rate": 0.104,
+        "prevalence_count": 25,
+        "prevalence_rate": 0.1,
         "intervention_count": 2,
-        "intervention_rate_given_prevalence": 0.0769,
+        "intervention_rate_given_prevalence": 0.08,
         "residual_count": 2,
-        "residual_rate_given_prevalence": 0.0769,
+        "residual_rate_given_prevalence": 0.08,
         "residual_observability": "partial"
       },
       {
@@ -553,8 +563,8 @@
         "n_baseline_evaluable": 250,
         "prevalence_count": 131,
         "prevalence_rate": 0.524,
-        "intervention_count": 131,
-        "intervention_rate_given_prevalence": 1.0,
+        "intervention_count": 130,
+        "intervention_rate_given_prevalence": 0.9924,
         "residual_count": 0,
         "residual_rate_given_prevalence": 0.0,
         "residual_observability": "direct"
@@ -565,8 +575,8 @@
         "n_baseline_evaluable": 250,
         "prevalence_count": 73,
         "prevalence_rate": 0.292,
-        "intervention_count": 65,
-        "intervention_rate_given_prevalence": 0.8904,
+        "intervention_count": 66,
+        "intervention_rate_given_prevalence": 0.9041,
         "residual_count": 65,
         "residual_rate_given_prevalence": 0.8904,
         "residual_observability": "partial"
@@ -575,13 +585,25 @@
         "failure_mode": "FM5_schema_output_failure",
         "mapped_guardrail": "G5",
         "n_baseline_evaluable": 250,
-        "prevalence_count": 0,
-        "prevalence_rate": 0.0,
-        "intervention_count": null,
-        "intervention_rate_given_prevalence": null,
+        "prevalence_count": 3,
+        "prevalence_rate": 0.012,
+        "intervention_count": 3,
+        "intervention_rate_given_prevalence": 1.0,
         "residual_count": null,
         "residual_rate_given_prevalence": null,
-        "residual_observability": "n/a"
+        "residual_observability": "not_robustly_observable"
+      },
+      {
+        "failure_mode": "FM6_format_familiarity",
+        "mapped_guardrail": "G6",
+        "n_baseline_evaluable": 250,
+        "prevalence_count": 30,
+        "prevalence_rate": 0.12,
+        "intervention_count": 30,
+        "intervention_rate_given_prevalence": 1.0,
+        "residual_count": 2,
+        "residual_rate_given_prevalence": 0.0667,
+        "residual_observability": "direct"
       }
     ],
     "definitions": [
@@ -624,6 +646,14 @@
         "intervention_field_logic": "G5 in llm_guardrail.triggered_guardrails OR llm_guardrail.routed_by_guardrail == G5",
         "residual_field_logic": "Not robustly observable. No independent post-intervention field measures whether the schema failure persists as a problematic end state after G5 treatment.",
         "notes": "Asymmetric operationalization: FM5 prevalence is observed on the guardrail/structured-output side only. The baseline does not undergo schema validation. Residual is not reported because absence of G5 routing does not robustly indicate a persisting problematic end state."
+      },
+      {
+        "failure_mode": "FM6_format_familiarity",
+        "mapped_guardrail": "G6",
+        "prevalence_field_logic": "llm_guardrail.g6_hint_injected == true",
+        "intervention_field_logic": "llm_guardrail.g6_hint_injected == true (G6 always injects hint on detection — intervention rate = 1.0 by construction)",
+        "residual_field_logic": "llm_guardrail.g6_hint_injected == true AND gt_has_secret == true AND llm_guardrail.pred_has_secret == false",
+        "notes": "G6 is a pre-processing guardrail that injects a format hint before the LLM call. Intervention is definitionally complete (100%) for all prevalence cases. Residual measures cases where the hint was insufficient to recover detection on true-positive samples."
       }
     ],
     "coverage": [
@@ -631,7 +661,7 @@
         "failure_mode": "FM1_evidence_location",
         "mapped_guardrail": "G1",
         "n_baseline_evaluable": 250,
-        "prevalence_base_n": 26,
+        "prevalence_base_n": 25,
         "residual_observability": "partial",
         "multi_fm_interference_note": "Multiple guardrails may act on the same sample. Observed FM1 residual may reflect bundle-wide output quality rather than G1-specific correction.",
         "notes": "Residual based on guardrail-side g1_valid, which is structurally analogous but not identical to the baseline validity check. G1 did not trigger in this dataset; observed residual=0 may reflect overall guardrail output quality rather than targeted G1 intervention."
@@ -667,10 +697,19 @@
         "failure_mode": "FM5_schema_output_failure",
         "mapped_guardrail": "G5",
         "n_baseline_evaluable": 250,
-        "prevalence_base_n": 0,
+        "prevalence_base_n": 3,
         "residual_observability": "not_robustly_observable",
         "multi_fm_interference_note": "G5 operates first in pipeline (G5 → G2 → G4 → G1 → G3). No structural overlap with other guardrails for schema failures.",
         "notes": "Asymmetric operationalization: prevalence observed on guardrail output side only. Residual not reported: no independent post-intervention field to assess whether schema failure persists as a problematic end state."
+      },
+      {
+        "failure_mode": "FM6_format_familiarity",
+        "mapped_guardrail": "G6",
+        "n_baseline_evaluable": 250,
+        "prevalence_base_n": 30,
+        "residual_observability": "direct",
+        "multi_fm_interference_note": "G6 is a pre-processing guardrail (hint injection before LLM call). Can co-occur with G4 on the same sample if LLM uncertainty persists despite the hint.",
+        "notes": "G6 intervenes by construction on every detected format-candidate (intervention rate = 1.0). Residual directly observable: gt_has_secret=true AND pred_has_secret=false after hint injection."
       }
     ]
   },
@@ -711,11 +750,11 @@
         "n_evaluable": 150,
         "recall_alert": 1.0,
         "precision_alert": 0.7937,
-        "recall_auto": 0.76,
-        "precision_auto": 1.0,
+        "recall_auto": 0.88,
+        "precision_auto": 0.8148,
         "escape_rate": 0.0,
-        "review_rate": 0.3333,
-        "block_rate": 0.5067,
+        "review_rate": 0.12,
+        "block_rate": 0.72,
         "pass_rate": 0.16
       },
       {
@@ -753,11 +792,11 @@
         "n_evaluable": 100,
         "recall_alert": 0.98,
         "precision_alert": 1.0,
-        "recall_auto": 0.2,
+        "recall_auto": 0.79,
         "precision_auto": 1.0,
         "escape_rate": 0.02,
-        "review_rate": 0.78,
-        "block_rate": 0.2,
+        "review_rate": 0.19,
+        "block_rate": 0.79,
         "pass_rate": 0.02
       },
       {
@@ -838,10 +877,10 @@
         "recall_alert": null,
         "precision_alert": 0.0,
         "recall_auto": null,
-        "precision_auto": null,
+        "precision_auto": 0.0,
         "escape_rate": null,
-        "review_rate": 1.0,
-        "block_rate": 0.0,
+        "review_rate": 0.2,
+        "block_rate": 0.8,
         "pass_rate": 0.0
       },
       {
@@ -879,11 +918,11 @@
         "n_evaluable": 75,
         "recall_alert": 1.0,
         "precision_alert": 1.0,
-        "recall_auto": 0.72,
+        "recall_auto": 0.8267,
         "precision_auto": 1.0,
         "escape_rate": 0.0,
-        "review_rate": 0.28,
-        "block_rate": 0.72,
+        "review_rate": 0.1733,
+        "block_rate": 0.8267,
         "pass_rate": 0.0
       },
       {
@@ -921,11 +960,11 @@
         "n_evaluable": 75,
         "recall_alert": 1.0,
         "precision_alert": 1.0,
-        "recall_auto": 0.52,
+        "recall_auto": 0.8533,
         "precision_auto": 1.0,
         "escape_rate": 0.0,
-        "review_rate": 0.48,
-        "block_rate": 0.52,
+        "review_rate": 0.1467,
+        "block_rate": 0.8533,
         "pass_rate": 0.0
       },
       {
@@ -963,11 +1002,11 @@
         "n_evaluable": 8,
         "recall_alert": 1.0,
         "precision_alert": 1.0,
-        "recall_auto": 0.0,
-        "precision_auto": null,
+        "recall_auto": 0.625,
+        "precision_auto": 1.0,
         "escape_rate": 0.0,
-        "review_rate": 1.0,
-        "block_rate": 0.0,
+        "review_rate": 0.375,
+        "block_rate": 0.625,
         "pass_rate": 0.0
       },
       {
@@ -1005,11 +1044,11 @@
         "n_evaluable": 8,
         "recall_alert": 1.0,
         "precision_alert": 1.0,
-        "recall_auto": 0.0,
-        "precision_auto": null,
+        "recall_auto": 1.0,
+        "precision_auto": 1.0,
         "escape_rate": 0.0,
-        "review_rate": 1.0,
-        "block_rate": 0.0,
+        "review_rate": 0.0,
+        "block_rate": 1.0,
         "pass_rate": 0.0
       },
       {
@@ -1047,11 +1086,11 @@
         "n_evaluable": 18,
         "recall_alert": 1.0,
         "precision_alert": 1.0,
-        "recall_auto": 0.2222,
+        "recall_auto": 0.6111,
         "precision_auto": 1.0,
         "escape_rate": 0.0,
-        "review_rate": 0.7778,
-        "block_rate": 0.2222,
+        "review_rate": 0.3889,
+        "block_rate": 0.6111,
         "pass_rate": 0.0
       },
       {
@@ -1089,11 +1128,11 @@
         "n_evaluable": 17,
         "recall_alert": 1.0,
         "precision_alert": 1.0,
-        "recall_auto": 0.7647,
+        "recall_auto": 0.8824,
         "precision_auto": 1.0,
         "escape_rate": 0.0,
-        "review_rate": 0.2353,
-        "block_rate": 0.7647,
+        "review_rate": 0.1176,
+        "block_rate": 0.8824,
         "pass_rate": 0.0
       }
     ],
@@ -1103,11 +1142,11 @@
         "slice_n": 150,
         "fm3_prevalence_count": 90,
         "fm3_prevalence_rate": 0.6,
-        "fm3_intervention_rate_given_prevalence": 1.0,
+        "fm3_intervention_rate_given_prevalence": 0.9889,
         "fm3_residual_rate_given_prevalence": 0.0,
         "fm4_prevalence_count": 34,
         "fm4_prevalence_rate": 0.2267,
-        "fm4_intervention_rate_given_prevalence": 0.9412
+        "fm4_intervention_rate_given_prevalence": 0.9706
       },
       {
         "slice_name": "stress",
@@ -1140,7 +1179,7 @@
         "fm3_residual_rate_given_prevalence": null,
         "fm4_prevalence_count": 25,
         "fm4_prevalence_rate": 1.0,
-        "fm4_intervention_rate_given_prevalence": 0.92
+        "fm4_intervention_rate_given_prevalence": 0.96
       },
       {
         "slice_name": "real",
@@ -1158,7 +1197,7 @@
         "slice_n": 75,
         "fm3_prevalence_count": 52,
         "fm3_prevalence_rate": 0.6933,
-        "fm3_intervention_rate_given_prevalence": 1.0,
+        "fm3_intervention_rate_given_prevalence": 0.9808,
         "fm3_residual_rate_given_prevalence": 0.0,
         "fm4_prevalence_count": 21,
         "fm4_prevalence_rate": 0.28,
@@ -1320,62 +1359,6 @@
       }
     },
     {
-      "policy": "p1",
-      "variant": "guardrail",
-      "view": "alert",
-      "TP": 199,
-      "FP": 26,
-      "TN": 24,
-      "FN": 1,
-      "skipped": 0,
-      "total_evaluated": 250,
-      "precision": 0.8844,
-      "recall": 0.995,
-      "f1": 0.9365,
-      "specificity": 0.48,
-      "accuracy": 0.892,
-      "escape_count": 1,
-      "escape_rate": 0.005,
-      "reviewer_load": 0.512,
-      "decision_distribution": {
-        "block_count": 97,
-        "block_rate": 0.388,
-        "review_count": 128,
-        "review_rate": 0.512,
-        "pass_count": 25,
-        "pass_rate": 0.1,
-        "total": 250
-      }
-    },
-    {
-      "policy": "p1",
-      "variant": "guardrail",
-      "view": "autonomous",
-      "TP": 97,
-      "FP": 0,
-      "TN": 50,
-      "FN": 103,
-      "skipped": 0,
-      "total_evaluated": 250,
-      "precision": 1.0,
-      "recall": 0.485,
-      "f1": 0.6532,
-      "specificity": 1.0,
-      "accuracy": 0.588,
-      "escape_count": 1,
-      "escape_rate": 0.005,
-      "reviewer_load": 0.512,
-      "decision_distribution": {
-        "block_count": 97,
-        "block_rate": 0.388,
-        "review_count": 128,
-        "review_rate": 0.512,
-        "pass_count": 25,
-        "pass_rate": 0.1,
-        "total": 250
-      }
-    },
-    {
       "policy": "p2",
       "variant": "baseline",
       "view": "alert",
@@ -1428,62 +1411,6 @@
         "review_rate": 0.216,
         "pass_count": 51,
         "pass_rate": 0.204,
-        "total": 250
-      }
-    },
-    {
-      "policy": "p2",
-      "variant": "guardrail",
-      "view": "alert",
-      "TP": 199,
-      "FP": 26,
-      "TN": 24,
-      "FN": 1,
-      "skipped": 0,
-      "total_evaluated": 250,
-      "precision": 0.8844,
-      "recall": 0.995,
-      "f1": 0.9365,
-      "specificity": 0.48,
-      "accuracy": 0.892,
-      "escape_count": 1,
-      "escape_rate": 0.005,
-      "reviewer_load": 0.544,
-      "decision_distribution": {
-        "block_count": 89,
-        "block_rate": 0.356,
-        "review_count": 136,
-        "review_rate": 0.544,
-        "pass_count": 25,
-        "pass_rate": 0.1,
-        "total": 250
-      }
-    },
-    {
-      "policy": "p2",
-      "variant": "guardrail",
-      "view": "autonomous",
-      "TP": 89,
-      "FP": 0,
-      "TN": 50,
-      "FN": 111,
-      "skipped": 0,
-      "total_evaluated": 250,
-      "precision": 1.0,
-      "recall": 0.445,
-      "f1": 0.6159,
-      "specificity": 1.0,
-      "accuracy": 0.556,
-      "escape_count": 1,
-      "escape_rate": 0.005,
-      "reviewer_load": 0.544,
-      "decision_distribution": {
-        "block_count": 89,
-        "block_rate": 0.356,
-        "review_count": 136,
-        "review_rate": 0.544,
-        "pass_count": 25,
-        "pass_rate": 0.1,
         "total": 250
       }
     },
@@ -1544,30 +1471,127 @@
       }
     },
     {
+      "policy": "p1",
+      "variant": "guardrail",
+      "view": "alert",
+      "total_evaluated": 250,
+      "TP": 200,
+      "FP": 26,
+      "TN": 24,
+      "FN": 0,
+      "skipped": 0,
+      "precision": 0.885,
+      "recall": 1.0,
+      "f1": 0.939,
+      "specificity": 0.48,
+      "accuracy": 0.896,
+      "escape_count": 0,
+      "escape_rate": 0.0,
+      "reviewer_load": 0.112,
+      "decision_distribution": {
+        "BLOCK": 198,
+        "REVIEW": 28,
+        "PASS": 24,
+        "total": 250
+      }
+    },
+    {
+      "policy": "p1",
+      "variant": "guardrail",
+      "view": "autonomous",
+      "total_evaluated": 250,
+      "TP": 175,
+      "FP": 23,
+      "TN": 27,
+      "FN": 25,
+      "skipped": 0,
+      "precision": 0.8838,
+      "recall": 0.875,
+      "f1": 0.8794,
+      "specificity": 0.54,
+      "accuracy": 0.808,
+      "escape_count": 0,
+      "escape_rate": 0.0,
+      "reviewer_load": 0.112,
+      "decision_distribution": {
+        "BLOCK": 198,
+        "REVIEW": 28,
+        "PASS": 24,
+        "total": 250
+      }
+    },
+    {
+      "policy": "p2",
+      "variant": "guardrail",
+      "view": "alert",
+      "total_evaluated": 250,
+      "TP": 199,
+      "FP": 26,
+      "TN": 24,
+      "FN": 1,
+      "skipped": 0,
+      "precision": 0.8844,
+      "recall": 0.995,
+      "f1": 0.9365,
+      "specificity": 0.48,
+      "accuracy": 0.892,
+      "escape_count": 1,
+      "escape_rate": 0.005,
+      "reviewer_load": 0.404,
+      "decision_distribution": {
+        "BLOCK": 124,
+        "REVIEW": 101,
+        "PASS": 25,
+        "total": 250
+      }
+    },
+    {
+      "policy": "p2",
+      "variant": "guardrail",
+      "view": "autonomous",
+      "total_evaluated": 250,
+      "TP": 117,
+      "FP": 7,
+      "TN": 43,
+      "FN": 83,
+      "skipped": 0,
+      "precision": 0.9435,
+      "recall": 0.585,
+      "f1": 0.7222,
+      "specificity": 0.86,
+      "accuracy": 0.64,
+      "escape_count": 1,
+      "escape_rate": 0.005,
+      "reviewer_load": 0.404,
+      "decision_distribution": {
+        "BLOCK": 124,
+        "REVIEW": 101,
+        "PASS": 25,
+        "total": 250
+      }
+    },
+    {
       "policy": "p3",
       "variant": "guardrail",
       "view": "alert",
-      "TP": 160,
-      "FP": 16,
-      "TN": 34,
-      "FN": 40,
-      "skipped": 0,
       "total_evaluated": 250,
-      "precision": 0.9091,
-      "recall": 0.8,
-      "f1": 0.8511,
-      "specificity": 0.68,
-      "accuracy": 0.776,
-      "escape_count": 40,
-      "escape_rate": 0.2,
-      "reviewer_load": 0.324,
+      "TP": 193,
+      "FP": 24,
+      "TN": 26,
+      "FN": 7,
+      "skipped": 0,
+      "precision": 0.8894,
+      "recall": 0.965,
+      "f1": 0.9257,
+      "specificity": 0.52,
+      "accuracy": 0.876,
+      "escape_count": 7,
+      "escape_rate": 0.035,
+      "reviewer_load": 0.22,
       "decision_distribution": {
-        "block_count": 95,
-        "block_rate": 0.38,
-        "pass_count": 74,
-        "pass_rate": 0.296,
-        "review_count": 81,
-        "review_rate": 0.324,
+        "BLOCK": 162,
+        "REVIEW": 55,
+        "PASS": 33,
         "total": 250
       }
     },
@@ -1575,27 +1599,24 @@
       "policy": "p3",
       "variant": "guardrail",
       "view": "autonomous",
-      "TP": 95,
-      "FP": 0,
-      "TN": 50,
-      "FN": 105,
-      "skipped": 0,
       "total_evaluated": 250,
-      "precision": 1.0,
-      "recall": 0.475,
-      "f1": 0.6441,
-      "specificity": 1.0,
-      "accuracy": 0.58,
-      "escape_count": 40,
-      "escape_rate": 0.2,
-      "reviewer_load": 0.324,
+      "TP": 148,
+      "FP": 14,
+      "TN": 36,
+      "FN": 52,
+      "skipped": 0,
+      "precision": 0.9136,
+      "recall": 0.74,
+      "f1": 0.8177,
+      "specificity": 0.72,
+      "accuracy": 0.736,
+      "escape_count": 7,
+      "escape_rate": 0.035,
+      "reviewer_load": 0.22,
       "decision_distribution": {
-        "block_count": 95,
-        "block_rate": 0.38,
-        "pass_count": 74,
-        "pass_rate": 0.296,
-        "review_count": 81,
-        "review_rate": 0.324,
+        "BLOCK": 162,
+        "REVIEW": 55,
+        "PASS": 33,
         "total": 250
       }
     }
@@ -1637,30 +1658,30 @@
       "method1": "Scanner",
       "method2": "Guardrails_Hit",
       "contingency_table": {
-        "both_correct": 161,
-        "only_method1_correct": 16,
-        "only_method2_correct": 60,
-        "both_wrong": 13,
+        "both_correct": 158,
+        "only_method1_correct": 19,
+        "only_method2_correct": 63,
+        "both_wrong": 10,
         "total": 250,
-        "discordant_pairs": 76
+        "discordant_pairs": 82
       },
       "mcnemar_test": {
         "test": "mcnemar",
-        "statistic": 25.4737,
-        "p_value": 1e-06,
-        "n_discordant": 76,
-        "b": 16,
-        "c": 60,
+        "statistic": 23.6098,
+        "p_value": 2e-06,
+        "n_discordant": 82,
+        "b": 19,
+        "c": 63,
         "method": "chi_squared",
         "significant_at_005": true,
         "significant_at_001": true,
         "interpretation": "Method 2 performs better (highly significant, p = 0.0000)"
       },
       "summary": {
-        "both_correct_pct": 64.4,
-        "both_wrong_pct": 5.2,
-        "method1_only_correct_pct": 6.4,
-        "method2_only_correct_pct": 24.0
+        "both_correct_pct": 63.2,
+        "both_wrong_pct": 4.0,
+        "method1_only_correct_pct": 7.6,
+        "method2_only_correct_pct": 25.2
       }
     },
     "baseline_vs_guardrail_hit": {
@@ -1668,30 +1689,30 @@
       "method1": "LLM_Baseline",
       "method2": "Guardrails_Hit",
       "contingency_table": {
-        "both_correct": 199,
-        "only_method1_correct": 1,
-        "only_method2_correct": 22,
-        "both_wrong": 28,
+        "both_correct": 196,
+        "only_method1_correct": 4,
+        "only_method2_correct": 25,
+        "both_wrong": 25,
         "total": 250,
-        "discordant_pairs": 23
+        "discordant_pairs": 29
       },
       "mcnemar_test": {
         "test": "mcnemar",
-        "statistic": 19.1739,
-        "p_value": 6e-06,
-        "n_discordant": 23,
-        "b": 1,
-        "c": 22,
-        "method": "exact_binomial",
+        "statistic": 15.2069,
+        "p_value": 0.000204,
+        "n_discordant": 29,
+        "b": 4,
+        "c": 25,
+        "method": "chi_squared",
         "significant_at_005": true,
         "significant_at_001": true,
-        "interpretation": "Method 2 performs better (highly significant, p = 0.0000)"
+        "interpretation": "Method 2 performs better (highly significant, p = 0.0002)"
       },
       "summary": {
-        "both_correct_pct": 79.6,
-        "both_wrong_pct": 11.2,
-        "method1_only_correct_pct": 0.4,
-        "method2_only_correct_pct": 8.8
+        "both_correct_pct": 78.4,
+        "both_wrong_pct": 10.0,
+        "method1_only_correct_pct": 1.6,
+        "method2_only_correct_pct": 10.0
       }
     },
     "scanner_vs_guardrail_alert": {
@@ -1939,8 +1960,8 @@
       "avg_exposure_ratio": 0.9044
     },
     "guardrail": {
-      "leakage_rate": 0.15,
-      "samples_with_leak": 30,
+      "leakage_rate": 0.145,
+      "samples_with_leak": 29,
       "samples_evaluated": 200,
       "leaked_sample_ids": [
         "REAL_010",
@@ -1948,7 +1969,6 @@
         "REAL_029",
         "REAL_032",
         "REAL_033",
-        "SYNTH_017",
         "SYNTH_020",
         "SYNTH_036",
         "SYNTH_042_E3-A_FM1_FM3_FM5_STRESS",
@@ -1976,14 +1996,14 @@
       ],
       "by_leak_type": {
         "exact_match": 0,
-        "partial_match": 30
+        "partial_match": 29
       },
-      "avg_exposure_ratio": 0.1935
+      "avg_exposure_ratio": 0.1954
     },
     "comparison": {
       "baseline_leakage_rate": 0.84,
-      "guardrail_leakage_rate": 0.15,
-      "leakage_reduction_pct": 82.14,
+      "guardrail_leakage_rate": 0.145,
+      "leakage_reduction_pct": 82.74,
       "guardrail_effective": true
     }
   }

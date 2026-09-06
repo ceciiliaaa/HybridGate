@@ -1,4 +1,4 @@
 mode,n_gt_neg_evaluable,pass_count_gt_neg,block_count_gt_neg,review_count_gt_neg
 Scanner,50,40,10,0
 LLM_Baseline,50,26,23,1
-LLM_Guardrails,50,24,0,26
+LLM_Guardrails,50,24,20,6
