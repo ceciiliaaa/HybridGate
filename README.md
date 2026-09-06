@@ -4,7 +4,7 @@
 
 > Bachelor thesis by **Cecilia Nothstein**<br>
 > DHBW Stuttgart, Business Information Systems<br>
-> Written in cooperation with **Mercedes-Benz Group AG** @ AI Security Engineering <br>
+> Written in cooperation with **Mercedes-Benz Group AG** @ AI Security Engineering
 
 Conventional secret scanners miss about a third of hardcoded credentials, 63 of 200
 in this benchmark, because a value's sensitivity comes from how it is used rather
