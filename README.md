@@ -8,7 +8,7 @@ Secret scanners miss roughly a third of hardcoded credentials, because a value's
 sensitivity comes from how it is used rather than from how it looks. An LLM
 reviewer can read that context, and it brings six failure modes of its own:
 
-![Pull request whose title and description claim the key is a placeholder, while the diff adds a live Stripe key](docs/figures/PR_Abbildung_Lang.png)
+![Pull request whose title and description claim the key is a placeholder, while the diff adds a live Stripe key](docs/figures/pr-exculpatory-metadata.png)
 
 *Title and description assert a harmless test value. The diff adds a production
 Stripe key. Both go into the same prompt, and nothing in a transformer separates
@@ -37,13 +37,7 @@ context-sensitive addition inside a controlled architecture.
 
 ## Two stages
 
-![HybridGate architecture: a pull request enters both the classic scanners and the guardrail-wrapped LLM reviewer, and both signals meet in the policy engine](docs/figures/HybridGate_Architektur.png)
-
-*Figure labels are German. Stufe 1 is stage 1, the guardrail layer: a G6 pre-hint
-before the model call, then the post-filter pipeline G5, G2, G4, G1, G3. Stufe 2
-is stage 2, the decision layer holding the three policies. The gate emits PASS,
-REVIEW or BLOCK, which map onto auto-merge, manual review and refused merge in the
-pull request lifecycle.*
+![HybridGate architecture: a pull request enters both the conventional scanners and the guardrail-wrapped LLM reviewer, and both signals meet in the policy engine](docs/figures/hybridgate-architecture.png)
 
 Stage 1 hardens the LLM reviewer against six failure modes. Stage 2 merges the
 cleaned output with the scanner signal into a deterministic gate decision, without
@@ -63,14 +57,12 @@ blocker. It feeds G4 through rule R7 as an ambiguity signal.
 They are not invented, and not read off the runs. They come from a systematic
 literature review (vom Brocke et al. for search, Webster and Watson for synthesis):
 
-<img src="docs/figures/SLR_FlowChart.png" width="520" alt="PRISMA-style selection process from 614 database hits down to a final corpus of 79 studies">
+![Literature search from research question through search string construction and database search to the final analysis corpus of 79 studies](docs/figures/slr-overview.png)
 
-*Identifikation, Screening, Eignungsprüfung, Einschluss are identification,
-screening, eligibility and inclusion. 614 hits across IEEE Xplore, Google Scholar,
-ACM, SpringerLink and arXiv, 179 duplicates removed, 312 excluded on title and
-abstract, 56 excluded on full text, 12 added by backward and forward snowballing.
-Final corpus 79 studies, condensed into 17 failure-mode clusters and reduced to 6
-evaluation failure modes.*
+*The 79 studies were condensed into 17 failure-mode clusters and reduced to 6
+evaluation failure modes. `docs/figures/slr-prisma-flowchart.png` gives the same
+process as a PRISMA diagram, with the exclusion counts and reasons at each stage:
+179 duplicates, 312 excluded on title and abstract, 56 excluded on full text.*
 
 The reduction from 17 to 6 uses Hevner's three DSR requirements as explicit
 selection criteria (problem relevance, artifact addressability, evaluability),
@@ -121,12 +113,7 @@ here was built manually against explicit criteria and peer-reviewed by two
 independent master's students in computer science, with disagreements resolved by
 adjudication.
 
-![Dataset construction: data sources, quality assurance chain, and the final 250 sample corpus](docs/figures/Datensatz_Abbildung.png)
-
-*Datenquellen are the data sources, Qualitätssicherung the quality assurance chain
-(label criteria after Basak et al., independent peer review of the annotations,
-adjudication on disagreement, final ground truth release), Finaler Datensatz the
-resulting corpus. Stressfälle are the stress cases.*
+![Dataset construction: data sources, quality assurance chain, and the final 250 sample corpus](docs/figures/dataset-construction.png)
 
 The figure counts samples by construction stage. Inside the data file they carry
 `sample_id` prefixes, which group them differently. Both views describe the same
@@ -165,14 +152,10 @@ secrets but are not, a recall-maximising system scores well by flagging everythi
 
 ## Results
 
-![Evaluation pipeline: the benchmark dataset runs through scanner baseline, LLM baseline, guardrail reviewer and policy engine, producing detection and operational metrics](docs/figures/EvaluationAbbildung.png)
+![Evaluation pipeline: the benchmark dataset runs through scanner baseline, LLM baseline, guardrail reviewer and policy engine, producing detection and operational metrics](docs/figures/evaluation-pipeline.png)
 
-*Empirische Erhebung is the empirical measurement stage, Deterministische
-Aggregation the deterministic aggregation, Ergebnisdimensionen the result
-dimensions, Vorher-Nacher Wirkung the paired before and after comparison, Externe
-Plausibilitätsprüfung the external plausibility check on real open-source pull
-requests. TF 1 to TF 3 are the three sub-questions. Operative Metriken are the
-leak-escape and false-block rates.*
+*SRQ 1 to SRQ 3 are the three sub-questions. The paired pre and post comparison
+runs on the identical 250 samples, first without and then with the guardrail layer.*
 
 Alert-level scoring: BLOCK and REVIEW both count as detection, since REVIEW routes
 to a human. A secret counts as missed only when it passes the gate as PASS.
@@ -410,13 +393,13 @@ docs/
   ARTIFACT_ARCHITECTURE.md    technical description of the artifact
   PERTURBATION_ENGINE.md      manipulation strategies
   SLR_FM_MetricsMapping.csv   literature-to-metric mapping from the SLR
-  figures/                    the thesis figures, German labels
+  figures/                    thesis figures, English labels
 ```
 
-`docs/figures/` holds all nine figures from the thesis, including the three not
-used above: `PR_Schematisch.png` (anatomy of a pull request),
-`SLR_graphisch.png` (an alternative view of the literature search) and
-`Aufbau_der_Arbeit_Abbildung.png` (chapter structure mapped onto the DSR phases).
+Beyond the five figures embedded above, `docs/figures/` also holds
+`slr-prisma-flowchart.png` (the literature search as a PRISMA diagram with
+exclusion counts) and `pull-request-anatomy.png` (the parts of a pull request that
+the reviewer receives).
 
 Start with **`runs/thesis_evaluation_summary_alert_only.md`**. It names, for every
 figure, which file is authoritative and which is superseded.
