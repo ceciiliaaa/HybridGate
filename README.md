@@ -2,7 +2,7 @@
 
 **A hybrid pre-merge gate for detecting hardcoded secrets in pull requests, hardened by six guardrails**
 
-Bachelor thesis · Cecilia Nothstein · DHBW Stuttgart, Business Information Systems · in cooperation with Mercedes-Benz Group AG · submitted 11 May 2026
+Cecilia Nothstein · Bachelor thesis, DHBW Stuttgart, Business Information Systems · written in cooperation with AI Security Engineering at Mercedes-Benz Group AG · submitted 11 May 2026
 
 Secret scanners miss roughly a third of hardcoded credentials, because a value's
 sensitivity comes from how it is used rather than from how it looks. An LLM
