@@ -61,6 +61,10 @@ data/02_interim/*
 data/03_baseline/*.json
 !data/03_baseline/.gitkeep
 
+# Resumable evaluation checkpoints (intermediate, superseded by runs/*/results.json)
+data/05_results/*.checkpoint.json
+data/05_results/*.partial.jsonl
+
 # Logs
 *.log
 logs/
