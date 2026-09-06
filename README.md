@@ -6,9 +6,10 @@
 > DHBW Stuttgart, Business Information Systems<br>
 > Written in cooperation with **Mercedes-Benz Group AG** @ AI Security Engineering <br>
 
-Secret scanners miss roughly a third of hardcoded credentials, because a value's
-sensitivity comes from how it is used rather than from how it looks. An LLM
-reviewer can read that context, and it brings six failure modes of its own:
+Conventional secret scanners miss about a third of hardcoded credentials, 63 of 200
+in this benchmark, because a value's sensitivity comes from how it is used rather
+than from how it looks. An LLM reviewer can read that context, and it brings six
+failure modes of its own:
 
 ![Pull request whose title and description claim the key is a placeholder, while the diff adds a live Stripe key](docs/figures/pr-exculpatory-metadata.png)
 
@@ -18,7 +19,7 @@ authoritative code evidence from the contributor's free text.*
 
 This repository is the artifact of a Design Science Research thesis asking where
 those failure modes limit an LLM reviewer, and how far a deterministic layer
-around it can make one safe enough for a DevSecOps pre-merge gate.
+around it can make one reliable enough for a DevSecOps pre-merge gate.
 
 > **RQ** What limits emerge when LLM-assisted code review is used to detect
 > hardcoded secrets in pull requests, and to what extent can they be secured
@@ -31,8 +32,8 @@ around it can make one safe enough for a DevSecOps pre-merge gate.
 > **SRQ 3** What follows for the design of a practically viable deployment of
 > LLM-assisted code review in a DevSecOps context?
 
-The short answer: the limit is not detection ability but the **reliability of
-finding production**. Guardrails raise operational recall from 0.870 to 0.990
+The short answer: the limit is not the ability to detect, but the **operational
+reliability of the findings**. Guardrails raise operational recall from 0.870 to 0.990
 (OpenAI) and from 0.835 to 0.995 (Anthropic), and they remove 100% of observed
 secret leakage from the model's own output. A large part of that gain is
 escalation to human review rather than better classification. An unhardened LLM
@@ -115,8 +116,8 @@ prints it into a CI log has not solved the problem.
 rather than as a representative sample of production repositories. It exists to
 provoke and measure the six failure modes under controlled conditions. Croft et al.
 report label errors in about 71% of common vulnerability datasets, so ground truth
-here was built manually against explicit criteria and peer-reviewed by two
-independent master's students in computer science, with disagreements resolved by
+here was built manually against explicit criteria, then independently reviewed by
+two computer science master's students, with disagreements resolved through
 adjudication.
 
 ![Dataset construction: data sources, quality assurance chain, and the final 250 sample corpus](docs/figures/dataset-construction.png)
@@ -237,8 +238,8 @@ In P3 a BLOCK always requires a detection signal, so context alone can never blo
 | **P3** Risk-Weighted | OpenAI | 162 / 55 / 33 | 3.5% | 28.0% | 0.926 |
 | **P3** Risk-Weighted | Anthropic | 132 / 73 / 45 | 6.0% | 14.0% | 0.928 |
 
-The F1 spread across all six configurations is **0.017**. F1 is therefore useless
-for choosing a policy, because the difference lives entirely in the error profile.
+The F1 spread across all six configurations is **0.017**. F1 alone cannot separate
+these policies, because the difference lives entirely in the error profile.
 
 P1 reaches LER = 0 on both providers and pays up to 46% false blocks for it. P2
 achieves the best F1 and the lowest false-block rate, and it leaks. On Anthropic its
