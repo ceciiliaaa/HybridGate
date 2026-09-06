@@ -384,8 +384,27 @@ class TestG4Uncertainty:
         result = g4.validate_with_details(llm_output, guardrail_context=ctx)
         assert "decoy_like_pattern" in result["inferred_flags"]
 
-    def test_g4_apply_routing_backward_compat(self):
-        """G4: apply_routing interface works with new rule-based logic."""
+    def test_g4_apply_routing_escalates_pass(self):
+        """G4: apply_routing escalates PASS → REVIEW when a rule fires."""
+        g4 = G4Uncertainty()
+        llm_output = {**_valid_secret()}
+        ctx = {"schema_repaired": True}
+
+        final_decision, metadata = g4.apply_routing(
+            llm_output, "PASS", guardrail_context=ctx
+        )
+        assert final_decision == "REVIEW"
+        assert metadata["routed_by_guardrail"] == "G4"
+        assert metadata["triggered_rule"] == "R5_schema_repair"
+        assert "format_or_schema_repair_used" in metadata["inferred_flags"]
+
+    def test_g4_apply_routing_does_not_downgrade_block(self):
+        """G4: a triggered rule must not weaken an existing BLOCK.
+
+        BLOCK is the stronger security signal; escalation is one-way
+        (PASS → REVIEW). The rule is still recorded in the metadata so
+        the trigger stays observable for the FM4 analysis.
+        """
         g4 = G4Uncertainty()
         llm_output = {**_valid_secret()}
         ctx = {"schema_repaired": True}
@@ -393,8 +412,8 @@ class TestG4Uncertainty:
         final_decision, metadata = g4.apply_routing(
             llm_output, "BLOCK", guardrail_context=ctx
         )
-        assert final_decision == "REVIEW"
-        assert metadata["routed_by_guardrail"] == "G4"
+        assert final_decision == "BLOCK"
+        assert metadata["routed_by_guardrail"] is None
         assert metadata["triggered_rule"] == "R5_schema_repair"
         assert "format_or_schema_repair_used" in metadata["inferred_flags"]
 
