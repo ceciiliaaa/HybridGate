@@ -5,7 +5,6 @@
 > Bachelor thesis by **Cecilia Nothstein**<br>
 > DHBW Stuttgart, Business Information Systems<br>
 > Written in cooperation with **Mercedes-Benz Group AG** @ AI Security Engineering <br>
-> Submitted 11 May 2026
 
 Secret scanners miss roughly a third of hardcoded credentials, because a value's
 sensitivity comes from how it is used rather than from how it looks. An LLM
