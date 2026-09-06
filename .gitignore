@@ -60,6 +60,8 @@ data/01_raw/*
 data/02_interim/*
 data/03_baseline/*.json
 !data/03_baseline/.gitkeep
+# ...except the canonical benchmark every published run is based on
+!data/03_baseline/all_250_samples_extreme.json
 
 # Resumable evaluation checkpoints (intermediate, superseded by runs/*/results.json)
 data/05_results/*.checkpoint.json
