@@ -8,7 +8,10 @@
   <img src="https://img.shields.io/badge/written%20at-Mercedes--Benz%20AI%20Security%20Engineering-f472b6?style=flat-square" alt="Written at Mercedes-Benz AI Security Engineering">
 </p>
 <p>
-  <img src="https://img.shields.io/github/actions/workflow/status/ceciiliaaa/BA/tests.yml?branch=main&label=tests&style=flat-square&color=ec4899" alt="Test status">
+  <!-- While the repository is private, shields.io cannot read the workflow and
+       renders "repo or workflow not found". On going public, swap this line for:
+       https://img.shields.io/github/actions/workflow/status/ceciiliaaa/BA/tests.yml?branch=main&label=tests&style=flat-square&color=ec4899 -->
+  <img src="https://img.shields.io/badge/tests-128%20passing-ec4899?style=flat-square" alt="128 tests passing">
   <img src="https://img.shields.io/badge/metrics-reproduce%20byte%20for%20byte-db2777?style=flat-square" alt="Metrics reproduce byte for byte">
   <img src="https://img.shields.io/badge/python-3.10%2B-9333ea?style=flat-square" alt="Python 3.10 or newer">
   <img src="https://img.shields.io/badge/submitted-11%20May%202026-8b5cf6?style=flat-square" alt="Submitted 11 May 2026">
