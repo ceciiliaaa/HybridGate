@@ -16,11 +16,22 @@ class P2ContextualVeto(Policy):
     Logic:
     Pre-Policy:  IF hard_fail → REVIEW
     IF scanner_hit AND llm_decision == "BLOCK" → BLOCK
-    IF scanner_hit AND llm_decision == "PASS"
-       AND NOT review_signal AND NOT high_risk_file AND NOT critical_secret_type
+    IF scanner_hit AND pred_has_secret is False
+       AND NOT high_risk_file AND NOT critical_secret_type
        → PASS  (LLM overrides scanner)
     IF scanner_hit OR llm_decision IN {"BLOCK","REVIEW"} OR review_signal → REVIEW
     ELSE → PASS
+
+    Two deviations from the veto condition as specified in the thesis
+    (S AND NOT pred AND NOT R AND NOT F):
+
+    - NOT review_signal (R) was dropped. G4 fires on every NEG_DECOY sample,
+      so keeping R would have disabled the veto entirely.
+    - NOT critical_secret_type (C) was added as a second context lock.
+
+    The veto reads pred_has_secret (the raw LLM judgment), not final_decision,
+    because the guardrail layer may already have escalated the decision to
+    REVIEW even where the LLM itself reports no secret.
 
     Use case: Developer-friendly environments where false positives are disruptive.
     Trade-off: Requires both scanner and LLM to agree on block; LLM can veto scanner.
