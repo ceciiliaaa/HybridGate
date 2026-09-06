@@ -387,7 +387,9 @@ runs/
   v150_anthropic_opus46_full/ Anthropic run (Claude Opus 4.6), same dataset
   policy_results/             authoritative policy comparison
   scanner_baseline/           scanner-only reference
-  archive/                    superseded runs, retained deliberately
+  archive/                    the superseded runs the documentation cites:
+                              v120 invalid, v121 its fix, v130 the source of the
+                              three substituted FM5 samples
 scripts/
   plausibilitaetspruefung.py  collects the real PRs for the external check
 tests/                        128 tests over G3, G4, G5, routing, policy REVIEW
