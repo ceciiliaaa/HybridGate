@@ -2,20 +2,10 @@
 
 **A hybrid pre-merge gate for detecting hardcoded secrets in pull requests, hardened by six guardrails**
 
-<p>
-  <img src="https://img.shields.io/badge/Bachelor%20Thesis-Cecilia%20Nothstein-c084fc?style=flat-square" alt="Bachelor thesis by Cecilia Nothstein">
-  <img src="https://img.shields.io/badge/DHBW%20Stuttgart-Business%20Information%20Systems-a78bfa?style=flat-square" alt="DHBW Stuttgart, Business Information Systems">
-  <img src="https://img.shields.io/badge/written%20at-Mercedes--Benz%20AI%20Security%20Engineering-f472b6?style=flat-square" alt="Written at Mercedes-Benz AI Security Engineering">
-</p>
-<p>
-  <!-- While the repository is private, shields.io cannot read the workflow and
-       renders "repo or workflow not found". On going public, swap this line for:
-       https://img.shields.io/github/actions/workflow/status/ceciiliaaa/BA/tests.yml?branch=main&label=tests&style=flat-square&color=ec4899 -->
-  <img src="https://img.shields.io/badge/tests-128%20passing-ec4899?style=flat-square" alt="128 tests passing">
-  <img src="https://img.shields.io/badge/metrics-reproduce%20byte%20for%20byte-db2777?style=flat-square" alt="Metrics reproduce byte for byte">
-  <img src="https://img.shields.io/badge/python-3.10%2B-9333ea?style=flat-square" alt="Python 3.10 or newer">
-  <img src="https://img.shields.io/badge/submitted-11%20May%202026-8b5cf6?style=flat-square" alt="Submitted 11 May 2026">
-</p>
+> Bachelor thesis by **Cecilia Nothstein**<br>
+> DHBW Stuttgart, Business Information Systems, course WWI2023E<br>
+> Written in cooperation with AI Security Engineering at Mercedes-Benz Group AG<br>
+> Submitted 11 May 2026
 
 Secret scanners miss roughly a third of hardcoded credentials, because a value's
 sensitivity comes from how it is used rather than from how it looks. An LLM
@@ -32,11 +22,15 @@ those failure modes limit an LLM reviewer, and how far a deterministic layer
 around it can make one safe enough for a DevSecOps pre-merge gate.
 
 > **RQ** What limits emerge when LLM-assisted code review is used to detect
-> hardcoded secrets in pull requests, and to what extent can they be secured for
-> operational DevSecOps use?
+> hardcoded secrets in pull requests, and to what extent can they be secured
+> through targeted measures for operational DevSecOps use?
 >
-> **SQ1** Which failure modes occur? · **SQ2** How far do guardrails reduce them? ·
-> **SQ3** What follows for practical deployment?
+> **SRQ 1** Which typical failure modes occur when LLM-assisted code review is used
+> to detect hardcoded secrets in pull requests?<br>
+> **SRQ 2** To what extent can the identified failure modes be reduced by suitable
+> guardrail measures?<br>
+> **SRQ 3** What follows for the design of a practically viable deployment of
+> LLM-assisted code review in a DevSecOps context?
 
 The short answer: the limit is not detection ability but the **reliability of
 finding production**. Guardrails raise operational recall from 0.870 to 0.990
@@ -167,8 +161,9 @@ secrets but are not, a recall-maximising system scores well by flagging everythi
 
 ![Evaluation pipeline: the benchmark dataset runs through scanner baseline, LLM baseline, guardrail reviewer and policy engine, producing detection and operational metrics](docs/figures/evaluation-pipeline.png)
 
-*SRQ 1 to SRQ 3 are the three sub-questions. The paired pre and post comparison
-runs on the identical 250 samples, first without and then with the guardrail layer.*
+*SRQ 1 to SRQ 3 are the three sub-research questions stated above. The paired pre
+and post comparison runs on the identical 250 samples, first without and then with
+the guardrail layer.*
 
 Alert-level scoring: BLOCK and REVIEW both count as detection, since REVIEW routes
 to a human. A secret counts as missed only when it passes the gate as PASS.
