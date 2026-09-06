@@ -380,7 +380,8 @@ src/
                       p3_escalation. The latter is not dead: its
                       compute_policy_tags is still called during evaluation
   metrics/            model, gate, failure-mode (PRI) and statistical metrics
-  scripts/            policy re-simulation
+  scripts/            policy re-simulation, imported by metrics/compute_all.py
+scripts/              standalone tooling, run directly and imported by nothing
 runs/
   v140_full_g6_250samples/    OpenAI run (GPT-5 mini), 250 samples
   v150_anthropic_opus46_full/ Anthropic run (Claude Opus 4.6), same dataset
