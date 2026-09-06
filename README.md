@@ -6,10 +6,17 @@ Bachelor thesis · Cecilia Nothstein · DHBW Stuttgart, Business Information Sys
 
 Secret scanners miss roughly a third of hardcoded credentials, because a value's
 sensitivity comes from how it is used rather than from how it looks. An LLM
-reviewer can read that context, and it brings six failure modes of its own. This
-repository is the artifact of a Design Science Research thesis asking where those
-failure modes limit an LLM reviewer, and how far a deterministic layer around it
-can make one safe enough for a DevSecOps pre-merge gate.
+reviewer can read that context, and it brings six failure modes of its own:
+
+![Pull request whose title and description claim the key is a placeholder, while the diff adds a live Stripe key](docs/figures/PR_Abbildung_Lang.png)
+
+*Title and description assert a harmless test value. The diff adds a production
+Stripe key. Both go into the same prompt, and nothing in a transformer separates
+authoritative code evidence from the contributor's free text.*
+
+This repository is the artifact of a Design Science Research thesis asking where
+those failure modes limit an LLM reviewer, and how far a deterministic layer
+around it can make one safe enough for a DevSecOps pre-merge gate.
 
 > **RQ** What limits emerge when LLM-assisted code review is used to detect
 > hardcoded secrets in pull requests, and to what extent can they be secured for
@@ -30,33 +37,13 @@ context-sensitive addition inside a controlled architecture.
 
 ## Two stages
 
-```mermaid
-flowchart LR
-    PR["Pull request<br/>title, body, code diff"]
-    SC["Classic scanners<br/>gitleaks, detect-secrets"]
-    G6["G6 pre-scan<br/>format familiarity"]
+![HybridGate architecture: a pull request enters both the classic scanners and the guardrail-wrapped LLM reviewer, and both signals meet in the policy engine](docs/figures/HybridGate_Architektur.png)
 
-    subgraph S1["Stage 1: guardrail layer"]
-        direction LR
-        LLM["LLM reviewer<br/>GPT-5 mini<br/>Claude Opus 4.6"]
-        G5["G5<br/>schema"]
-        G2["G2<br/>untrusted input"]
-        G4["G4<br/>uncertainty"]
-        G1["G1<br/>evidence"]
-        G3["G3<br/>redaction"]
-        LLM --> G5 --> G2 --> G4 --> G1 --> G3
-    end
-
-    POL{"Stage 2<br/>gate policy<br/>P1, P2, P3"}
-    D["BLOCK<br/>REVIEW<br/>PASS"]
-
-    PR --> SC
-    PR --> G6
-    G6 -->|"hint injection"| LLM
-    SC --> POL
-    G3 --> POL
-    POL --> D
-```
+*Figure labels are German. Stufe 1 is stage 1, the guardrail layer: a G6 pre-hint
+before the model call, then the post-filter pipeline G5, G2, G4, G1, G3. Stufe 2
+is stage 2, the decision layer holding the three policies. The gate emits PASS,
+REVIEW or BLOCK, which map onto auto-merge, manual review and refused merge in the
+pull request lifecycle.*
 
 Stage 1 hardens the LLM reviewer against six failure modes. Stage 2 merges the
 cleaned output with the scanner signal into a deterministic gate decision, without
@@ -76,14 +63,14 @@ blocker. It feeds G4 through rule R7 as an ambiguity signal.
 They are not invented, and not read off the runs. They come from a systematic
 literature review (vom Brocke et al. for search, Webster and Watson for synthesis):
 
-```
-614 hits (IEEE Xplore, ACM DL, SpringerLink, Google Scholar, arXiv; 2023 to 2026)
- → 435 after deduplication
- → 123 after title and abstract screening
- →  67 full texts included, plus 12 via backward and forward snowballing
- →  79 primary studies → 17 failure-mode clusters
- →   6 evaluation failure modes
-```
+<img src="docs/figures/SLR_FlowChart.png" width="520" alt="PRISMA-style selection process from 614 database hits down to a final corpus of 79 studies">
+
+*Identifikation, Screening, Eignungsprüfung, Einschluss are identification,
+screening, eligibility and inclusion. 614 hits across IEEE Xplore, Google Scholar,
+ACM, SpringerLink and arXiv, 179 duplicates removed, 312 excluded on title and
+abstract, 56 excluded on full text, 12 added by backward and forward snowballing.
+Final corpus 79 studies, condensed into 17 failure-mode clusters and reduced to 6
+evaluation failure modes.*
 
 The reduction from 17 to 6 uses Hevner's three DSR requirements as explicit
 selection criteria (problem relevance, artifact addressability, evaluability),
@@ -134,6 +121,17 @@ here was built manually against explicit criteria and peer-reviewed by two
 independent master's students in computer science, with disagreements resolved by
 adjudication.
 
+![Dataset construction: data sources, quality assurance chain, and the final 250 sample corpus](docs/figures/Datensatz_Abbildung.png)
+
+*Datenquellen are the data sources, Qualitätssicherung the quality assurance chain
+(label criteria after Basak et al., independent peer review of the annotations,
+adjudication on disagreement, final ground truth release), Finaler Datensatz the
+resulting corpus. Stressfälle are the stress cases.*
+
+The figure counts samples by construction stage. Inside the data file they carry
+`sample_id` prefixes, which group them differently. Both views describe the same
+250 samples:
+
 | Group | n | Ground truth | Construction |
 |---|---|---|---|
 | `REAL_*` | 75 | secret | Real public PR diffs, dummy secret injected (50 baseline, 25 perturbed) |
@@ -141,6 +139,10 @@ adjudication.
 | `NEG_CLEAN_*` | 25 | clean | Clean diffs, no secret candidate |
 | `NEG_DECOY_*` | 25 | clean | Secret-shaped values that are not credentials |
 | `HARD_*` | 50 | mixed | Hand-written format stress cases (FM4a, FM4b, G6) |
+
+The figure's 100 stress cases are the 25 perturbed `REAL_*`, the 25 perturbed
+`SYNTH_*` and the 50 `HARD_*` samples taken together, which is why it shows 50
+real and 50 synthetic where the table shows 75 of each.
 
 A value is labelled a secret only if it is not reconstructable without the original
 context, opens a security-relevant access vector on disclosure, and is hardcoded as
@@ -162,6 +164,15 @@ secrets but are not, a recall-maximising system scores well by flagging everythi
 ---
 
 ## Results
+
+![Evaluation pipeline: the benchmark dataset runs through scanner baseline, LLM baseline, guardrail reviewer and policy engine, producing detection and operational metrics](docs/figures/EvaluationAbbildung.png)
+
+*Empirische Erhebung is the empirical measurement stage, Deterministische
+Aggregation the deterministic aggregation, Ergebnisdimensionen the result
+dimensions, Vorher-Nacher Wirkung the paired before and after comparison, Externe
+Plausibilitätsprüfung the external plausibility check on real open-source pull
+requests. TF 1 to TF 3 are the three sub-questions. Operative Metriken are the
+leak-escape and false-block rates.*
 
 Alert-level scoring: BLOCK and REVIEW both count as detection, since REVIEW routes
 to a human. A secret counts as missed only when it passes the gate as PASS.
@@ -399,7 +410,13 @@ docs/
   ARTIFACT_ARCHITECTURE.md    technical description of the artifact
   PERTURBATION_ENGINE.md      manipulation strategies
   SLR_FM_MetricsMapping.csv   literature-to-metric mapping from the SLR
+  figures/                    the thesis figures, German labels
 ```
+
+`docs/figures/` holds all nine figures from the thesis, including the three not
+used above: `PR_Schematisch.png` (anatomy of a pull request),
+`SLR_graphisch.png` (an alternative view of the literature search) and
+`Aufbau_der_Arbeit_Abbildung.png` (chapter structure mapped onto the DSR phases).
 
 Start with **`runs/thesis_evaluation_summary_alert_only.md`**. It names, for every
 figure, which file is authoritative and which is superseded.
