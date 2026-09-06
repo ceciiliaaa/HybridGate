@@ -181,14 +181,78 @@ def policy_resimulation_hook(
     results: List[Dict],
 ) -> Optional[List[Dict]]:
     """
-    Placeholder for future policy re-simulation.
+    Re-simulate P1/P2/P3 on guardrail inputs using current policy code.
 
-    Currently returns None — only the stored policy decisions from
-    results.json are evaluated (Section D1).  To add re-simulation,
-    implement custom P1/P2/P3 logic here and return a list of dicts
-    with the same schema as compute_all_policy_metrics() output.
+    Returns 6 rows (3 policies × 2 views, variant='guardrail') that
+    replace the stale stored-field guardrail rows from compute_all_policy_metrics().
+    Baseline rows are unaffected (still read from stored fields).
     """
-    return None
+    try:
+        from src.policies import P1SafetyNet, P2ContextualVeto, P3RiskWeighted
+        from src.scripts.run_policy_comparison_v2 import _guardrail_inputs
+    except ImportError:
+        return None
+
+    policies = [
+        ("p1", P1SafetyNet()),
+        ("p2", P2ContextualVeto()),
+        ("p3", P3RiskWeighted()),
+    ]
+
+    rows = []
+    for pname, policy_obj in policies:
+        sample_decisions: List[tuple] = []
+        for s in results:
+            inputs = _guardrail_inputs(s)
+            if inputs is None:
+                continue
+            dec = policy_obj.get_full_result(**inputs).decision.value
+            sample_decisions.append((dec, bool(s.get("gt_has_secret", False))))
+
+        n = len(sample_decisions)
+        n_pos = sum(1 for _, g in sample_decisions if g)
+        review_count = sum(1 for d, _ in sample_decisions if d == "REVIEW")
+        escaped = sum(1 for d, g in sample_decisions if g and d == "PASS")
+
+        for view in ("alert", "autonomous"):
+            tp = fp = tn = fn = 0
+            for dec, gt in sample_decisions:
+                pred = dec in ("BLOCK", "REVIEW") if view == "alert" else dec == "BLOCK"
+                if gt and pred:       tp += 1
+                elif not gt and pred: fp += 1
+                elif gt and not pred: fn += 1
+                else:                 tn += 1
+
+            prec = tp / (tp + fp) if (tp + fp) else 0.0
+            rec  = tp / (tp + fn) if (tp + fn) else 0.0
+            f1   = 2 * prec * rec / (prec + rec) if (prec + rec) else 0.0
+            spec = tn / (tn + fp) if (tn + fp) else 0.0
+            acc  = (tp + tn) / n if n else 0.0
+
+            rows.append({
+                "policy": pname,
+                "variant": "guardrail",
+                "view": view,
+                "total_evaluated": n,
+                "TP": tp, "FP": fp, "TN": tn, "FN": fn,
+                "skipped": 0,
+                "precision":    round(prec, 4),
+                "recall":       round(rec, 4),
+                "f1":           round(f1, 4),
+                "specificity":  round(spec, 4),
+                "accuracy":     round(acc, 4),
+                "escape_count": escaped,
+                "escape_rate":  round(escaped / n_pos, 4) if n_pos else 0.0,
+                "reviewer_load": round(review_count / n, 4) if n else 0.0,
+                "decision_distribution": {
+                    "BLOCK": sum(1 for d, _ in sample_decisions if d == "BLOCK"),
+                    "REVIEW": review_count,
+                    "PASS":  sum(1 for d, _ in sample_decisions if d == "PASS"),
+                    "total": n,
+                },
+            })
+
+    return rows
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -259,9 +323,10 @@ def main() -> None:
     logger.info("Computing policy metrics ...")
     policy_rows = compute_all_policy_metrics(results)
 
-    # Section D2: hook for future re-simulation
+    # Section D2: re-simulation with current policy code replaces stale guardrail rows
     resim = policy_resimulation_hook(results)
     if resim:
+        policy_rows = [r for r in policy_rows if r.get("variant") != "guardrail"]
         policy_rows.extend(resim)
 
     # ── 8. Statistical tests ──────────────────────────────────────

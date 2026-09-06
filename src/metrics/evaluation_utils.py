@@ -1095,6 +1095,30 @@ def compute_failure_mode_pri(results: List[Dict]) -> Dict[str, Any]:
     # FM5 residual intentionally not computed — not robustly observable.
 
     # ══════════════════════════════════════════════════════════════
+    #  FM6 — Format-Familiarity Failure  (G6: hint injection)
+    # ══════════════════════════════════════════════════════════════
+    # Evaluable: all samples where guardrail was run (G6 is a guardrail-side step).
+    fm6_evaluable = [s for s in results if s.get("llm_guardrail") is not None]
+    n_fm6 = len(fm6_evaluable)
+
+    # Prevalence: G6 identified a format-ambiguous candidate and injected a hint.
+    fm6_prev = [s for s in fm6_evaluable
+                if _g(s, "llm_guardrail", "g6_hint_injected") is True]
+    fm6_prev_n = len(fm6_prev)
+
+    # Intervention: by construction G6 always intervenes (injects hint) on every
+    # detected candidate — intervention_rate = 1.0 for all prevalence cases.
+    fm6_interv_n = fm6_prev_n
+
+    # Residual: hint injected, gt_has_secret=True, LLM still predicted no secret.
+    # Measures cases where G6 hint was insufficient to correct the detection failure.
+    fm6_resid_n = sum(
+        1 for s in fm6_prev
+        if s.get("gt_has_secret") is True
+        and _g(s, "llm_guardrail", "pred_has_secret") is False
+    )
+
+    # ══════════════════════════════════════════════════════════════
     #  Build output tables
     # ══════════════════════════════════════════════════════════════
 
@@ -1136,6 +1160,8 @@ def compute_failure_mode_pri(results: List[Dict]) -> Dict[str, Any]:
         _pri_row("FM5_schema_output_failure", "G5", n_fm5,
                  fm5_prev_n, fm5_interv_n, None,
                  "not_robustly_observable"),
+        _pri_row("FM6_format_familiarity", "G6", n_fm6,
+                 fm6_prev_n, fm6_interv_n, fm6_resid_n, "direct"),
     ]
 
     # ── 5B: PRI Definitions ──────────────────────────────────────
@@ -1226,6 +1252,25 @@ def compute_failure_mode_pri(results: List[Dict]) -> Dict[str, Any]:
                 "reported because absence of G5 routing does not robustly "
                 "indicate a persisting problematic end state.",
         },
+        {
+            "failure_mode": "FM6_format_familiarity",
+            "mapped_guardrail": "G6",
+            "prevalence_field_logic":
+                "llm_guardrail.g6_hint_injected == true",
+            "intervention_field_logic":
+                "llm_guardrail.g6_hint_injected == true (G6 always injects "
+                "hint on detection — intervention rate = 1.0 by construction)",
+            "residual_field_logic":
+                "llm_guardrail.g6_hint_injected == true "
+                "AND gt_has_secret == true "
+                "AND llm_guardrail.pred_has_secret == false",
+            "notes":
+                "G6 is a pre-processing guardrail that injects a format hint "
+                "before the LLM call. Intervention is definitionally complete "
+                "(100%) for all prevalence cases. Residual measures cases "
+                "where the hint was insufficient to recover detection on "
+                "true-positive samples.",
+        },
     ]
 
     # ── 5C: PRI Coverage / Observability ─────────────────────────
@@ -1305,6 +1350,22 @@ def compute_failure_mode_pri(results: List[Dict]) -> Dict[str, Any]:
                 "guardrail output side only. Residual not reported: no "
                 "independent post-intervention field to assess whether "
                 "schema failure persists as a problematic end state.",
+        },
+        {
+            "failure_mode": "FM6_format_familiarity",
+            "mapped_guardrail": "G6",
+            "n_baseline_evaluable": n_fm6,
+            "prevalence_base_n": fm6_prev_n,
+            "residual_observability": "direct",
+            "multi_fm_interference_note":
+                "G6 is a pre-processing guardrail (hint injection before LLM "
+                "call). Can co-occur with G4 on the same sample if LLM "
+                "uncertainty persists despite the hint.",
+            "notes":
+                "G6 intervenes by construction on every detected "
+                "format-candidate (intervention rate = 1.0). Residual "
+                "directly observable: gt_has_secret=true AND "
+                "pred_has_secret=false after hint injection.",
         },
     ]
 
