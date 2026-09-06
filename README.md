@@ -2,7 +2,17 @@
 
 **A hybrid pre-merge gate for detecting hardcoded secrets in pull requests, hardened by six guardrails**
 
-Cecilia Nothstein · Bachelor thesis, DHBW Stuttgart, Business Information Systems · written in cooperation with AI Security Engineering at Mercedes-Benz Group AG · submitted 11 May 2026
+<p>
+  <img src="https://img.shields.io/badge/Bachelor%20Thesis-Cecilia%20Nothstein-c084fc?style=flat-square" alt="Bachelor thesis by Cecilia Nothstein">
+  <img src="https://img.shields.io/badge/DHBW%20Stuttgart-Business%20Information%20Systems-a78bfa?style=flat-square" alt="DHBW Stuttgart, Business Information Systems">
+  <img src="https://img.shields.io/badge/written%20at-Mercedes--Benz%20AI%20Security%20Engineering-f472b6?style=flat-square" alt="Written at Mercedes-Benz AI Security Engineering">
+</p>
+<p>
+  <img src="https://img.shields.io/github/actions/workflow/status/ceciiliaaa/BA/tests.yml?branch=main&label=tests&style=flat-square&color=ec4899" alt="Test status">
+  <img src="https://img.shields.io/badge/metrics-reproduce%20byte%20for%20byte-db2777?style=flat-square" alt="Metrics reproduce byte for byte">
+  <img src="https://img.shields.io/badge/python-3.10%2B-9333ea?style=flat-square" alt="Python 3.10 or newer">
+  <img src="https://img.shields.io/badge/submitted-11%20May%202026-8b5cf6?style=flat-square" alt="Submitted 11 May 2026">
+</p>
 
 Secret scanners miss roughly a third of hardcoded credentials, because a value's
 sensitivity comes from how it is used rather than from how it looks. An LLM
@@ -419,6 +429,10 @@ to this repository.
 ---
 
 ## Contact
+
+Six months of work, two providers, 250 samples and one evaluation run that was
+silently wrong for a while. If you read this far and want to talk about guardrails,
+secret detection or the places where this breaks, I would genuinely enjoy that.
 
 Cecilia Nothstein · <Cecilia.Nothstein@gmail.com>
 
