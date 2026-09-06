@@ -213,18 +213,9 @@ detection logic.
 
 ![The three gate policies as decision functions over the signal variables](docs/figures/gate-policies.png)
 
-P1 is implemented exactly as printed above. P2 and P3 are not. The implementation
-evaluates:
-
-```
-P2   PASS   if  S ∧ ¬P̂ ∧ ¬F ∧ ¬C                  (¬R dropped, ¬C added)
-P3   σ  =  2S + 2L_B + 𝟙(L_R ∨ R) + Q + F + C      (Q and C added)
-```
-
-Both deviations are set out in
-[Where implementation and thesis diverge](#where-implementation-and-thesis-diverge).
-Every number reported below comes from the implementation, never from the printed
-formulas.
+*The logic as implemented in this repository, which is what every number below was
+produced from. The thesis prints the P2 veto and the P3 score differently, see
+[Where implementation and thesis diverge](#where-implementation-and-thesis-diverge).*
 
 In P3 a BLOCK always requires a detection signal, so context alone can never block.
 
@@ -294,7 +285,7 @@ the written specification and this repository do not match:
 |---|---|---|
 | G4 score, Eq. 4.1 | σ_u = Σ w_i · f_i with threshold θ_u, alongside the hard rules | Not implemented. Only the seven ordered rules in [`REVIEW_RULES`](src/guardrails/g4_uncertainty.py#L654) |
 | G4 flags, App. 4/6 | 9 uncertainty flags | 13, in [`KNOWN_UNCERTAINTY_FLAGS`](src/guardrails/g4_uncertainty.py#L41) |
-| P2 veto, Eq. 4.4 | S ∧ ¬P̂ ∧ ¬R ∧ ¬F | S ∧ ¬pred ∧ ¬F ∧ ¬C |
+| P2 veto, Eq. 4.4 | S ∧ ¬P̂ ∧ ¬R ∧ ¬F | S ∧ ¬P̂ ∧ ¬F ∧ ¬C |
 | P3 score, Eq. 4.5 | σ = 2S + 2L_B + 𝟙(L_R ∨ R) + F | σ = 2S + 2L_B + 𝟙(L_R ∨ R) + Q + F + C |
 
 The P2 deviation was deliberate. G4 fires on every `NEG_DECOY` sample, so keeping
