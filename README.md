@@ -431,10 +431,9 @@ to this repository.
 
 ## Contact
 
-If you work on LLM reliability, secret detection or DevSecOps tooling, I would be
-glad to talk about the method, the results, or the places where this still breaks.
+If you are interested in LLM security, reliable AI systems, DevSecOps, or guardrail architectures, I am happy to discuss the research, methodology, or implementation! ✨
 
-Cecilia Nothstein · <Cecilia.Nothstein@gmail.com>
+Cecilia Nothstein, <Cecilia.Nothstein@gmail.com>
 
 Bachelor thesis, DHBW Stuttgart, 2026. Code and data are released for review of the
 thesis. Please get in touch before reuse.
