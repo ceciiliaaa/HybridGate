@@ -19,7 +19,8 @@ authoritative code evidence from the contributor's free text.*
 
 This repository is the artifact of a Design Science Research thesis asking where
 those failure modes limit an LLM reviewer, and how far a deterministic layer
-around it can make one reliable enough for a DevSecOps pre-merge gate.
+around it can make LLM-assisted review more reliable and more controllable
+inside a DevSecOps pre-merge gate.
 
 > **RQ** What limits emerge when LLM-assisted code review is used to detect
 > hardcoded secrets in pull requests, and to what extent can they be secured
@@ -304,10 +305,12 @@ as printed in the thesis.
 Two further design decisions did not survive contact with the data. **G6 does not
 generalise**: detection with hint is 93.3% on OpenAI against 33.3% on Anthropic, and
 corrected for base rates the Anthropic gain is 0.6 points, within noise. And an
-entire evaluation run was **silently invalid** when G5 rejected the `confidence`
-field that G4 requires, misrouting 166 of 200 samples and producing a guardrail
-recall of 2%. The broken run is kept at `runs/archive/v120_final_extreme_openai/`
-next to its corrected successor.
+intermediate evaluation run was **invalidated by a schema incompatibility**: G5
+rejected the `confidence` field that G4 requires, which misrouted 166 of 200 samples
+and produced a guardrail recall of 2%. The run passed without raising an error,
+which is why the pipeline now validates that field explicitly. It is retained for
+provenance at `runs/archive/v120_final_extreme_openai/`, next to its corrected
+successor, and excluded from every reported result.
 
 ---
 
@@ -428,9 +431,8 @@ to this repository.
 
 ## Contact
 
-Six months of work, two providers, 250 samples and one evaluation run that was
-silently wrong for a while. If you read this far and want to talk about guardrails,
-secret detection or the places where this breaks, I would genuinely enjoy that.
+If you work on LLM reliability, secret detection or DevSecOps tooling, I would be
+glad to talk about the method, the results, or the places where this still breaks.
 
 Cecilia Nothstein · <Cecilia.Nothstein@gmail.com>
 
