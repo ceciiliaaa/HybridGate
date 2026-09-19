@@ -435,5 +435,16 @@ If you are interested in LLM security, reliable AI systems, DevSecOps, or guardr
 
 Cecilia Nothstein, <Cecilia.Nothstein@gmail.com>
 
-Bachelor thesis, DHBW Stuttgart, 2026. Code and data are released for review of the
-thesis. Please get in touch before reuse.
+Bachelor thesis, DHBW Stuttgart, 2026.
+
+---
+
+## License
+
+The code in this repository is released under the **MIT License**, see
+[`LICENSE`](LICENSE). The benchmark dataset under `data/`, the evaluation outputs
+under `runs/` and the figures under `docs/figures/` are released under
+**CC BY 4.0**, so they may be reused with attribution.
+
+If you build on this work, a citation of the thesis is appreciated but not
+required by either licence.
