@@ -27,7 +27,6 @@ from guardrails.g3_redaction import (
     _detect_candidate_echo,
     _detect_reconstructed_leak,
     _sanitize_output,
-    _run_detection,
     _shannon_entropy,
 )
 

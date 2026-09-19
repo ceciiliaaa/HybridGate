@@ -13,7 +13,6 @@ Author: Cecilia Nothstein
 
 from __future__ import annotations
 
-import math
 from collections import Counter, defaultdict
 from typing import Any, Callable, Dict, List, Optional, Tuple
 

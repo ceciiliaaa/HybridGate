@@ -188,7 +188,7 @@ def prepare_new_version(description: str = None, force_archive: bool = True) -> 
     print(f"Prepared for new version: {new_version}")
     print(f"Previous version: {old_version} (safely archived)")
     print(f"Cleared files: {', '.join(cleared_files)}")
-    print(f"Manifest updated. Generate new data files now.")
+    print("Manifest updated. Generate new data files now.")
 
     return new_version
 

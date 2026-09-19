@@ -5,7 +5,7 @@ Implements statistical significance tests for comparing detection methods:
 - McNemar Test: For comparing paired binary classifiers
 """
 
-from typing import Dict, List, Any, Tuple, Optional
+from typing import Dict, List, Any
 from dataclasses import dataclass
 import math
 

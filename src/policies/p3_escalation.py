@@ -13,7 +13,7 @@ Design Decision:
 
 import re
 from typing import Optional
-from .base import Policy, PolicyDecision, PolicyResult, LLMDecision
+from .base import Policy, PolicyDecision, PolicyResult
 
 
 class P3Escalation(Policy):

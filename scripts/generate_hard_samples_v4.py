@@ -2,7 +2,7 @@
 """Generate 8 additional Format-Familiarity-Bias hard samples (HARD_329–336).
 
 Each sample exploits a DIFFERENT 'known non-secret format' than v1–v3.
-Appends to hardSamples_claude_komprimiert.json.
+Appends to hardSamples_claude_compressed.json.
 
 New formats (not yet covered by 301–328):
   - Base64 digest (44-char, SHA-256-as-base64)
@@ -23,7 +23,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "data" / "03_baseline" / "hardSamples_claude_komprimiert.json"
+OUT = ROOT / "data" / "03_baseline" / "hardSamples_claude_compressed.json"
 
 existing = json.loads(OUT.read_text())
 print(f"Existing: {len(existing)} samples")

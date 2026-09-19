@@ -14,7 +14,6 @@ import logging
 import os
 import time
 from dataclasses import dataclass, asdict
-from pathlib import Path
 from typing import List, Dict, Optional
 from dotenv import load_dotenv
 from openai import OpenAI

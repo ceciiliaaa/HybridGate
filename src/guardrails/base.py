@@ -6,7 +6,7 @@ Defines abstract interface and data structures for guardrail implementations.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Optional, Dict, Any
+from typing import Dict, Any
 
 
 @dataclass

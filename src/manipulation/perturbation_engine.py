@@ -555,7 +555,7 @@ class E3A_StringConcatenation(PerturbationStrategy):
             if quoted in line:
                 return line.replace(quoted, replacement, 1)
         # Fallback: should not happen if extract_secret_from_line worked
-        logger.warning(f"Could not find quoted secret in line, using raw replace")
+        logger.warning("Could not find quoted secret in line, using raw replace")
         return line.replace(secret, replacement, 1)
 
     def _split_secret_parts(self, secret: str) -> Tuple[Optional[str], Optional[str]]:
@@ -1202,7 +1202,7 @@ class PerturbationEngine:
         print(f"\nBaseline samples loaded: {len(baseline_samples)}")
         print(f"Seed: {self.config.seed}")
         print(f"Include baseline in output: {self.config.include_baseline}")
-        print(f"\nActive strategies and target counts:")
+        print("\nActive strategies and target counts:")
 
         total_target = 0
         total_available = 0

@@ -5,7 +5,7 @@ on LLM-based secret detection robustness.
 
 Usage:
     export GITHUB_TOKEN=ghp_your_token_here
-    python3 scripts/plausibilitaetspruefung.py
+    python3 scripts/plausibility_check.py
 
 Output:
     - collected_prs.json: Structured metadata of found PRs
@@ -18,7 +18,6 @@ import json
 import csv
 import os
 import time
-from datetime import datetime
 from pathlib import Path
 
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
@@ -72,7 +71,7 @@ def search_prs(query: str, max_results: int = 10) -> list:
     resp = requests.get(url, headers=HEADERS, params=params)
 
     if resp.status_code == 403:
-        print(f"  Rate limited. Waiting 60s...")
+        print("  Rate limited. Waiting 60s...")
         time.sleep(60)
         resp = requests.get(url, headers=HEADERS, params=params)
 
@@ -181,7 +180,7 @@ def main():
 
             diff = get_pr_diff(owner, repo, pr_number)
             if not diff:
-                print(f"    Skipped: could not fetch diff")
+                print("    Skipped: could not fetch diff")
                 continue
 
             if len(diff) > 500_000:
@@ -190,7 +189,7 @@ def main():
 
             indicators = contains_secret_indicators(diff)
             if not indicators:
-                print(f"    Skipped: no secret indicators in diff")
+                print("    Skipped: no secret indicators in diff")
                 continue
 
             details = get_pr_details(owner, repo, pr_number)
@@ -251,7 +250,7 @@ def main():
                 writer.writerow(row)
 
     print(f"\n{'=' * 60}")
-    print(f"RESULTS")
+    print("RESULTS")
     print(f"{'=' * 60}")
     print(f"Total PRs collected: {len(all_prs)}")
     print(f"JSON output: {json_path}")
@@ -259,7 +258,7 @@ def main():
     print(f"Diffs saved: {DIFF_DIR}/")
 
     if all_prs:
-        print(f"\nSecret type distribution:")
+        print("\nSecret type distribution:")
         type_counts = {}
         for pr in all_prs:
             for t in pr["secret_indicators"]:
@@ -267,11 +266,11 @@ def main():
         for t, c in sorted(type_counts.items(), key=lambda x: -x[1]):
             print(f"  {t}: {c}")
 
-    print(f"\n--- IMPORTANT ---")
-    print(f"1. Review each diff manually before using in your thesis")
-    print(f"2. Verify that secrets are truly hard-coded (not env vars, not test fixtures)")
-    print(f"3. Check that secrets are already revoked/rotated (ethical requirement)")
-    print(f"4. The sanitize function is basic - do a manual pass for real values")
+    print("\n--- IMPORTANT ---")
+    print("1. Review each diff manually before using in your thesis")
+    print("2. Verify that secrets are truly hard-coded (not env vars, not test fixtures)")
+    print("3. Check that secrets are already revoked/rotated (ethical requirement)")
+    print("4. The sanitize function is basic - do a manual pass for real values")
     print(f"5. Select your final 20 from the {len(all_prs)} collected for diversity")
 
 

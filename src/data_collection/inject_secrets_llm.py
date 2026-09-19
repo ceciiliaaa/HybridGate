@@ -21,10 +21,9 @@ import os
 import re
 from dataclasses import dataclass, asdict
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional
 from dotenv import load_dotenv
 import openai
-import random
 
 
 # Load environment variables

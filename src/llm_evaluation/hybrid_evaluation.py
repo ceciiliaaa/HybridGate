@@ -29,7 +29,6 @@ Bachelor Thesis: Robustness of LLM-based Code Reviews for Hardcoded Secret Detec
 import argparse
 import json
 import logging
-import os
 import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -53,9 +52,9 @@ from .run_evaluation import (
 )
 
 # Import new HybridGate components
-from ..scanners import GitleaksScanner, DetectSecretsScanner, ScanResult
+from ..scanners import GitleaksScanner, DetectSecretsScanner
 from ..guardrails import (
-    get_guardrail_bundle, get_g6_hint, get_g6_prescan,
+    get_guardrail_bundle, get_g6_prescan,
     apply_guardrails, apply_guardrails_with_routing,
     GuardrailSettings, DEFAULT_SETTINGS,
     G1EvidenceLocation, G2UntrustedInput, G4Uncertainty,
@@ -388,7 +387,7 @@ class HybridEvaluationClient:
         # =====================================================================
         prediction = extract_json(raw_response)
         if prediction is None:
-            logger.error(f"Failed to parse JSON from LLM response")
+            logger.error("Failed to parse JSON from LLM response")
             return None
 
         return {
@@ -786,12 +785,12 @@ class HybridEvaluationRunner:
             return True
 
         if self.resume_mode == "fresh":
-            logger.info(f"Checkpoint found but --fresh specified. Starting from scratch.")
+            logger.info("Checkpoint found but --fresh specified. Starting from scratch.")
             return False
 
         # Interactive mode (default)
         print(f"\n{'='*60}")
-        print(f"  CHECKPOINT FOUND")
+        print("  CHECKPOINT FOUND")
         print(f"  Completed: {completed}/{total} samples")
         print(f"  Last updated: {last_updated}")
         print(f"  Input: {checkpoint.get('input_path', 'unknown')}")

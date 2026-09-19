@@ -402,7 +402,7 @@ runs/
                               v120 invalid, v121 its fix, v130 the source of the
                               three substituted FM5 samples
 scripts/
-  plausibilitaetspruefung.py  collects the real PRs for the external check
+  plausibility_check.py        collects the real PRs for the external check
 tests/                        128 tests over G3, G4, G5, routing, policy REVIEW
 docs/
   ARTIFACT_ARCHITECTURE.md    technical description of the artifact

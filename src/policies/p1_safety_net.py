@@ -82,7 +82,7 @@ class P1SafetyNet(Policy):
                 return "REVIEW: Hard-fail condition (G5 schema invalid or G3 leak persisted)"
             if (llm_decision or "").upper() == "REVIEW":
                 return f"REVIEW: LLM uncertain (decision={llm_dec})"
-            return f"REVIEW: Epistemic signal from guardrails"
+            return "REVIEW: Epistemic signal from guardrails"
 
         return "PASS: No detection from scanner or LLM"
 

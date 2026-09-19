@@ -135,9 +135,9 @@ def create_token(user_id):
         lines = code.split('\n')
         diff_lines = [
             f'diff --git a/{file_path} b/{file_path}',
-            f'new file mode 100644',
-            f'index 0000000..1234567',
-            f'--- /dev/null',
+            'new file mode 100644',
+            'index 0000000..1234567',
+            '--- /dev/null',
             f'+++ b/{file_path}',
             f'@@ -0,0 +1,{len(lines)} @@'
         ]
@@ -282,8 +282,8 @@ class HybridBaselineBuilder:
             else:
                 # Fallback to default metadata
                 pr_data = {
-                    'title': f'Add configuration for service integration',
-                    'body': f'This PR adds necessary configuration for third-party service integration.'
+                    'title': 'Add configuration for service integration',
+                    'body': 'This PR adds necessary configuration for third-party service integration.'
                 }
 
             sample = self.generate_sample(pr_data, i + 1)

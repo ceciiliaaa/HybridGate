@@ -139,7 +139,7 @@ def evaluate_condition(
         pred, raw = run_sample(client, effective_system_prompt, user_prompt, sid)
 
         if pred is None:
-            print(f"  => PARSE ERROR")
+            print("  => PARSE ERROR")
             results.append({
                 "sample_id": sid,
                 "condition": s.get("condition", ""),
@@ -361,7 +361,7 @@ def main():
         print(f"\n{'='*60}")
         print("CONDITION: G6 forced-reasoning + experimental review floor")
         print(f"{'='*60}")
-        print(f"  (Derived from g6_forced — no additional API calls)")
+        print("  (Derived from g6_forced — no additional API calls)")
         print(f"  Samples with g6_analysis: "
               f"{verdict_stats['samples_with_g6_analysis']}")
         print(f"  Samples with escalation verdict (uncertain/likely_secret): "

@@ -23,7 +23,7 @@ Design constraints:
 """
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Optional
 
 from .base import Guardrail, GuardrailConfig

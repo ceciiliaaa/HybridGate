@@ -7,7 +7,7 @@ Computes standard ML metrics for secret detection models:
 - Location accuracy
 """
 
-from typing import Dict, List, Any, Tuple
+from typing import Dict, List, Any
 from dataclasses import dataclass
 
 

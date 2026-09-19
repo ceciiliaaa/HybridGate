@@ -121,21 +121,21 @@ def print_quality_report(metrics: QualityMetrics, name: str):
     print(f"  Total Samples:      {metrics.total_samples}")
     print(f"  Positive (secrets): {metrics.positive_samples}")
     print(f"  Negative (clean):   {metrics.negative_samples}")
-    print(f"")
+    print("")
     print(f"  Unique Secrets:     {metrics.unique_secrets}")
     print(f"  Duplicate Rate:     {metrics.duplicate_rate*100:.1f}%")
-    print(f"")
-    print(f"  Secret Type Distribution:")
+    print("")
+    print("  Secret Type Distribution:")
     for stype, count in sorted(metrics.secret_type_distribution.items()):
         pct = count / metrics.positive_samples * 100 if metrics.positive_samples > 0 else 0
         print(f"    - {stype}: {count} ({pct:.1f}%)")
-    print(f"")
+    print("")
     print(f"  Unique Code Contexts: {metrics.unique_code_contexts}")
     print(f"  Context Diversity:    {metrics.context_diversity_score*100:.1f}%")
 
     if metrics.duplicate_groups:
-        print(f"")
-        print(f"  Most Duplicated Secrets:")
+        print("")
+        print("  Most Duplicated Secrets:")
         for secret, count in metrics.duplicate_groups[:5]:
             print(f"    - '{secret}': {count}x")
     print(f"{'='*60}\n")
@@ -160,7 +160,7 @@ def compare_datasets(old_metrics: QualityMetrics, new_metrics: QualityMetrics,
             return "→ (no change)"
         return f"{symbol} {color}{abs(diff):.1f}"
 
-    print(f"")
+    print("")
     print(f"  Metric                    {old_name:>12}  {new_name:>12}  Change")
     print(f"  {'-'*54}")
     print(f"  Unique Secrets            {old_metrics.unique_secrets:>12}  {new_metrics.unique_secrets:>12}  {fmt_change(old_metrics.unique_secrets, new_metrics.unique_secrets)}")

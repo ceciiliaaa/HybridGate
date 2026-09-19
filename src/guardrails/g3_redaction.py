@@ -35,7 +35,7 @@ import json
 import math
 import re
 from copy import deepcopy
-from typing import Dict, List, Optional, Set, Tuple, Any
+from typing import Dict, List, Set, Tuple, Any
 
 from .base import Guardrail, GuardrailResult
 

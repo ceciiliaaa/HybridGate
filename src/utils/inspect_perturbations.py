@@ -7,7 +7,7 @@ making it easy to verify that manipulations were applied correctly.
 
 import json
 import logging
-from typing import List, Dict, Optional
+from typing import List, Dict
 from collections import defaultdict
 
 logging.basicConfig(level=logging.INFO)

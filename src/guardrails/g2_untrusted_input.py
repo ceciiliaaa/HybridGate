@@ -20,8 +20,7 @@ G2 does NOT validate:
     - Uncertainty calibration     (→ G4)
 """
 
-import re
-from typing import Dict, List, Optional, Tuple
+from typing import List, Optional, Tuple
 from .base import Guardrail, GuardrailResult
 
 
