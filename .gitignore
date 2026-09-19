@@ -80,3 +80,8 @@ outputs/
 *.tmp
 *.bak
 *.swp
+
+# Local working documents, not part of the artifact
+*.docx
+*.doc
+*.pptx
